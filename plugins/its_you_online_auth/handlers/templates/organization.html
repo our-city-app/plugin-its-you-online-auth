@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Organization | Framework</title>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
+<link href="/static/demo/web/css/style.css" rel="stylesheet" type="text/css" media="all" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+$( function() {
+    $("#submit_client_id").click(function() {
+        var clientId = $("#client_id").val();
+        window.location.assign(window.location.pathname + "?source={{ source }}&client_id=" + clientId);
+    });
+});
+</script>
+
+</head>
+<body>
+	<!---header--->
+<div class="header">
+	<div class="wrap">
+		<div class="logo">
+			<a href="/"><img src="/static/demo/web/images/logo.png" alt=""/></a>
+		</div>
+		<div class="clear"> </div>
+    </div>
+</div>
+<!-- start main -->
+<div class="main_bg">
+<div class="wrap">
+<div class="main">
+	<div class="login_left">
+		<h3>Organization</h3>
+		<p>Enter the name of the organization to continue</p>
+		<input id="client_id" placeholder="enter..." type="text" tabindex="1" required="" autofocus="">
+		<input id="submit_client_id" type="submit" value="Submit">
+		
+		{% if error %}
+		<p style="color: red;">{{ error }}</p>
+		{% endif %}
+		
+	</div>
+	<div class="clear"></div>
+</div>
+</div>
+</div>
+<div class="footer-bottom">
+<div class="wrap">
+   <div class="copy-right">
+		 <p>Copyright 2014. All Rights Reserved</p>
+   </div>
+	<div class="copy">
+		 <p>Template by <a href="http://w3layouts.com">w3layouts</a></p>
+   </div>
+</div>
+</div>
+</body>
+</html>

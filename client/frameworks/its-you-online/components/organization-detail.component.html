@@ -1,0 +1,73 @@
+<form (submit)="save(organization)" #organizationForm="ngForm">
+  <div fxLayout="column" fxFlex="40" fxFlex.md="60" fxFlex.xs="100">
+    <md-input-container>
+      <input md-input [(ngModel)]="organization.name" name="newOrganizationName"
+             [placeholder]="'organization_name' | translate" required>
+    </md-input-container>
+
+    <md-input-container>
+      <input md-input [(ngModel)]="organization.client_id" name="client_id" [placeholder]="'client_id' | translate"
+             required [disabled]="!isNew" pattern="^[a-z\d\-_\s]{3,150}$">
+    </md-input-container>
+    <h3>{{ 'auto_connected_services' | translate }}</h3>
+    <md-chip-list>
+      <md-chip *ngFor="let acs of organization.auto_connected_services" class="md-primary"
+               (click)="showConfirmRemoveACS(acs)">
+        {{ acs }}
+      </md-chip>
+    </md-chip-list>
+    <br/>
+    <div fxLayout="row" fxLayoutAlign="center center">
+      <md-input-container fxFlex>
+        <input md-input name="newACS" [(ngModel)]="newACS" type="email"
+               placeholder="{{ 'new_auto_connected_service' | translate }}"
+               pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+               #newACSElem="ngModel"/>
+      </md-input-container>
+      <button type="button" md-button md-raised-button (click)="addAutoConnectedInput();"
+              [disabled]="!newACS || !newACSElem.valid">
+        {{ 'add' | translate }}
+      </button>
+    </div>
+    <h3>{{ 'roles' | translate }}</h3>
+    <md-list>
+      <md-list-item *ngFor="let role of organization.roles">
+        <h4 md-line>{{ 'service' | translate }}: {{ role.service }}</h4>
+        <p md-line>{{ 'identity'| translate }}: {{ role.identity }}</p>
+        <p md-line class="demo-secondary-text">{{ 'role_ids_x'|translate:{ids:role.ids} }}</p>
+        <button md-icon-button (click)="removeRole(role)">
+          <md-icon>delete</md-icon>
+        </button>
+      </md-list-item>
+    </md-list>
+    <md-input-container>
+      <input md-input name="newRoleService" [(ngModel)]="newRole.service" type="email"
+             placeholder="{{ 'service' | translate }}"
+             pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+             #newRoleServiceElem="ngModel"/>
+    </md-input-container>
+    <md-input-container>
+      <input md-input name="newRoleIdentity" [(ngModel)]="newRole.identity" type="text"
+             placeholder="{{ 'identity' | translate }}"
+             #newRoleIdentityElem="ngModel"/>
+    </md-input-container>
+    <md-input-container>
+      <input md-input name="newRoleIds" [(ngModel)]="newRoleIds" type="text"
+             placeholder="{{ 'role_ids' | translate }}"
+             #newRoleIdsElem="ngModel"/>
+    </md-input-container>
+    <div fxLayoutAlign="end center">
+      <button type="button" md-button md-raised-button (click)="addRole();"
+              [disabled]="!newRole.service || !newRole.identity ||  !newRoleServiceElem.valid || !newRoleIdentityElem.valid">
+        {{ 'add_role' | translate }}
+      </button>
+    </div>
+  </div>
+  <br/>
+  <div>
+    <button type="submit" md-button md-raised-button color="primary" [disabled]="!organizationForm.form.valid">
+      {{(isNew ? 'add_organization' : 'update_organization') | translate}}
+    </button>
+    <p *ngIf="status">{{ status | translate }}</p>
+  </div>
+</form>

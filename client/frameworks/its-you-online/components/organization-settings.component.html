@@ -1,0 +1,14 @@
+<h3 md-subheader>Organizations</h3>
+<a md-button md-raised-button [routerLink]="'/itsyouonlinesettings/organizations/create'">
+  {{ 'add_organization' | translate }}
+</a>
+<md-nav-list fxLayout="column" fxFlex="40" fxFlex.md="60" fxFlex.xs="100">
+  <md-list-item *ngFor="let organization of (organizations$ | async)"
+                [routerLink]="'/itsyouonlinesettings/organizations/' + clientId(organization)">
+    <h4 md-line>{{ organization.name }}</h4>
+    <p md-line class="list-secondary-text">{{ organization.client_id }}</p>
+    <button md-icon-button (click)="deleteOrganization(organization)">
+      <md-icon>delete</md-icon>
+    </button>
+  </md-list-item>
+</md-nav-list>
