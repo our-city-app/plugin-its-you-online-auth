@@ -15,12 +15,6 @@
 #
 # @@license_version:1.1@@
 
-import requests_toolbelt.adapters.appengine
-from auth import get_current_session
-from mcfw.consts import AUTHENTICATED
-from mcfw.restapi import rest_functions
-from plugin_loader import AuthPlugin
-from plugin_loader import get_plugin
 from plugins.its_you_online_auth.api import authenticated
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
     PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler
@@ -28,6 +22,13 @@ from plugins.its_you_online_auth.plugin_consts import Scopes
 from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
 from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
 from plugins.rogerthat_api.rogerthat_api_plugin import RogerthatApiPlugin
+
+import requests_toolbelt.adapters.appengine
+from auth import get_current_session
+from mcfw.consts import AUTHENTICATED
+from mcfw.restapi import rest_functions
+from plugin_loader import AuthPlugin
+from plugin_loader import get_plugin
 from utils import Handler
 
 requests_toolbelt.adapters.appengine.monkeypatch()
@@ -63,7 +64,7 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
         return self.configuration.cookie_key
 
     def get_visible_modules(self):
-        modules = ['home', 'news']
+        modules = ['home']
         scopes = get_current_session().scopes
         if Scopes.ADMIN in scopes:
             modules.append('its_you_online_settings')

@@ -1,4 +1,12 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  OnDestroy,
+  ChangeDetectorRef
+} from '@angular/core';
 import { Organization, RegistrationResultRoles } from '../types/organization.types';
 import { ActionTypes, IOrganizationsActions } from '../actions/organizations.action';
 import { Store } from '@ngrx/store';
@@ -45,7 +53,7 @@ export class OrganizationDetailComponent implements OnDestroy {
   @Output() remove = new EventEmitter<Organization>();
 
   constructor(private log: LogService, private store: Store<IOrganizationsState>, public routerext: RouterExtensions,
-              public dialog: MdDialog, public translate: TranslateService) {
+              public dialog: MdDialog, public translate: TranslateService, private cdRef: ChangeDetectorRef) {
     this.newRole = Object.assign({}, this.emptyRole);
     this.statusSubscription = store.select((state: any) => state.organizations.organizationStatus).subscribe((status: string) => {
       if (ActionTypes.EDITED === status) {
@@ -57,6 +65,7 @@ export class OrganizationDetailComponent implements OnDestroy {
       }
       setTimeout(() => {
         this.status = null;
+        cdRef.markForCheck();
       }, 5000);
     });
   }
@@ -87,6 +96,7 @@ export class OrganizationDetailComponent implements OnDestroy {
 
   public removeAutoConnectedService(acs: string) {
     this.organization.auto_connected_services = this.organization.auto_connected_services.filter(a => a !== acs);
+    this.cdRef.markForCheck();
   }
 
   public addRole() {
