@@ -17,7 +17,7 @@ export const ItsYouOnlineAuthRoutes: Array<Route> = [
     component: CreateOrganizationComponent
   },
   {
-    path: 'itsyouonlinesettings/organizations/:client_id',
+    path: 'itsyouonlinesettings/organizations/:organization_id',
     component: ViewOrganizationComponent
   }
 ];

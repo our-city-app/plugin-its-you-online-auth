@@ -52,14 +52,14 @@ def friend_register(rt_settings, id_, service_identity, user_details, origin, da
 
         scope = data.get("result", {}).get("scope")
         config = get_config(NAMESPACE)
-        expected_scope = "user:memberof:%s" % get_sub_organization(config, login_state.client_id)
+        expected_scope = "user:memberof:%s" % get_sub_organization(config, login_state.organization_id)
         if not scope or scope != expected_scope:
             return DECLINE_ID
 
         profile_key = Profile.create_key(login_state.source, username)
         profile = profile_key.get() or Profile(key=profile_key)
         profile.access_token = access_token
-        profile.client_id = login_state.client_id
+        profile.organization_id = login_state.organization_id
         profile.app_email = u"%s:%s" % (user_details[0]['email'], user_details[0]['app_id'])
         login_state.completed = True
         ndb.put_multi([profile, login_state])
@@ -69,7 +69,7 @@ def friend_register(rt_settings, id_, service_identity, user_details, origin, da
         r.auto_connected_services = []
         r.roles = []
         try:
-            organization = get_organization(login_state.client_id)
+            organization = get_organization(login_state.organization_id)
             r.auto_connected_services = organization.auto_connected_services
             if organization.roles:
                 r.roles = parse_complex_value(RegistrationResultRolesTO, json.loads(organization.roles), True)

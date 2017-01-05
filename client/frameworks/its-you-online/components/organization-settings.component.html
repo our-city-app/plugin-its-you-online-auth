@@ -4,9 +4,9 @@
 </a>
 <md-nav-list fxLayout="column" fxFlex="40" fxFlex.md="60" fxFlex.xs="100">
   <md-list-item *ngFor="let organization of (organizations$ | async)"
-                [routerLink]="'/itsyouonlinesettings/organizations/' + clientId(organization)">
+                [routerLink]="'/itsyouonlinesettings/organizations/' + organizationId(organization)">
     <h4 md-line>{{ organization.name }}</h4>
-    <p md-line class="list-secondary-text">{{ organization.client_id }}</p>
+    <p md-line class="list-secondary-text">{{ organization.id }}</p>
     <button md-icon-button (click)="deleteOrganization(organization)">
       <md-icon>delete</md-icon>
     </button>

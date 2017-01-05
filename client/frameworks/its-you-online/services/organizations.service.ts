@@ -24,8 +24,8 @@ export class OrganizationsService extends Analytics {
       .map(res => res.json());
   }
 
-  getOrganization(clientId: string): Observable<Organization> {
-    return this.http.get(`${ItsYouOnlineConfig.API_URL}/organizations/${encodeURIComponent(clientId)}`)
+  getOrganization(id: string): Observable<Organization> {
+    return this.http.get(`${ItsYouOnlineConfig.API_URL}/organizations/${encodeURIComponent(id)}`)
       .map(res => res.json());
   }
 
@@ -35,13 +35,13 @@ export class OrganizationsService extends Analytics {
   }
 
   updateOrganization(organization: Organization): Observable<Organization> {
-    const url = `${ItsYouOnlineConfig.API_URL}/organizations/${encodeURIComponent(organization.client_id)}`;
+    const url = `${ItsYouOnlineConfig.API_URL}/organizations/${encodeURIComponent(organization.id)}`;
     return this.http.put(url, organization)
       .map(res => res.json());
   }
 
   deleteOrganization(organization: Organization): Observable<Organization> {
-    return this.http.delete(`${ItsYouOnlineConfig.API_URL}/organizations/${encodeURIComponent(organization.client_id)}`)
+    return this.http.delete(`${ItsYouOnlineConfig.API_URL}/organizations/${encodeURIComponent(organization.id)}`)
       .map(res => organization);
   }
 }

@@ -18,8 +18,8 @@ export function getOrganizations(state$: Observable<IOrganizationsState>) {
 }
 
 export function getOrganization(state$: Observable<IOrganizationsState>) {
-  return state$.select(state => state.organizations.filter(o => o.client_id === state.selectedOrganization)[ 0 ] || {
-    client_id: '',
+  return state$.select(state => state.organizations.filter(o => o.id === state.selectedOrganization)[ 0 ] || {
+    id: '',
     name: '',
     auto_connected_services: [],
     roles: [],

@@ -5,7 +5,7 @@
   "new_module": "New module",
   "do_you_want_to_delete_module": "Do you want to delete module '{{ m }}' ?",
   "auto_connected_services": "Auto connected services",
-  "client_id": "Client id",
+  "organization_id": "Organization id",
   "do_you_want_to_delete_auto_connected_service": "Do you want to delete auto connected service '{{ acs }}' ?",
   "identity": "Identity",
   "invalid_roles": "Invalid role(s). Roles should be a list of integers, comma separated.",

@@ -18,8 +18,8 @@ export class ViewOrganizationComponent implements OnDestroy {
 
   constructor(private store: Store<IOrganizationsState>, route: ActivatedRoute) {
     this.actionsSubscription = route.params
-      .select<string>('client_id')
-      .map(clientId => new organizationActions.GetOrganizationAction(clientId))
+      .select<string>('organization_id')
+      .map(organizationId => new organizationActions.GetOrganizationAction(organizationId))
       .subscribe(store);
   }
 

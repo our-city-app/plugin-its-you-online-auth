@@ -3,7 +3,7 @@ export class RegistrationResultRoles {
   }
 }
 export class Organization {
-  constructor(public name: string, public client_id: string, public auto_connected_services: string[],
+  constructor(public name: string, public id: string, public auto_connected_services: string[],
               public roles: RegistrationResultRoles[], public modules: string[]) {
   }
 }

@@ -26,7 +26,7 @@ export function organizationsReducer(state: IOrganizationsState = initialState,
       };
     case actions.ActionTypes.EDITED:
       const org = <Organization>action.payload;
-      organizations = state.organizations.filter(o => o.client_id !== org.client_id);
+      organizations = state.organizations.filter(o => o.id !== org.id);
       return (<any>Object).assign({}, state, {
         organizations: [ ...organizations, org ],
         selectedOrganization: state.selectedOrganization,
@@ -35,14 +35,14 @@ export function organizationsReducer(state: IOrganizationsState = initialState,
     case actions.ActionTypes.GET_ORGANIZATION_COMPLETE:
       const organization = <Organization>action.payload;
 
-      if (state.organizations.find(organization => organization.client_id === organization.client_id)) {
+      if (state.organizations.find(organization => organization.id === organization.id)) {
         // already present in the state
         return Object.assign({}, state, {organizationStatus: action.type});
       }
 
       return Object.assign({}, state, {
         organizations: [ ...state.organizations, organization ],
-        selectedOrganization: organization.client_id,
+        selectedOrganization: organization.id,
         organizationStatus: action.type
       });
     case actions.ActionTypes.ORGANIZATION_ADDED:
@@ -53,7 +53,7 @@ export function organizationsReducer(state: IOrganizationsState = initialState,
       });
     case actions.ActionTypes.DELETED:
       organizations = state.organizations.filter(org => {
-        return org.client_id !== (<Organization>action.payload).client_id;
+        return org.id !== (<Organization>action.payload).id;
       });
       return (<any>Object).assign({}, state, {
         organizations: organizations,

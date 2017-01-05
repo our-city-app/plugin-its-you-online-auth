@@ -40,35 +40,35 @@ def api_get_organizations():
 @arguments(data=OrganizationTO)
 def api_create_organization(data):
     try:
-        organization = create_organization(data.client_id, data.name, data.auto_connected_services, data.roles, data.modules)
+        organization = create_organization(data.id, data.name, data.auto_connected_services, data.roles, data.modules)
         return OrganizationTO.from_model(organization)
     except OrganizationAlreadyExistsException as e:
         raise HttpConflictException(e.message)
 
 
-@rest('/organizations/<client_id:[^/]+>', 'get', [Scopes.ADMIN])
+@rest('/organizations/<organization_id:[^/]+>', 'get', [Scopes.ADMIN])
 @returns(OrganizationTO)
-@arguments(client_id=unicode)
-def api_get_organization(client_id):
+@arguments(organization_id=unicode)
+def api_get_organization(organization_id):
     try:
-        return OrganizationTO.from_model(get_organization(client_id))
+        return OrganizationTO.from_model(get_organization(organization_id))
     except OrganizationNotFoundException as e:
         raise HttpNotFoundException(e.message)
 
 
-@rest('/organizations/<client_id:[^/]+>', 'put', [Scopes.ADMIN])
+@rest('/organizations/<organization_id:[^/]+>', 'put', [Scopes.ADMIN])
 @returns(OrganizationTO)
-@arguments(client_id=unicode, data=OrganizationTO)
-def api_update_organization(client_id, data):
+@arguments(organization_id=unicode, data=OrganizationTO)
+def api_update_organization(organization_id, data):
     try:
-        organization = update_organization(client_id, data.name, data.auto_connected_services, data.roles, data.modules)
+        organization = update_organization(organization_id, data.name, data.auto_connected_services, data.roles, data.modules)
         return OrganizationTO.from_model(organization)
     except OrganizationNotFoundException as e:
         raise HttpNotFoundException(e.message)
 
 
-@rest('/organizations/<client_id:[^/]+>', 'delete', [Scopes.ADMIN])
+@rest('/organizations/<organization_id:[^/]+>', 'delete', [Scopes.ADMIN])
 @returns(OrganizationTO)
-@arguments(client_id=unicode)
-def api_delete_organization(client_id):
-    delete_organization(client_id)
+@arguments(organization_id=unicode)
+def api_delete_organization(organization_id):
+    delete_organization(organization_id)

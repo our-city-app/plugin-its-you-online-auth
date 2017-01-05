@@ -63,22 +63,22 @@ class AppLoginHandler(webapp2.RequestHandler):
 
 class PickOrganizationHandler(webapp2.RequestHandler):
     def get(self):
-        client_id = self.request.GET.get('client_id', None)
+        organization_id = self.request.GET.get('organization_id', None)
         source = self.request.GET.get('source', SOURCE_WEB)
 
         error = None
-        if client_id:
+        if organization_id:
             config = get_config(NAMESPACE)
-            if client_id != config.root_organization.name:
+            if organization_id != config.root_organization.name:
                 try:
-                    get_organization(client_id)
+                    get_organization(organization_id)
                 except OrganizationNotFoundException as e:
                     error = e.message
 
             if not error:
                 params = dict()
                 params['source'] = source
-                params['client_id'] = client_id
+                params['organization_id'] = organization_id
                 self.redirect('/login/redirect?%s' % urllib.urlencode(params))
                 return
 
@@ -91,17 +91,17 @@ class PickOrganizationHandler(webapp2.RequestHandler):
 
 class DoLoginHandler(webapp2.RequestHandler):
     def get(self):
-        client_id = self.request.GET.get('client_id', None)
+        organization_id = self.request.GET.get('organization_id', None)
         source = self.request.GET.get('source', SOURCE_WEB)
 
-        if not client_id:
+        if not organization_id:
             self.redirect('/login/organization')
             return
 
         config = get_config(NAMESPACE)
-        if client_id != config.root_organization.name:
+        if organization_id != config.root_organization.name:
             try:
-                get_organization(client_id)
+                get_organization(organization_id)
             except OrganizationNotFoundException as e:
                 render_error_page(self.response, httplib.BAD_REQUEST, e.message)
                 return
@@ -110,14 +110,14 @@ class DoLoginHandler(webapp2.RequestHandler):
             render_error_page(self.response, httplib.BAD_REQUEST, 'Bad Request')
             return
 
-        if client_id == config.root_organization.name:
+        if organization_id == config.root_organization.name:
             if source == SOURCE_APP:
                 render_error_page(self.response, httplib.BAD_REQUEST, 'Bad Request')
                 return
             else:
-                sub_org = client_id
+                sub_org = organization_id
         else:
-            sub_org = get_sub_organization(config, client_id)
+            sub_org = get_sub_organization(config, organization_id)
 
         params = {
             'response_type': 'code',
@@ -129,7 +129,7 @@ class DoLoginHandler(webapp2.RequestHandler):
 
         login_state = OauthLoginState(key=OauthLoginState.create_key(params['state']))
         login_state.timestamp = now()
-        login_state.client_id = client_id
+        login_state.organization_id = organization_id
         login_state.source = source
         login_state.completed = False
         login_state.put()

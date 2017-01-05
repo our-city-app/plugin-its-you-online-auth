@@ -80,13 +80,13 @@ def get_user_scopes(code, state):
     scope = access_result.get('scope')
 
 
-    if login_state.client_id == config.root_organization.name:
+    if login_state.organization_id == config.root_organization.name:
         if login_state.source == "app":
             raise HttpForbiddenException()
         else:
-            sub_org = login_state.client_id
+            sub_org = login_state.organization_id
     else:
-        sub_org = get_sub_organization(config, login_state.client_id)
+        sub_org = get_sub_organization(config, login_state.organization_id)
 
     expected_scope = 'user:memberof:%s' % sub_org
     if not scope or expected_scope not in scope:
@@ -95,7 +95,7 @@ def get_user_scopes(code, state):
     profile_key = Profile.create_key(login_state.source, username)
     profile = profile_key.get() or Profile(key=profile_key)
     profile.access_token = access_result.get('access_token')
-    profile.client_id = login_state.client_id
+    profile.organization_id = login_state.organization_id
     login_state.completed = True
     ndb.put_multi([profile, login_state])
 
@@ -108,8 +108,8 @@ def get_user_scopes(code, state):
     if has_access_to_organization(client, uber_admin_organization, username):
         scopes.append(Scopes.ADMIN)
     if has_access_to_organization(client, admin_organization, username):
-        scopes.append(Scopes.get_organization_scope(Scopes.ORGANIZATION_ADMIN, login_state.client_id))
-        scopes.append(Scopes.get_organization_scope(Scopes.ORGANIZATION_MEMBER, login_state.client_id))
+        scopes.append(Scopes.get_organization_scope(Scopes.ORGANIZATION_ADMIN, login_state.organization_id))
+        scopes.append(Scopes.get_organization_scope(Scopes.ORGANIZATION_MEMBER, login_state.organization_id))
     elif not has_access_to_organization(client, sub_org, username):
         raise HttpForbiddenException()
     return username, scopes

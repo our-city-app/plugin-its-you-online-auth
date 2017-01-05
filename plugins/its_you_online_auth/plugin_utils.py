@@ -16,5 +16,5 @@
 # @@license_version:1.1@@
 
 
-def get_sub_organization(config, client_id):
-    return "%s.organizations.%s" % (config.root_organization.name, client_id)
+def get_sub_organization(config, organization_id):
+    return "%s.organizations.%s" % (config.root_organization.name, organization_id)

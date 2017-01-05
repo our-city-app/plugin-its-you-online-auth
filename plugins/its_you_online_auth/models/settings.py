@@ -34,12 +34,12 @@ class ItsYouOnlineOrganization(ndb.Model):
     modules = ndb.StringProperty(indexed=False, repeated=True)
 
     @property
-    def client_id(self):
+    def organization_id(self):
         return self.key.id().decode('utf8')
 
     @classmethod
-    def create_key(cls, client_id):
-        return ndb.Key(cls, client_id, namespace=plugin_consts.NAMESPACE)
+    def create_key(cls, organization_id):
+        return ndb.Key(cls, organization_id, namespace=plugin_consts.NAMESPACE)
 
     @classmethod
     def query(cls, *args, **kwargs):

@@ -21,7 +21,7 @@ from plugins.its_you_online_auth import plugin_consts
 
 class OauthLoginState(ndb.Model):
     timestamp = ndb.IntegerProperty(indexed=False)
-    client_id = ndb.StringProperty(indexed=False)
+    organization_id = ndb.StringProperty(indexed=False)
     source = ndb.StringProperty(indexed=False)
     completed = ndb.BooleanProperty(indexed=False)
 
@@ -36,7 +36,7 @@ class OauthLoginState(ndb.Model):
 
 class Profile(ndb.Model):
     access_token = ndb.StringProperty(indexed=False)
-    client_id = ndb.StringProperty(indexed=False)
+    organization_id = ndb.StringProperty(indexed=False)
     app_email = ndb.StringProperty(indexed=False)
 
     @property

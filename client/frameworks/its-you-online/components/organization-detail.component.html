@@ -6,7 +6,7 @@
     </md-input-container>
 
     <md-input-container>
-      <input md-input [(ngModel)]="organization.client_id" name="client_id" [placeholder]="'client_id' | translate"
+      <input md-input [(ngModel)]="organization.id" name="organization_id" [placeholder]="'organization_id' | translate"
              required [disabled]="!isNew" pattern="^[a-z\d\-_\s]{3,150}$">
     </md-input-container>
     <h3>{{ 'modules' | translate }}</h3>

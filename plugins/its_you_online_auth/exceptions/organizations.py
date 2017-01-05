@@ -17,14 +17,14 @@
 
 
 class OrganizationNotFoundException(Exception):
-    def __init__(self, client_id):
-        self.client_id = client_id
-        msg = 'Organization with client id \'%s\' does not exists' % self.client_id
+    def __init__(self, organization_id):
+        self.organization_id = organization_id
+        msg = 'Organization with id \'%s\' does not exists' % self.organization_id
         super(OrganizationNotFoundException, self).__init__(msg)
 
 
 class OrganizationAlreadyExistsException(Exception):
-    def __init__(self, client_id):
-        self.client_id = client_id
-        msg = 'Organization with client id \'%s\' already exists' % self.client_id
+    def __init__(self, organization_id):
+        self.organization_id = organization_id
+        msg = 'Organization with client id \'%s\' already exists' % self.organization_id
         super(OrganizationAlreadyExistsException, self).__init__(msg)

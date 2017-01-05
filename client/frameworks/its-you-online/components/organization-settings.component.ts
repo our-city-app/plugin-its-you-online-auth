@@ -22,8 +22,8 @@ export class OrganizationSettingsComponent {
     this.organizations$ = store.let(states.getOrganizations);
   }
 
-  public clientId(organization: Organization) {
-    return organization.client_id;
+  public organizationId(organization: Organization) {
+    return organization.id;
   }
 
   public deleteOrganization(organization: Organization) {
