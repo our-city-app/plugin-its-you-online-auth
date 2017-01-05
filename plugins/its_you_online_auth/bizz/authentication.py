@@ -79,7 +79,6 @@ def get_user_scopes(code, state):
     username = access_result['info']['username']
     scope = access_result.get('scope')
 
-
     if login_state.organization_id == config.root_organization.name:
         if login_state.source == "app":
             raise HttpForbiddenException()

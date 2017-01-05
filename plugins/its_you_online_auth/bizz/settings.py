@@ -36,7 +36,8 @@ def get_organization(organization_id):
 
 
 @returns(ItsYouOnlineOrganization)
-@arguments(organization_id=unicode, name=unicode, auto_connected_services=[unicode], roles=[RegistrationResultRolesTO], modules=[unicode])
+@arguments(organization_id=unicode, name=unicode, auto_connected_services=[unicode],
+           roles=[RegistrationResultRolesTO], modules=[unicode])
 def create_organization(organization_id, name, auto_connected_services, roles, modules):
     key = ItsYouOnlineOrganization.create_key(organization_id)
     if key.get():
@@ -44,14 +45,16 @@ def create_organization(organization_id, name, auto_connected_services, roles, m
     organization = ItsYouOnlineOrganization(key=key)
     organization.name = name
     organization.auto_connected_services = auto_connected_services
-    organization.roles = [OrganizationRole(service=role.service, identity=role.identity, ids=role.ids) for role in roles]
+    organization.roles = [OrganizationRole(service=role.service, identity=role.identity, ids=role.ids)
+                          for role in roles]
     organization.modules = modules
     organization.put()
     return organization
 
 
 @returns(ItsYouOnlineOrganization)
-@arguments(organization_id=unicode, name=unicode, auto_connected_services=[unicode], roles=[RegistrationResultRolesTO], modules=[unicode])
+@arguments(organization_id=unicode, name=unicode, auto_connected_services=[unicode],
+           roles=[RegistrationResultRolesTO], modules=[unicode])
 def update_organization(organization_id, name, auto_connected_services, roles, modules):
     key = ItsYouOnlineOrganization.create_key(organization_id)
     organization = key.get()
@@ -59,7 +62,8 @@ def update_organization(organization_id, name, auto_connected_services, roles, m
         raise OrganizationNotFoundException(organization_id)
     organization.name = name
     organization.auto_connected_services = auto_connected_services
-    organization.roles = [OrganizationRole(service=role.service, identity=role.identity, ids=role.ids) for role in roles]
+    organization.roles = [OrganizationRole(service=role.service, identity=role.identity, ids=role.ids)
+                          for role in roles]
     organization.modules = modules
     organization.put()
     return organization

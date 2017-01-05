@@ -25,6 +25,7 @@ from plugins.its_you_online_auth.exceptions.organizations import OrganizationNot
 from plugins.its_you_online_auth.plugin_consts import Scopes
 from plugins.its_you_online_auth.to.organizations import OrganizationTO
 
+
 @rest('/organizations', 'get', [Scopes.ADMIN])
 @returns([OrganizationTO])
 @arguments()
@@ -61,7 +62,11 @@ def api_get_organization(organization_id):
 @arguments(organization_id=unicode, data=OrganizationTO)
 def api_update_organization(organization_id, data):
     try:
-        organization = update_organization(organization_id, data.name, data.auto_connected_services, data.roles, data.modules)
+        organization = update_organization(organization_id,
+                                           data.name,
+                                           data.auto_connected_services,
+                                           data.roles,
+                                           data.modules)
         return OrganizationTO.from_model(organization)
     except OrganizationNotFoundException as e:
         raise HttpNotFoundException(e.message)

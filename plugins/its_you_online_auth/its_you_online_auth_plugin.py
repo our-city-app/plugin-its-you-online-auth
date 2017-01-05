@@ -61,7 +61,7 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
     def get_modules(self):
         # TODO: create an admin page organization admins
         # yield Module(name="its_you_online_settings", scopes=[Scopes.ORGANIZATION_ADMIN])
-        yield Module(name="its_you_online_settings", scopes=[Scopes.ADMIN])
+        yield Module(name='its_you_online_settings', scopes=[Scopes.ADMIN])
 
     def get_login_url(self):
         return self.configuration.login_url
@@ -82,7 +82,8 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
             return []
 
         organization_id = profile.organization_id
-        logging.debug("get_visible_modules\n- organization_id: %s\n- user_id: %s\n- scopes: %s", organization_id, user_id, scopes)
+        logging.debug('get_visible_modules\n- organization_id: %s\n- user_id: %s\n- scopes: %s',
+                      organization_id, user_id, scopes)
         if not organization_id:
             return []
 
@@ -97,8 +98,14 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
                 for m in p.get_modules():
                     if m.name not in organization.modules:
                         continue
+                    module_scopes = list()
+                    for scope in m.scopes:
+                        if Scopes.get_organization_scope(scope, organization_id) in scopes:
+                            module_scopes.append(True)
+                        else:
+                            module_scopes.append(False)
 
-                    if m.scopes and not any([True if Scopes.get_organization_scope(scope, organization_id) in scopes else False for scope in m.scopes]):
+                    if m.scopes and not any(module_scopes):
                         continue
 
                     visible_modules.add(m.name)
@@ -107,4 +114,3 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
         except:
             logging.debug('Failed to get visible modules', exc_info=True)
             return []
-
