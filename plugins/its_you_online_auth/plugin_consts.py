@@ -25,9 +25,9 @@ SOURCE_APP = 'app'
 
 class Scopes(object):
     ADMIN = 'admin'
-    ORGANIZATION_MEMBER = 'memberof:{organization}'
-    ORGANIZATION_ADMIN = 'memberof:{organization}:admin'
+    ORGANIZATION_MEMBER = 'memberof:{organization_id}'
+    ORGANIZATION_ADMIN = 'memberof:{organization_id}:admin'
 
     @classmethod
-    def get_organization_scope(cls, scope, organization):
-        return scope.replace('{organization}', organization)
+    def get_organization_scope(cls, scope, organization_id):
+        return scope.replace('{organization_id}', organization_id)

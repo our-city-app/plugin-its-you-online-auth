@@ -46,7 +46,7 @@ def api_create_organization(data):
         raise HttpConflictException(e.message)
 
 
-@rest('/organizations/<organization_id:[^/]+>', 'get', [Scopes.ADMIN])
+@rest('/organizations/<organization_id:[^/]+>', 'get', [Scopes.ADMIN, Scopes.ORGANIZATION_ADMIN])
 @returns(OrganizationTO)
 @arguments(organization_id=unicode)
 def api_get_organization(organization_id):
@@ -56,7 +56,7 @@ def api_get_organization(organization_id):
         raise HttpNotFoundException(e.message)
 
 
-@rest('/organizations/<organization_id:[^/]+>', 'put', [Scopes.ADMIN])
+@rest('/organizations/<organization_id:[^/]+>', 'put', [Scopes.ADMIN, Scopes.ORGANIZATION_ADMIN])
 @returns(OrganizationTO)
 @arguments(organization_id=unicode, data=OrganizationTO)
 def api_update_organization(organization_id, data):
