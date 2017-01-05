@@ -56,10 +56,8 @@ def friend_register(rt_settings, id_, service_identity, user_details, origin, da
         if not scope or scope != expected_scope:
             return DECLINE_ID
 
-        profile_key = Profile.create_key(username)
-        profile = profile_key.get()
-        if not profile:
-            profile = Profile(key=profile_key)
+        profile_key = Profile.create_key(login_state.source, username)
+        profile = profile_key.get() or Profile(key=profile_key)
         profile.access_token = access_token
         profile.client_id = login_state.client_id
         profile.app_email = u"%s:%s" % (user_details[0]['email'], user_details[0]['app_id'])

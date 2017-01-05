@@ -19,6 +19,9 @@ NAMESPACE = 'its_you_online_auth'
 ITS_YOU_ONLINE_DOMAIN = 'itsyou.online'
 OAUTH_BASE_URL = 'https://itsyou.online/v1/oauth'
 
+SOURCE_WEB = 'web'
+SOURCE_APP = 'app'
+
 
 class Scopes(object):
     ADMIN = 'admin'

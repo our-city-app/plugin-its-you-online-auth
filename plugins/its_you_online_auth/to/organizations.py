@@ -24,16 +24,20 @@ class OrganizationTO(object):
     name = unicode_property('2')
     auto_connected_services = unicode_list_property('3')
     roles = typed_property('4', RegistrationResultRolesTO, True)
+    modules = unicode_list_property('5')
 
-    def __init__(self, client_id=None, name=None, auto_connected_services=None, roles=None):
+    def __init__(self, client_id=None, name=None, auto_connected_services=None, roles=None, modules=None):
         if auto_connected_services is None:
             auto_connected_services = []
         if roles is None:
             roles = []
+        if modules is None:
+            modules = []
         self.client_id = client_id
         self.name = name
         self.auto_connected_services = auto_connected_services
         self.roles = roles
+        self.modules = modules
 
     @classmethod
     def from_model(cls, organization):
@@ -50,4 +54,8 @@ class OrganizationTO(object):
                 to.ids = organization_role.ids
                 roles_to.append(to)
 
-        return cls(organization.client_id, organization.name, organization.auto_connected_services, roles_to)
+        return cls(organization.client_id,
+                   organization.name,
+                   organization.auto_connected_services,
+                   roles_to,
+                   organization.modules)

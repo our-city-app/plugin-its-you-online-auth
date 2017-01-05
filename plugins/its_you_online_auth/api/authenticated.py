@@ -40,7 +40,7 @@ def api_get_organizations():
 @arguments(data=OrganizationTO)
 def api_create_organization(data):
     try:
-        organization = create_organization(data.client_id, data.name, data.auto_connected_services, data.roles)
+        organization = create_organization(data.client_id, data.name, data.auto_connected_services, data.roles, data.modules)
         return OrganizationTO.from_model(organization)
     except OrganizationAlreadyExistsException as e:
         raise HttpConflictException(e.message)
@@ -61,7 +61,7 @@ def api_get_organization(client_id):
 @arguments(client_id=unicode, data=OrganizationTO)
 def api_update_organization(client_id, data):
     try:
-        organization = update_organization(client_id, data.name, data.auto_connected_services, data.roles)
+        organization = update_organization(client_id, data.name, data.auto_connected_services, data.roles, data.modules)
         return OrganizationTO.from_model(organization)
     except OrganizationNotFoundException as e:
         raise HttpNotFoundException(e.message)

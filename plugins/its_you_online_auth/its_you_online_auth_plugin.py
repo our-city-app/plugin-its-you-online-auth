@@ -15,21 +15,25 @@
 #
 # @@license_version:1.1@@
 
-from plugins.its_you_online_auth.api import authenticated
-from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
-    PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler
-from plugins.its_you_online_auth.plugin_consts import Scopes
-from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
-from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
-from plugins.rogerthat_api.rogerthat_api_plugin import RogerthatApiPlugin
+import logging
 
-import requests_toolbelt.adapters.appengine
 from auth import get_current_session
 from mcfw.consts import AUTHENTICATED
 from mcfw.restapi import rest_functions
-from plugin_loader import AuthPlugin
+from plugin_loader import AuthPlugin, get_plugins, get_config
 from plugin_loader import get_plugin
-from utils import Handler
+from plugins.its_you_online_auth.api import authenticated
+from plugins.its_you_online_auth.bizz.settings import get_organization
+from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
+    PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler
+from plugins.its_you_online_auth.models import Profile
+from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_WEB
+from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
+from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
+from plugins.rogerthat_api.rogerthat_api_plugin import RogerthatApiPlugin
+import requests_toolbelt.adapters.appengine
+from utils import Handler, Module
+
 
 requests_toolbelt.adapters.appengine.monkeypatch()
 
@@ -54,6 +58,10 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
             for url, handler in rest_functions(authenticated, authentication=AUTHENTICATED):
                 yield Handler(url=url, handler=handler)
 
+    def get_modules(self):
+        yield Module(name="its_you_online_settings", scopes=[Scopes.ORGANIZATION_ADMIN])
+        yield Module(name="its_you_online_settings", scopes=[Scopes.ADMIN])
+
     def get_login_url(self):
         return self.configuration.login_url
 
@@ -64,8 +72,38 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
         return self.configuration.cookie_key
 
     def get_visible_modules(self):
-        modules = ['home']
-        scopes = get_current_session().scopes
-        if Scopes.ADMIN in scopes:
-            modules.append('its_you_online_settings')
-        return modules
+        session = get_current_session()
+        user_id = session.user_id
+        scopes = session.scopes
+
+        profile = Profile.create_key(SOURCE_WEB, user_id).get()
+        if not profile:
+            return []
+
+        client_id = profile.client_id
+        logging.debug("get_visible_modules\n- client_id: %s\n- user_id: %s\n- scopes: %s", client_id, user_id, scopes)
+        if not client_id:
+            return []
+
+        config = get_config(NAMESPACE)
+        if client_id == config.root_organization.name:
+            return ['its_you_online_settings']
+
+        try:
+            organization = get_organization(client_id)
+            visible_modules = set()
+            for p in get_plugins():
+                for m in p.get_modules():
+                    if m.name not in organization.modules:
+                        continue
+
+                    if m.scopes and not any([True if Scopes.get_organization_scope(scope, client_id) in scopes else False for scope in m.scopes]):
+                        continue
+
+                    visible_modules.add(m.name)
+
+            return list(visible_modules)
+        except:
+            logging.debug('Failed to get visible modules', exc_info=True)
+            return []
+

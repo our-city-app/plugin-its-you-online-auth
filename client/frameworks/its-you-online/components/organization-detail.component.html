@@ -9,6 +9,25 @@
       <input md-input [(ngModel)]="organization.client_id" name="client_id" [placeholder]="'client_id' | translate"
              required [disabled]="!isNew" pattern="^[a-z\d\-_\s]{3,150}$">
     </md-input-container>
+    <h3>{{ 'modules' | translate }}</h3>
+    <md-chip-list>
+      <md-chip *ngFor="let m of organization.modules" class="md-primary"
+               (click)="showConfirmRemoveModule(m)">
+        {{ m }}
+      </md-chip>
+    </md-chip-list>
+    <br/>
+    <div fxLayout="row" fxLayoutAlign="center center">
+      <md-input-container fxFlex>
+        <input md-input name="newModule" [(ngModel)]="newModule" type="email"
+               placeholder="{{ 'new_module' | translate }}"
+               #newModuleElem="ngModel"/>
+      </md-input-container>
+      <button type="button" md-button md-raised-button (click)="addModuleInput();"
+              [disabled]="!newModule || !newModuleElem.valid">
+        {{ 'add' | translate }}
+      </button>
+    </div>
     <h3>{{ 'auto_connected_services' | translate }}</h3>
     <md-chip-list>
       <md-chip *ngFor="let acs of organization.auto_connected_services" class="md-primary"

@@ -31,6 +31,7 @@ class ItsYouOnlineOrganization(ndb.Model):
     scopes = ndb.StringProperty(indexed=False, repeated=True)
     auto_connected_services = ndb.StringProperty(indexed=False, repeated=True)
     roles = ndb.LocalStructuredProperty(OrganizationRole, repeated=True)
+    modules = ndb.StringProperty(indexed=False, repeated=True)
 
     @property
     def client_id(self):

@@ -40,9 +40,14 @@ class Profile(ndb.Model):
     app_email = ndb.StringProperty(indexed=False)
 
     @property
+    def source(self):
+        return self.parent_key().id().decode('utf8')
+
+    @property
     def username(self):
         return self.key.id().decode('utf8')
 
     @classmethod
-    def create_key(cls, username):
-        return ndb.Key(cls, username, namespace=plugin_consts.NAMESPACE)
+    def create_key(cls, source, username):
+        parent_key = ndb.Key(cls, source, namespace=plugin_consts.NAMESPACE)
+        return ndb.Key(cls, username, parent=parent_key)

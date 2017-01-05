@@ -36,8 +36,8 @@ def get_organization(client_id):
 
 
 @returns(ItsYouOnlineOrganization)
-@arguments(client_id=unicode, name=unicode, auto_connected_services=[unicode], roles=[RegistrationResultRolesTO])
-def create_organization(client_id, name, auto_connected_services, roles):
+@arguments(client_id=unicode, name=unicode, auto_connected_services=[unicode], roles=[RegistrationResultRolesTO], modules=[unicode])
+def create_organization(client_id, name, auto_connected_services, roles, modules):
     key = ItsYouOnlineOrganization.create_key(client_id)
     if key.get():
         raise OrganizationAlreadyExistsException(client_id)
@@ -45,13 +45,14 @@ def create_organization(client_id, name, auto_connected_services, roles):
     organization.name = name
     organization.auto_connected_services = auto_connected_services
     organization.roles = [OrganizationRole(service=role.service, identity=role.identity, ids=role.ids) for role in roles]
+    organization.modules = modules
     organization.put()
     return organization
 
 
 @returns(ItsYouOnlineOrganization)
-@arguments(client_id=unicode, name=unicode, auto_connected_services=[unicode], roles=[RegistrationResultRolesTO])
-def update_organization(client_id, name, auto_connected_services, roles):
+@arguments(client_id=unicode, name=unicode, auto_connected_services=[unicode], roles=[RegistrationResultRolesTO], modules=[unicode])
+def update_organization(client_id, name, auto_connected_services, roles, modules):
     key = ItsYouOnlineOrganization.create_key(client_id)
     organization = key.get()
     if not organization:
@@ -59,6 +60,7 @@ def update_organization(client_id, name, auto_connected_services, roles):
     organization.name = name
     organization.auto_connected_services = auto_connected_services
     organization.roles = [OrganizationRole(service=role.service, identity=role.identity, ids=role.ids) for role in roles]
+    organization.modules = modules
     organization.put()
     return organization
 

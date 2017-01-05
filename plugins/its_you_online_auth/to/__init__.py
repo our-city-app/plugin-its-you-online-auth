@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 # @@license_version:1.1@@
+from plugins.its_you_online_auth.plugin_consts import SOURCE_WEB, SOURCE_APP
 
 
 class OauthConfig(object):
@@ -25,14 +26,14 @@ class OauthConfig(object):
 class RootOrganization(object):
     def __init__(self, config):
         self.name = config['name']
-        self.web = OauthConfig(config['web'])
-        self.app = OauthConfig(config['app'])
+        self.web = OauthConfig(config[SOURCE_WEB])
+        self.app = OauthConfig(config[SOURCE_APP])
 
     def __getitem__(self, key):
         if isinstance(key, (str, unicode)):
-            if key == 'web':
+            if key == SOURCE_WEB:
                 return self.web
-            if key == 'app':
+            if key == SOURCE_APP:
                 return self.app
         raise KeyError()
 

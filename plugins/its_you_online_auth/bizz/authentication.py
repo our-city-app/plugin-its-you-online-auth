@@ -92,7 +92,7 @@ def get_user_scopes(code, state):
     if not scope or expected_scope not in scope:
         raise HttpForbiddenException()
 
-    profile_key = Profile.create_key(username)
+    profile_key = Profile.create_key(login_state.source, username)
     profile = profile_key.get() or Profile(key=profile_key)
     profile.access_token = access_result.get('access_token')
     profile.client_id = login_state.client_id

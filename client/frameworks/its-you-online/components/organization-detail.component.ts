@@ -30,6 +30,7 @@ export class OrganizationDetailComponent implements OnDestroy {
   ActionTypes: IOrganizationsActions = ActionTypes;
   statusSubscription: Subscription;
   dialogRef: MdDialogRef<ConfirmDialogComponent>;
+  newModule: string;
   newACS: string;
   newRole: RegistrationResultRoles;
   newRoleIds: string;
@@ -86,6 +87,18 @@ export class OrganizationDetailComponent implements OnDestroy {
       this.update.emit(organization);
     }
   }
+  
+  public addModuleInput() {
+      if (this.organization.modules.indexOf(this.newModule) === -1) {
+        this.organization.modules = [ ...this.organization.modules, this.newModule ];
+      }
+      this.newModule = '';
+    }
+
+  public removeModule(thiz: OrganizationDetailComponent, m: string) {
+      thiz.organization.modules = thiz.organization.modules.filter(a => a !== m);
+      thiz.cdRef.markForCheck();
+  }
 
   public addAutoConnectedInput() {
     if (this.organization.auto_connected_services.indexOf(this.newACS) === -1) {
@@ -94,9 +107,9 @@ export class OrganizationDetailComponent implements OnDestroy {
     this.newACS = '';
   }
 
-  public removeAutoConnectedService(acs: string) {
-    this.organization.auto_connected_services = this.organization.auto_connected_services.filter(a => a !== acs);
-    this.cdRef.markForCheck();
+  public removeAutoConnectedService(thiz: OrganizationDetailComponent, acs: string) {
+    thiz.organization.auto_connected_services = thiz.organization.auto_connected_services.filter(a => a !== acs);
+    thiz.cdRef.markForCheck();
   }
 
   public addRole() {
@@ -115,31 +128,39 @@ export class OrganizationDetailComponent implements OnDestroy {
   public removeRole(role: RegistrationResultRoles) {
     this.organization.roles = this.organization.roles.filter(a => a !== role);
   }
-
-  public showConfirmRemoveACS(acs: string) {
-    let config: MdDialogConfig = {
-      disableClose: false,
-      width: '',
-      height: '',
-      position: {
-        top: '',
-        bottom: '',
-        left: '',
-        right: ''
-      }
-    };
-    this.dialogRef = this.dialog.open(ConfirmDialogComponent, config);
-    // TODO: https://github.com/angular/material2/pull/2266
-    this.dialogRef.componentInstance[ 'title' ] = this.translate.get('confirmation');
-    this.dialogRef.componentInstance[ 'message' ] = this.translate.get('do_you_want_to_delete_auto_connected_service', {acs: acs});
-    this.dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-      this.dialogRef = null;
-      if (confirmed) {
-        this.removeAutoConnectedService(acs);
-      }
-    });
+  
+  public showConfirmRemoveModule(m: string) {
+    this.showConfirmDialog(this.translate.get('confirmation'), this.translate.get('do_you_want_to_delete_module', {m: m}), this.removeModule, m);
   }
 
+  public showConfirmRemoveACS(acs: string) {
+    this.showConfirmDialog(this.translate.get('confirmation'), this.translate.get('do_you_want_to_delete_auto_connected_service', {acs: acs}), this.removeAutoConnectedService, acs);
+  }
+  
+  public showConfirmDialog(title: any, message: any, callback: any, callback_param: string) {
+      let config: MdDialogConfig = {
+          disableClose: false,
+          width: '',
+          height: '',
+          position: {
+            top: '',
+            bottom: '',
+            left: '',
+            right: ''
+          }
+      };
+      this.dialogRef = this.dialog.open(ConfirmDialogComponent, config);
+      // TODO: https://github.com/angular/material2/pull/2266
+      this.dialogRef.componentInstance[ 'title' ] = title;
+      this.dialogRef.componentInstance[ 'message' ] = message;
+      this.dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+          this.dialogRef = null;
+          if (confirmed) {
+              callback(this, callback_param);
+          }
+      });
+  }
+  
   ngOnDestroy(): void {
     this.statusSubscription.unsubscribe();
   }

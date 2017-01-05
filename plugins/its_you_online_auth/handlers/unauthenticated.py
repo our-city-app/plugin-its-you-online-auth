@@ -28,7 +28,7 @@ from plugins.its_you_online_auth.bizz.authentication import get_user_scopes
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
 from plugins.its_you_online_auth.models import OauthLoginState
-from plugins.its_you_online_auth.plugin_consts import OAUTH_BASE_URL, NAMESPACE
+from plugins.its_you_online_auth.plugin_consts import OAUTH_BASE_URL, NAMESPACE, SOURCE_WEB, SOURCE_APP
 from plugins.its_you_online_auth.plugin_utils import get_sub_organization
 from utils import now
 import webapp2
@@ -64,7 +64,7 @@ class AppLoginHandler(webapp2.RequestHandler):
 class PickOrganizationHandler(webapp2.RequestHandler):
     def get(self):
         client_id = self.request.GET.get('client_id', None)
-        source = self.request.GET.get('source', 'web')
+        source = self.request.GET.get('source', SOURCE_WEB)
 
         error = None
         if client_id:
@@ -84,7 +84,7 @@ class PickOrganizationHandler(webapp2.RequestHandler):
 
         path = os.path.join(os.path.dirname(__file__), 'templates', 'organization.html')
 
-        context = dict(source=self.request.GET.get('source', 'web'),
+        context = dict(source=self.request.GET.get('source', SOURCE_WEB),
                        error=error)
         self.response.out.write(template.render(path, context))
 
@@ -92,7 +92,7 @@ class PickOrganizationHandler(webapp2.RequestHandler):
 class DoLoginHandler(webapp2.RequestHandler):
     def get(self):
         client_id = self.request.GET.get('client_id', None)
-        source = self.request.GET.get('source', 'web')
+        source = self.request.GET.get('source', SOURCE_WEB)
 
         if not client_id:
             self.redirect('/login/organization')
@@ -106,12 +106,12 @@ class DoLoginHandler(webapp2.RequestHandler):
                 render_error_page(self.response, httplib.BAD_REQUEST, e.message)
                 return
 
-        if source not in ['web', 'app']:
+        if source not in [SOURCE_WEB, SOURCE_APP]:
             render_error_page(self.response, httplib.BAD_REQUEST, 'Bad Request')
             return
 
         if client_id == config.root_organization.name:
-            if source == "app":
+            if source == SOURCE_APP:
                 render_error_page(self.response, httplib.BAD_REQUEST, 'Bad Request')
                 return
             else:
@@ -148,5 +148,6 @@ class Oauth2CallbackHandler(webapp2.RequestHandler):
         except HttpException as e:
             render_error_page(self.response, e.http_code, e.error)
             return
+
         login_user(self.response, username, scopes)
         self.redirect('/test/a')

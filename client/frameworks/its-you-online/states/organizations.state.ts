@@ -22,7 +22,8 @@ export function getOrganization(state$: Observable<IOrganizationsState>) {
     client_id: '',
     name: '',
     auto_connected_services: [],
-    roles: []
+    roles: [],
+    modules: [],
   });
 }
 
