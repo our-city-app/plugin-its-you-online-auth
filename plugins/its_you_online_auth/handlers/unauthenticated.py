@@ -150,4 +150,4 @@ class Oauth2CallbackHandler(webapp2.RequestHandler):
             return
 
         login_user(self.response, username, scopes)
-        self.redirect('/test/a')
+        self.redirect('/')
