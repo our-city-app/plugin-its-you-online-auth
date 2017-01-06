@@ -64,19 +64,19 @@ def friend_register(rt_settings, id_, service_identity, user_details, origin, da
         login_state.completed = True
         ndb.put_multi([profile, login_state])
 
-        r = RegistrationResultTO()
-        r.result = ACCEPT_ID
-        r.auto_connected_services = []
-        r.roles = []
+        result = RegistrationResultTO()
+        result.result = ACCEPT_ID
+        result.auto_connected_services = []
+        result.roles = []
         try:
             organization = get_organization(login_state.organization_id)
-            r.auto_connected_services = organization.auto_connected_services
+            result.auto_connected_services = organization.auto_connected_services
             if organization.roles:
-                r.roles = parse_complex_value(RegistrationResultRolesTO, json.loads(organization.roles), True)
+                result.roles = parse_complex_value(RegistrationResultRolesTO, json.loads(organization.roles), True)
         except OrganizationNotFoundException:
             pass
 
-        return serialize_complex_value(r, RegistrationResultTO, False)
+        return serialize_complex_value(result, RegistrationResultTO, False)
     except:
         logging.warn('friend_register failed', exc_info=True)
         return DECLINE_ID

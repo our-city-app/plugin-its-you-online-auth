@@ -26,14 +26,14 @@ class OrganizationTO(object):
     roles = typed_property('4', RegistrationResultRolesTO, True)
     modules = unicode_list_property('5')
 
-    def __init__(self, id=None, name=None, auto_connected_services=None, roles=None, modules=None):
+    def __init__(self, _id=None, name=None, auto_connected_services=None, roles=None, modules=None):
         if auto_connected_services is None:
             auto_connected_services = []
         if roles is None:
             roles = []
         if modules is None:
             modules = []
-        self.id = id
+        self.id = _id
         self.name = name
         self.auto_connected_services = auto_connected_services
         self.roles = roles

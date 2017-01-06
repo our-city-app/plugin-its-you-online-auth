@@ -19,13 +19,14 @@ import logging
 import urllib
 
 from google.appengine.ext import ndb
+
+import requests
 from mcfw.exceptions import HttpBadRequestException, HttpException, HttpForbiddenException
 from plugin_loader import get_config
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import OauthLoginState, Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE
 from plugins.its_you_online_auth.plugin_utils import get_sub_organization
-import requests
 
 
 def get_access_response(config, login_state, code):

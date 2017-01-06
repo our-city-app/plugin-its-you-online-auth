@@ -43,7 +43,7 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
         super(ItsYouOnlineAuthPlugin, self).__init__(configuration)
         self.configuration = ItsYouOnlineConfiguration(configuration)
         rogerthat_api_plugin = get_plugin('rogerthat_api')
-        assert (isinstance(rogerthat_api_plugin, RogerthatApiPlugin))
+        assert isinstance(rogerthat_api_plugin, RogerthatApiPlugin)
         rogerthat_api_plugin.subscribe('friend.register', friend_register)
         rogerthat_api_plugin.subscribe('friend.register_result', friend_register_result)
 
@@ -94,21 +94,21 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
         try:
             organization = get_organization(organization_id)
             visible_modules = set()
-            for p in get_plugins():
-                for m in p.get_modules():
-                    if m.name not in organization.modules:
+            for plugin in get_plugins():
+                for module in plugin.get_modules():
+                    if module.name not in organization.modules:
                         continue
                     module_scopes = list()
-                    for scope in m.scopes:
+                    for scope in module.scopes:
                         if Scopes.get_organization_scope(scope, organization_id) in scopes:
                             module_scopes.append(True)
                         else:
                             module_scopes.append(False)
 
-                    if m.scopes and not any(module_scopes):
+                    if module.scopes and not any(module_scopes):
                         continue
 
-                    visible_modules.add(m.name)
+                    visible_modules.add(module.name)
 
             return list(visible_modules)
         except:
