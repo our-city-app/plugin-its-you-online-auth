@@ -20,7 +20,6 @@ import urllib
 import uuid
 
 from auth import login_user, logout_user, get_current_user_id
-from google.appengine.ext.webapp import template
 from handlers import render_error_page, render_page
 from mcfw.exceptions import HttpException
 from plugin_loader import get_config
