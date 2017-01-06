@@ -1,0 +1,2 @@
+# plugin-its-you-online-auth
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/32093039f2484a91b00b0584d6bf58fc)](https://www.codacy.com/app/lucas-vanhalst/plugin-its-you-online-auth?utm_source=github.com&utm_medium=referral&utm_content=rogerthat-platform/plugin-its-you-online-auth&utm_campaign=badger)
