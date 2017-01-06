@@ -21,7 +21,7 @@ import uuid
 
 from auth import login_user, logout_user, get_current_user_id
 from google.appengine.ext.webapp import template
-from handlers import render_error_page
+from handlers import render_error_page, render_page
 from mcfw.exceptions import HttpException
 from plugin_loader import get_config
 from plugins.its_you_online_auth.bizz.authentication import get_user_scopes
@@ -41,9 +41,7 @@ class SigninHandler(webapp2.RequestHandler):
             self.redirect('/')
             return
 
-        path = os.path.join(os.path.dirname(__file__), 'templates', 'signin.html')
-        with open(path, 'r') as f:
-            self.response.out.write(f.read())
+        render_page(self.response, os.path.join('unauthenticated', 'signin.html'), plugin_name=NAMESPACE)
 
 
 class LogoutHandler(webapp2.RequestHandler):
@@ -82,11 +80,11 @@ class PickOrganizationHandler(webapp2.RequestHandler):
                 self.redirect('/login/redirect?%s' % urllib.urlencode(params))
                 return
 
-        path = os.path.join(os.path.dirname(__file__), 'templates', 'organization.html')
+        template_dict = dict(source=self.request.GET.get('source', SOURCE_WEB),
+                             error=error)
 
-        context = dict(source=self.request.GET.get('source', SOURCE_WEB),
-                       error=error)
-        self.response.out.write(template.render(path, context))
+        render_page(self.response, os.path.join('unauthenticated', 'organization.html'), plugin_name=NAMESPACE,
+                    template_dict=template_dict)
 
 
 class DoLoginHandler(webapp2.RequestHandler):
