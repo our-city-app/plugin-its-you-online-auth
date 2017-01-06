@@ -19,6 +19,8 @@ import os
 import urllib
 import uuid
 
+import webapp2
+
 from auth import login_user, logout_user, get_current_user_id
 from handlers import render_error_page, render_page
 from mcfw.exceptions import HttpException
@@ -30,7 +32,6 @@ from plugins.its_you_online_auth.models import OauthLoginState
 from plugins.its_you_online_auth.plugin_consts import OAUTH_BASE_URL, NAMESPACE, SOURCE_WEB, SOURCE_APP
 from plugins.its_you_online_auth.plugin_utils import get_sub_organization
 from utils import now
-import webapp2
 
 
 class SigninHandler(webapp2.RequestHandler):

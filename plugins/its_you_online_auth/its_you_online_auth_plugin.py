@@ -17,11 +17,13 @@
 
 import logging
 
+import requests_toolbelt.adapters.appengine
 from auth import get_current_session
 from mcfw.consts import AUTHENTICATED
 from mcfw.restapi import rest_functions
-from plugin_loader import AuthPlugin, get_plugins, get_config
+from plugin_loader import AuthPlugin
 from plugin_loader import get_plugin
+from plugin_loader import get_plugins, get_config
 from plugins.its_you_online_auth.api import authenticated
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
@@ -31,9 +33,7 @@ from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_
 from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
 from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
 from plugins.rogerthat_api.rogerthat_api_plugin import RogerthatApiPlugin
-import requests_toolbelt.adapters.appengine
-from utils import Handler, Module
-
+from utils.plugins import Handler, Module
 
 requests_toolbelt.adapters.appengine.monkeypatch()
 
