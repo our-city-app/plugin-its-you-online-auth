@@ -58,6 +58,9 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
             for url, handler in rest_functions(authenticated, authentication=AUTHENTICATED):
                 yield Handler(url=url, handler=handler)
 
+    def get_client_routes(self):
+        return ['/itsyouonlinesettings<route:.*>']
+
     def get_modules(self):
         # TODO: create an admin page organization admins
         # yield Module(name="its_you_online_settings", scopes=[Scopes.ORGANIZATION_ADMIN])
