@@ -64,7 +64,7 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
     def get_modules(self):
         # TODO: create an admin page organization admins
         # yield Module(name="its_you_online_settings", scopes=[Scopes.ORGANIZATION_ADMIN])
-        yield Module(name='its_you_online_settings', scopes=[Scopes.ADMIN])
+        yield Module(name=u'its_you_online_settings', scopes=[Scopes.ADMIN])
 
     def get_login_url(self):
         return self.configuration.login_url
@@ -91,8 +91,9 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
             return []
 
         config = get_config(NAMESPACE)
-        if organization_id == config.root_organization.name:
-            return ['its_you_online_settings']
+        organization_admin_scope = Scopes.get_organization_scope(Scopes.ORGANIZATION_ADMIN, organization_id)
+        if organization_id == config.root_organization.name or organization_admin_scope in scopes:
+            return [u'its_you_online_settings']
 
         try:
             organization = get_organization(organization_id)
@@ -101,7 +102,7 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
                 for module in plugin.get_modules():
                     if module.name not in organization.modules:
                         continue
-                    module_scopes = list()
+                    module_scopes = []
                     for scope in module.scopes:
                         if Scopes.get_organization_scope(scope, organization_id) in scopes:
                             module_scopes.append(True)

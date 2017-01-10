@@ -14,20 +14,31 @@
 # limitations under the License.
 #
 # @@license_version:1.1@@
+import re
 
-NAMESPACE = 'its_you_online_auth'
-ITS_YOU_ONLINE_DOMAIN = 'itsyou.online'
-OAUTH_BASE_URL = 'https://itsyou.online/v1/oauth'
+from plugins.its_you_online_auth.plugin_consts import Scopes
 
-SOURCE_WEB = 'web'
-SOURCE_APP = 'app'
+admin_re = re.compile('memberof:(.*?):admin')
 
 
-class Scopes(object):
-    ADMIN = u'admin'
-    ORGANIZATION_MEMBER = u'memberof:{organization_id}'
-    ORGANIZATION_ADMIN = u'memberof:{organization_id}:admin'
+def is_admin(session):
+    """
+    Args:
+        session (models.Session)
+    Returns:
+        is_admin(bool)
+    """
+    return any(scope == Scopes.ADMIN for scope in session.scopes)
 
-    @classmethod
-    def get_organization_scope(cls, scope, organization_id):
-        return scope.replace('{organization_id}', organization_id)
+
+def get_admin_organization(session):
+    """
+    Args:
+        session (models.Session)
+    Returns:
+        unicode
+    """
+    for scope in session.scopes:
+        match = admin_re.match(scope)
+        if match:
+            return match.group(0)

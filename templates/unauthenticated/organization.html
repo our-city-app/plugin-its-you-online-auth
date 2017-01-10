@@ -9,10 +9,11 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
 $( function() {
-    $("#submit_organization_id").click(function() {
-        var organizationId = $("#organization_id").val();
-        window.location.assign(window.location.pathname + "?source={{ source }}&organization_id=" + organizationId);
-    });
+  $("#organization-form").submit(function (e) {
+    e.preventDefault();
+    var organizationId = $("#organization_id").val();
+    window.location.assign(window.location.pathname + "?source={{ source }}&organization_id=" + organizationId);
+  });
 });
 </script>
 
@@ -34,14 +35,17 @@ $( function() {
 	<div class="login_left">
 		<h3>Organization</h3>
 		<p>Enter the name of your organization to continue</p>
-		<input id="organization_id" placeholder="enter..." type="text" tabindex="1" required="" autofocus="">
-		<input id="submit_organization_id" type="submit" value="Login">
-		
-		{% if error %}
+    <form id="organization-form">
+      <input id="organization_id" placeholder="Enter an organization..." type="text" tabindex="1" minlength="3" required
+             autofocus>
+      <input type="submit" value="Login">
+    </form>
+
+    {% if error %}
 		<p style="color: red;">{{ error }}</p>
 		{% endif %}
-		
-	</div>
+
+  </div>
 	<div class="clear"></div>
 </div>
 </div>

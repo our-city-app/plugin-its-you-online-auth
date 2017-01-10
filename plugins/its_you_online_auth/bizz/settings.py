@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 # @@license_version:1.1@@
+from google.appengine.ext import ndb
 
 from mcfw.rpc import returns, arguments
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationAlreadyExistsException, \
@@ -22,7 +23,13 @@ from plugins.its_you_online_auth.models.settings import ItsYouOnlineOrganization
 from plugins.rogerthat_api.to.friends import RegistrationResultRolesTO
 
 
+@returns(ndb.Query)
+@arguments()
 def get_organizations():
+    """
+    Returns:
+        query(ndb.Query)
+    """
     return ItsYouOnlineOrganization.query()
 
 
