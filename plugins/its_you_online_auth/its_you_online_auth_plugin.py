@@ -62,8 +62,6 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
         return ['/itsyouonlinesettings<route:.*>']
 
     def get_modules(self):
-        # TODO: create an admin page organization admins
-        # yield Module(name="its_you_online_settings", scopes=[Scopes.ORGANIZATION_ADMIN])
         yield Module(name=u'its_you_online_settings', scopes=[Scopes.ADMIN])
 
     def get_login_url(self):
@@ -85,8 +83,6 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
             return []
 
         organization_id = profile.organization_id
-        logging.debug('get_visible_modules\n- organization_id: %s\n- user_id: %s\n- scopes: %s',
-                      organization_id, user_id, scopes)
         if not organization_id:
             return []
 
