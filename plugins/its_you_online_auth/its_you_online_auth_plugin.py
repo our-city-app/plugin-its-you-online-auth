@@ -62,7 +62,7 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
         return ['/itsyouonlinesettings<route:.*>']
 
     def get_modules(self):
-        yield Module(name=u'its_you_online_settings', scopes=[Scopes.ADMIN])
+        yield Module(name=u'its_you_online_settings', scopes=[Scopes.ADMIN, Scopes.ORGANIZATION_ADMIN])
 
     def get_login_url(self):
         return self.configuration.login_url
@@ -87,8 +87,7 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
             return []
 
         config = get_config(NAMESPACE)
-        organization_admin_scope = Scopes.get_organization_scope(Scopes.ORGANIZATION_ADMIN, organization_id)
-        if organization_id == config.root_organization.name or organization_admin_scope in scopes:
+        if organization_id == config.root_organization.name:
             return [u'its_you_online_settings']
 
         try:

@@ -25,16 +25,16 @@ from mcfw.exceptions import HttpBadRequestException, HttpException, HttpForbidde
 from plugin_loader import get_config
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import OauthLoginState, Profile
-from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE
+from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE, SOURCE_WEB
 from plugins.its_you_online_auth.plugin_utils import get_sub_organization
 
 
 def get_access_response(config, login_state, code):
     params = {
         'client_id': config.root_organization.name,
-        'client_secret': config.root_organization.web.client_secret,
+        'client_secret': config.root_organization[SOURCE_WEB].client_secret,
         'code': code,
-        'redirect_uri': config.root_organization.web.redirect_uri,
+        'redirect_uri': config.root_organization[SOURCE_WEB].redirect_uri,
         'state': login_state.state
     }
     access_token_url = '%s/access_token?%s' % (OAUTH_BASE_URL, urllib.urlencode(params))
@@ -100,7 +100,8 @@ def get_user_scopes(code, state):
     ndb.put_multi([profile, login_state])
 
     client = Client()
-    client.oauth.LoginViaClientCredentials(config.root_organization.name, config.root_organization.web.client_secret)
+    client.oauth.LoginViaClientCredentials(config.root_organization.name,
+                                           config.root_organization[SOURCE_WEB].client_secret)
 
     scopes = []
     uber_admin_organization = '%s.admins' % config.root_organization.name
