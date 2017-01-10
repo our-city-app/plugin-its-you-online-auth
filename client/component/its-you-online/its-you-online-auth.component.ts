@@ -27,10 +27,14 @@ export class ItsYouOnlineAuthComponent implements OnInit {
         if (identity.scopes.includes('admin')) {
           this.isAdmin = true;
         } else {
-          let organization = identity.scopes.filter((s: string) => s.startsWith('memberof:') && s.endsWith(':admin'))[ 0 ];
+          let organization = identity.scopes.filter((s: string) => {
+            return s.startsWith('memberof:') && s.endsWith(':admin');
+          })[ 0 ];
           let route: string = '';
           if (organization) {
-            route = '/itsyouonlinesettings/organizations/' + organization.replace('memberof:', '').replace(':admin', '');
+            route = '/itsyouonlinesettings/organizations/' + organization
+                .replace('memberof:', '')
+                .replace(':admin', '');
           }
           this.routerext.navigateByUrl(route);
         }
