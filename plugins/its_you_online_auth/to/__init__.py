@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016 Mobicage NV
+# Copyright 2017 Green IT Globe NV
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 # limitations under the License.
 #
 # @@license_version:1.1@@
+
 from mcfw.consts import DEBUG
 from plugins.its_you_online_auth.plugin_consts import SOURCE_WEB, SOURCE_APP, SOURCE_DEV
 

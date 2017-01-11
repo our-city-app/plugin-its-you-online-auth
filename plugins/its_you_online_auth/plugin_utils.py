@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016 Mobicage NV
+# Copyright 2017 Green IT Globe NV
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 # @@license_version:1.1@@
-
 
 def get_sub_organization(config, organization_id):
     return "%s.organizations.%s" % (config.root_organization.name, organization_id)
