@@ -1,6 +1,6 @@
 <h3 md-subheader>Organizations</h3>
 <a md-button md-raised-button [routerLink]="'/itsyouonlinesettings/organizations/create'">
-  {{ 'add_organization' | translate }}
+  {{ 'iyo.add_organization' | translate }}
 </a>
 <md-nav-list fxLayout="column" fxFlex="40" fxFlex.md="60" fxFlex.xs="100">
   <md-list-item *ngFor="let organization of (organizations$ | async)"

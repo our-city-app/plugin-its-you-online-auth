@@ -7,7 +7,7 @@ export const ItsYouOnlineAuthRoutes: Array<Route> = [
   {
     path: 'itsyouonlinesettings',
     data: {
-      label: 'itsyouonline_settings',
+      label: 'iyo.itsyouonline_settings',
       id: 'its_you_online_settings'
     },
     component: ItsYouOnlineAuthComponent,

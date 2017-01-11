@@ -1,0 +1,1173 @@
+/*
+Author: W3layout
+Author URL: http://w3layouts.com
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+*/
+/* reset */
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, dl, dt, dd, ol, nav ul, nav li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+ol, ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote:before, blockquote:after, q:before, q:after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* start editing from here */
+a {
+  text-decoration: none;
+}
+
+.txt-rt {
+  text-align: right;
+}
+
+/* text align right */
+.txt-lt {
+  text-align: left;
+}
+
+/* text align left */
+.txt-center {
+  text-align: center;
+}
+
+/* text align center */
+.float-rt {
+  float: right;
+}
+
+/* float right */
+.float-lt {
+  float: left;
+}
+
+/* float left */
+.clear {
+  clear: both;
+}
+
+/* clear float */
+.pos-relative {
+  position: relative;
+}
+
+/* Position Relative */
+.pos-absolute {
+  position: absolute;
+}
+
+/* Position Absolute */
+.vertical-base {
+  vertical-align: baseline;
+}
+
+/* vertical align baseline */
+.vertical-top {
+  vertical-align: top;
+}
+
+/* vertical align top */
+.underline {
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+  margin: 0 0 20px 0;
+}
+
+/* Add 5px bottom padding and a underline */
+nav.vertical ul li {
+  display: block;
+}
+
+/* vertical menu */
+nav.horizontal ul li {
+  display: inline-block;
+}
+
+/* horizontal menu */
+img {
+  max-width: 100%;
+}
+
+/*end reset*/
+body {
+  font-family: 'Open Sans', sans-serif;
+  background: #ffffff;
+}
+
+.wrap {
+  width: 80%;
+  margin: 0px auto;
+}
+
+.header {
+  background: #008FD5;
+  padding: 1%;
+}
+
+.logo {
+  float: left;
+  margin-top: 0.5%;
+}
+
+.signin {
+  float: right;
+  width: 22%;
+  position: relative;
+  margin-top: 0.5%;
+}
+
+.signin ul li {
+}
+
+.signin li a {
+  padding: 6px 30px;
+  text-align: center;
+  float: left;
+  background: #1371B3;
+  font-size: 0.9em;
+  border-radius: 2em 0 0 2em;
+  color: #ffffff;
+  -webkit-transition: 0.5s linear;
+  -moz-transition: 0.5s linear;
+  -ms-transition: 0.5s linear;
+  -o-transition: 0.5s linear;
+  transition: 0.5s linear;
+  margin-right: -6px;
+}
+
+.signin li a:hover {
+  color: #76AE41;
+}
+
+.signin li.a h6 {
+  padding: 13px 14px;
+  text-align: center;
+  font-size: 0.9em;
+  float: left;
+  background: #1065A1;
+  border-radius: 2em;
+  color: #ffffff;
+  vertical-align: middle;
+  margin-top: -7px;
+  z-index: 1;
+  position: relative;
+}
+
+.signin li.b a {
+  padding: 6px 30px;
+  text-align: center;
+  font-size: 0.9em;
+  float: left;
+  background: #1371B3;
+  margin-left: -6px;
+  border-radius: 0 2em 2em 0;
+  color: #ffffff;
+  -webkit-transition: 0.5s linear;
+  -moz-transition: 0.5s linear;
+  -ms-transition: 0.5s linear;
+  -o-transition: 0.5s linear;
+  transition: 0.5s linear;
+}
+
+.signin li.b a:hover {
+  color: #76AE41;
+}
+
+.content {
+  padding: 2% 0;
+}
+
+.text {
+  text-align: center;
+  position: relative;
+}
+
+.text h2 {
+  font-size: 2.4em;
+  color: #3C4348;
+  font-weight: 800;
+  display: block;
+}
+
+.text p {
+  font-size: 1.4em;
+  color: #008FD5;
+  font-weight: 900;
+  display: block;
+  margin: 1% 0 0%;
+  padding: 0% 0 2%;
+  border-bottom: 3px double #DBDBDB;
+}
+
+.text:after {
+  content: url('../images/border.png') 0px 0px;
+  position: absolute;
+  bottom: 13px;
+  width: 0;
+  height: 0;
+}
+
+/*---start-form---*/
+.form input[type="text"] {
+  border: 1px solid #D7DFE5;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  color: #999;
+  font-size: 0.9755em;
+  background: #F1F5F8;
+  padding: 16px;
+  outline: none;
+  font-family: 'Open Sans', sans-serif;
+  width: 73%;
+  float: left;
+}
+
+.form span {
+  padding: 16px 0px;
+  border: 1px solid #DADADA;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.form input[type="submit"] {
+  background: #8dc059;
+  background: -moz-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #8dc059), color-stop(45%, #77b03f), color-stop(100%, #6ba537));
+  background: -webkit-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -o-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -ms-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: linear-gradient(to bottom, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#8dc059', endColorstr='#6ba537', GradientType=0);
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: bold;
+  border: 1px solid rgba(31, 29, 29, 0.11);
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1em;
+  padding: 9px 30px;
+  -o-text-shadow: 0px 1px 1px #000000;
+  -webkit-text-shadow: 0px 1px 1px #000000;
+  -moz-text-shadow: 0px 1px 1px #000000;
+  text-shadow: 0px 1px 1px #000000;
+  box-shadow: 1px 2px 1px rgba(94, 94, 94, 1);
+  -webkit-box-shadow: 1px 2px 1px rgba(94, 94, 94, 1);
+  -moz-box-shadow: 1px 2px 1px rgba(94, 94, 94, 1);
+  -o-box-shadow: 1px 2px 1px rgba(94, 94, 94, 1);
+  margin: 8px;
+  cursor: pointer;
+  outline: none;
+  -webkit-transition: all 0.5s ease-out;
+  -moz-transition: all 0.5s ease-out;
+  -ms-transition: all 0.5s ease-out;
+  -o-transition: all 0.5s ease-out;
+  transition: all 0.5s ease-out;
+}
+
+.form input[type="submit"]:hover {
+  background: #1371B3;
+}
+
+.form input[type="submit"]:active {
+  position: relative;
+}
+
+.form {
+  width: 60%;
+  padding-bottom: 0.5em;
+  text-align: right;
+  margin: 40px auto 125px;
+}
+
+/*---end-form---*/
+.slider {
+  background: #E6EFF6;
+  padding-bottom: 4%;
+}
+
+.container {
+  position: relative;
+  top: -80px;
+}
+
+.bottom-text {
+  text-align: center;
+  position: relative;
+  margin-top: -5%;
+}
+
+.bottom-text h2 {
+  font-size: 2.4em;
+  color: #3C4348;
+  font-weight: 800;
+  display: block;
+}
+
+.bottom-text p {
+  font-size: 0.8755em;
+  color: #686C70;
+  font-weight: 400;
+  line-height: 1.9em;
+  display: block;
+  margin: 1% 0 0%;
+  padding: 0% 0 0.7%;
+}
+
+.bottom-text p a {
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 0.9em;
+  background: #1371B3;
+  border-radius: 2em;
+  -webkit-transition: 0.5s linear;
+  -moz-transition: 0.5s linear;
+  -ms-transition: 0.5s linear;
+  -o-transition: 0.5s linear;
+  transition: 0.5s linear;
+
+}
+
+.bottom-text p a:hover {
+  color: #fff;
+  background: #8dc059;
+  background: -moz-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #8dc059), color-stop(45%, #77b03f), color-stop(100%, #6ba537));
+  background: -webkit-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -o-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -ms-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: linear-gradient(to bottom, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#8dc059', endColorstr='#6ba537', GradientType=0);
+}
+
+.footer-top {
+  padding: 2% 0 4%;
+}
+
+.left {
+  float: left;
+  width: 50%;
+}
+
+.left h3 {
+  font-size: 2.4em;
+  color: #3C4348;
+  font-weight: 800;
+  display: block;
+}
+
+.left p {
+  font-size: 0.8755em;
+  color: #686C70;
+  font-weight: 400;
+  line-height: 1.9em;
+  display: block;
+  margin: 2% 0 0%;
+  padding: 0% 0 0.7%;
+}
+
+.left p.a {
+  font-size: 0.8755em;
+  color: #686C70;
+  font-weight: 600;
+  line-height: 1.9em;
+  display: block;
+  margin: 2% 0 4%;
+  padding: 0% 0 0.7%;
+}
+
+.left p a {
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 0.9em;
+  background: #1371B3;
+  border-radius: 2em;
+  -webkit-transition: 0.5s linear;
+  -moz-transition: 0.5s linear;
+  -ms-transition: 0.5s linear;
+  -o-transition: 0.5s linear;
+  transition: 0.5s linear;
+
+}
+
+.left p a:hover {
+  color: #fff;
+  background: #8dc059;
+  background: -moz-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #8dc059), color-stop(45%, #77b03f), color-stop(100%, #6ba537));
+  background: -webkit-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -o-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -ms-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: linear-gradient(to bottom, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#8dc059', endColorstr='#6ba537', GradientType=0);
+}
+
+.right {
+  float: right;
+  width: 35%;
+  padding: 10px 10px 4px;
+  border: 1px solid #DFDFDF;
+  margin-top: 0.7%;
+}
+
+.footer-top p {
+  font-size: 0.8755em;
+  color: #686C70;
+  font-weight: 400;
+  line-height: 1.9em;
+  display: block;
+  padding: 0% 0 1.7%;
+}
+
+.footer-top p a {
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 0.9em;
+  background: #1371B3;
+  border-radius: 2em;
+  -webkit-border-radius: 2em;
+  -moz-border-radius: 2em;
+  -o-border-radius: 2em;
+  -webkit-transition: 0.5s linear;
+  -moz-transition: 0.5s linear;
+  -ms-transition: 0.5s linear;
+  -o-transition: 0.5s linear;
+  transition: 0.5s linear;
+
+}
+
+.footer-top p a:hover {
+  color: #fff;
+  background: #8dc059;
+  background: -moz-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #8dc059), color-stop(45%, #77b03f), color-stop(100%, #6ba537));
+  background: -webkit-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -o-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -ms-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: linear-gradient(to bottom, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#8dc059', endColorstr='#6ba537', GradientType=0);
+}
+
+.footer-bottom {
+  padding: 2% 0 3%;
+  background: #FFFFFF;
+}
+
+.copy-right {
+  float: left;
+}
+
+.copy-right p {
+  font-size: 0.8755em;
+  color: #686C70;
+}
+
+.copy {
+  float: right;
+}
+
+.copy p {
+  font-size: 0.8755em;
+  color: #686C70;
+}
+
+.copy p a {
+  color: #686C70;
+}
+
+.copy p a:hover {
+  color: #1371B3;
+}
+
+/********** Login & registration *************/
+.main_bg {
+  background: #E6EFF6;
+  min-height: 47em;
+}
+
+.main_top {
+  padding: 1% 2%;
+}
+
+.main {
+  background: #fff;
+}
+
+.top_bg {
+  background: #242424;
+}
+
+.log_reg {
+  border-right: 1px solid rgb(60, 60, 60);
+  padding: 12px 16px;
+  float: right;
+}
+
+.log_reg ul li {
+  display: inline-block;
+}
+
+.log_reg li a {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.8125em;
+  display: block;
+  padding: 5px 8px;
+  color: #777777;
+  text-transform: uppercase;
+  -webkit-text-stroke: 0.5px;
+}
+
+.log_reg span.log {
+  font-size: 0.8125em;
+  color: #777777;
+  text-transform: lowercase;
+  -webkit-text-stroke: 0.5px;
+}
+
+h2.style {
+  font-size: 1.8em;
+  color: #5e5e5e;
+  text-transform: capitalize;
+}
+
+h4.style {
+  font-size: 1.5em;
+  color: #919191;
+  text-transform: capitalize;
+  border: 1px solid rgba(58, 58, 58, 0.23);
+  padding: 0.5% 1%;
+}
+
+.login_left {
+  float: left;
+  width: 44.33333%;
+  margin-left: 3.3333%;
+  padding: 2%;
+  min-height: 350px;
+}
+
+.login_left:first-child {
+  margin-left: 0;
+}
+
+.login_left h3 {
+  font-size: 2.4em;
+  font-weight: 700;
+  color: #3C4348;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 white;
+  border-bottom: 1px solid #E9E9E9;
+}
+
+.login_left p {
+  font-size: 0.8725em;
+  line-height: 1.9em;
+  color: #686C70;
+  margin: 4% 0;
+}
+
+.btn form input[type="button"], .registration_form input[type="submit"] {
+  font-family: 'Open Sans', sans-serif;
+  cursor: pointer;
+  background: #1371B3;
+  border: 1px solid #1371B3;
+  padding: 10px 20px;
+  outline: none;
+  color: #ffffff;
+  font-size: 0.8755em;
+  text-transform: capitalize;
+  -webkit-appearance: none;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  border-radius: 2em;
+  -webkit-border-radius: 2em;
+  -moz-border-radius: 2em;
+  -o-border-radius: 2em;
+}
+
+.btn form input[type="button"]:hover, .registration_form input[type="submit"]:hover {
+  background: #8dc059;
+  background: -moz-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #8dc059), color-stop(45%, #77b03f), color-stop(100%, #6ba537));
+  background: -webkit-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -o-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -ms-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: linear-gradient(to bottom, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#8dc059', endColorstr='#6ba537', GradientType=0);
+  border: 1px solid #8dc059;
+}
+
+/* start registration */
+.registration {
+  margin: 4% 0;
+}
+
+.reg_fb {
+  margin: 3% 0;
+  display: block;
+  background: #1371B3;
+  transition: all 0.5s ease-out;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  border-radius: 2em;
+  -webkit-border-radius: 2em;
+  -moz-border-radius: 2em;
+  -o-border-radius: 2em;
+}
+
+.reg_fb img {
+  background: #1065A1;
+  padding: 16px;
+  float: left;
+  border-radius: 2em 0 0 2em;
+  -webkit-border-radius: 2em 0 0 2em;
+  -moz-border-radius: 2em 0 0 2em;
+  -o-border-radius: 2em 0 0 2em;
+}
+
+.reg_fb i {
+  color: #ffffff;
+  padding: 12px 16px;
+  display: inline-block;
+  font-size: 1.3em;
+  text-transform: capitalize;
+}
+
+.reg_fb:hover {
+  background: #1065A1;
+}
+
+.registration_left {
+}
+
+.registration_left:first-child {
+  margin-left: 0;
+}
+
+.registration span {
+  color: #777777;
+}
+
+.registration_form {
+  display: block;
+}
+
+.registration_form div {
+  padding: 10px 0;
+}
+
+.registration_form input[type="text"], .registration_form input[type="email"], .registration_form input[type="tel"], .registration_form input[type="password"] {
+  padding: 10px;
+  display: block;
+  width: 95.333333%;
+  outline: none;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.8925em;
+  color: #686C70;
+  -webkit-appearance: none;
+  text-transform: capitalize;
+  background: none;
+  border: 1px solid #86C8D5;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  border-radius: 6px;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  -o-border-radius: 6px;
+}
+
+.registration_form input[type="text"]:focus, .registration_form input[type="email"]:focus, .registration_form input[type="tel"]:focus, .registration_form input[type="password"]:focus {
+  box-shadow: inset -1px -1px 1px rgba(228, 228, 228, 0.67);
+  -webkit-box-shadow: inset -1px -1px 1px rgba(228, 228, 228, 0.67);
+  -moz-box-shadow: inset -1px -1px 1px rgba(228, 228, 228, 0.67);
+  -o-box-shadow: inset -1px -1px 1px rgba(228, 228, 228, 0.67);
+}
+
+.sky_form ul li {
+  display: inline-block;
+  line-height: 1.5em;
+}
+
+.sky_form ul li input[type="radio"] {
+  margin-bottom: 4px;
+  vertical-align: middle;
+}
+
+.sky_form label i {
+  color: #686C70;
+  font-size: 0.8725em;
+  margin-right: 12px;
+  vertical-align: text-top;
+}
+
+.sky_form input[type="checkbox"] {
+  vertical-align: text-top;
+}
+
+.terms {
+  color: #686C70;
+  text-decoration: underline;
+}
+
+.terms:hover {
+  text-decoration: none;
+}
+
+.forget a {
+  text-transform: capitalize;
+  color: #686C70;
+  text-decoration: underline;
+  font-size: 0.8725em;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+.forget a:hover {
+  text-decoration: none;
+  color: #1065A1;
+}
+
+.about-text {
+  text-align: center;
+  position: relative;
+}
+
+.about-text h2 {
+  font-size: 2.4em;
+  color: #3C4348;
+  font-weight: 800;
+  display: block;
+}
+
+.about-text p {
+  font-size: 0.8755em;
+  color: #686C70;
+  font-weight: 400;
+  line-height: 1.9em;
+  display: block;
+  margin: 1% 0 0%;
+  padding: 0% 0 0.7%;
+}
+
+.contact {
+  background: #E6EFF6;
+  padding: 3% 0 4%;
+}
+
+.contact h3 {
+  font-size: 2.4em;
+  color: #3C4348;
+  font-weight: 800;
+  display: block;
+  margin-bottom: 2%;
+}
+
+form-text {
+  float: left;
+  width: 45%;
+}
+
+form {
+}
+
+form-text input[type="text"] {
+  font-size: 0.8925em;
+  font-family: 'Open Sans', sans-serif;
+  color: #686C70;
+  padding: 8px;
+  display: block;
+  float: left;
+  width: 100%;
+  background: none;
+  border: 1px solid #86C8D5;
+  outline: none;
+  margin-bottom: 2%;
+  -webkit-appearance: none;
+  border-radius: 8px;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -o-border-radius: 8px;
+}
+
+form textarea {
+  font-size: 0.8925em;
+  font-family: 'Open Sans', sans-serif;
+  color: #686C70;
+  padding: 8px;
+  display: inline-block;
+  width: 50%;
+  background: none;
+  border: 1px solid #86C8D5;
+  outline: none;
+  -webkit-appearance: none;
+  border-radius: 8px;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -o-border-radius: 8px;
+  float: right;
+  margin-right: 0em;
+}
+
+form textarea {
+  resize: none;
+  height: 120px;
+}
+
+form input[type="submit"] {
+  color: #fff;
+  font-family: 'Open Sans', sans-serif;
+  padding: 12px 30px;
+  float: right;
+  font-size: 0.9em;
+  background: #1371B3;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  margin-top: 2%;
+  border-radius: 2em;
+  -webkit-border-radius: 2em;
+  -moz-border-radius: 2em;
+  -o-border-radius: 2em;
+  -webkit-transition: 0.5s linear;
+  -moz-transition: 0.5s linear;
+  -ms-transition: 0.5s linear;
+  -o-transition: 0.5s linear;
+  transition: 0.5s linear;
+}
+
+form input[type="submit"]:hover {
+  color: #fff;
+  background: #8dc059;
+  background: -moz-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #8dc059), color-stop(45%, #77b03f), color-stop(100%, #6ba537));
+  background: -webkit-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -o-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: -ms-linear-gradient(top, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  background: linear-gradient(to bottom, #8dc059 0%, #77b03f 45%, #6ba537 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#8dc059', endColorstr='#6ba537', GradientType=0);
+}
+
+/*-----start-responsive-design------*/
+@media only screen and (max-width: 1366px) {
+  .wrap {
+    width: 95%;
+  }
+
+}
+
+@media only screen and (max-width: 1280px) {
+  .wrap {
+    width: 95%;
+  }
+
+}
+
+@media only screen and (max-width: 1024px) {
+  .wrap {
+    width: 95%;
+  }
+
+  .logo {
+    margin-top: 0.9%;
+  }
+
+  .signin {
+    width: 27%;
+  }
+
+  .form input[type="text"] {
+    width: 67%;
+  }
+
+  .bottom-text h2, .left h3, .contact h3, .about-text h2, .login_left h3, .text h2 {
+    font-size: 1.6em;
+  }
+
+  .right {
+    width: 43%;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  .wrap {
+    width: 95%;
+  }
+
+  .signin {
+    width: 34%;
+    margin-top: 1.2%;
+  }
+
+  .text h2 {
+    font-size: 1.4em;
+  }
+
+  .form input[type="text"] {
+    width: 70%;
+    padding: 9px;
+  }
+
+  .form input[type="submit"] {;
+    font-size: 0.8755em;
+    padding: 4px 13px;
+  }
+
+  .form span {
+    padding: 9px 0px 12px;
+  }
+
+  .bottom-text h2, .left h3, .contact h3, .about-text h2, .login_left h3 {
+    font-size: 1.2em;
+  }
+
+  .right {
+    width: 43%;
+  }
+
+  .text p {
+    font-size: 1em;
+  }
+
+  form-text input[type="text"] {
+    width: 90%;
+    margin-bottom: 3%;
+  }
+
+  .footer-bottom {
+    padding: 2% 0 4%;
+  }
+
+  .reg_fb i {
+    font-size: 0.8755em;
+  }
+
+  .reg_fb img {
+    padding: 11px;
+  }
+
+  .container {
+    top: -47px;
+  }
+
+  .form {
+    margin: 40px auto 79px;
+  }
+
+  form input[type="submit"] {
+    padding: 10px 27px;
+  }
+
+  .registration_form input[type="text"], .registration_form input[type="email"], .registration_form input[type="tel"], .registration_form input[type="password"] {
+    width: 90.333333%;
+  }
+
+  h4.style {
+    font-size: 1.2em;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .wrap {
+    width: 95%;
+  }
+
+  .signin {
+    width: 46%;
+    margin-top: 1.2%;
+  }
+
+  .bottom-text h2, .left h3, .contact h3, .about-text h2, .login_left h3 {
+    font-size: 1em;
+  }
+
+  .form input[type="text"] {
+    width: 61%;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .wrap {
+    width: 95%;
+  }
+
+  .logo {
+    margin-top: 1.6%;
+  }
+
+  .signin {
+    width: 46%;
+    margin-top: 1.2%;
+  }
+
+  .bottom-text h2, .left h3, .contact h3, .about-text h2, .login_left h3 {
+    font-size: 1em;
+  }
+
+  .signin li a {
+    padding: 6px 15px;
+  }
+
+  .signin li.b a {
+    padding: 6px 15px;
+  }
+
+  .form input[type="text"] {
+    width: 53%;
+    padding: 9px;
+  }
+
+  .slider {
+    padding-bottom: 6%;
+  }
+
+  form-text input[type="text"] {
+    font-size: 0.82355em;
+    padding: 5px;
+  }
+
+  form textarea {
+    height: 87px;
+  }
+
+  .footer-bottom {
+    padding: 2% 0 6%;
+  }
+
+  .reg_fb i {
+    font-size: 0.82355em;
+    padding: 12px 2px;
+  }
+
+  .registration_form input[type="submit"] {
+    padding: 10px 23px;
+  }
+
+  .reg_fb img {
+    padding: 10px 4px;
+  }
+
+  h4.style {
+    font-size: 1em;
+  }
+}
+
+@media only screen and (max-width: 320px) {
+  .wrap {
+    width: 95%;
+  }
+
+  .logo {
+    text-align: center;
+    float: none;
+    margin: 9px 0 3px;
+  }
+
+  .signin {
+    width: 75%;
+    margin-bottom: 3%;
+  }
+
+  .signin li a {
+    padding: 6px 10px;
+  }
+
+  .signin li.b a {
+    padding: 6px 10px;
+  }
+
+  .signin li.a h6 {
+    padding: 9px 10px;;
+    margin-top: -3px;
+  }
+
+  .form {
+    width: 92%;
+  }
+
+  .form {
+    margin: 40px auto 55px;
+  }
+
+  .left {
+    width: 100%;
+  }
+
+  .right {
+    width: 92%;
+    margin-top: 5%;
+  }
+
+  form-text {
+    width: 100%;
+  }
+
+  form-text input[type="text"] {
+    width: 96%;
+  }
+
+  form textarea {
+    height: 60px;
+    width: 93.3%;
+  }
+
+  .copy-right {
+    float: none;
+    text-align: center;
+    margin-top: 1%;
+  }
+
+  .copy {
+    float: none;
+    text-align: center;
+    margin-top: 1%;
+  }
+
+  .login_left {
+    width: 91%;
+    min-height: 231px;
+  }
+
+  .reg_fb img {
+    padding: 10px 10px;
+  }
+
+  .reg_fb i {
+    padding: 12px 28px;
+  }
+}

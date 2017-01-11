@@ -59,10 +59,11 @@ export class OrganizationDetailComponent implements OnDestroy {
     this.newRole = Object.assign({}, this.emptyRole);
     this.statusSubscription = store.select((state: any) => state.organizations.organizationStatus)
       .subscribe((status: string) => {
+        // We need a better way to do this...
       if (ActionTypes.EDITED === status) {
-        this.status = 'organization_edited';
+        this.status = 'iyo.organization_edited';
       } else if (ActionTypes.ORGANIZATION_ADDED === status) {
-        this.status = 'organization_added';
+        this.status = 'iyo.organization_added';
       } else {
         return;
       }
@@ -97,9 +98,9 @@ export class OrganizationDetailComponent implements OnDestroy {
       this.newModule = '';
     }
 
-  public removeModule(thiz: OrganizationDetailComponent, m: string) {
-      thiz.organization.modules = thiz.organization.modules.filter(a => a !== m);
-      thiz.cdRef.markForCheck();
+  public removeModule(m: string) {
+    this.organization.modules = this.organization.modules.filter(a => a !== m);
+    this.cdRef.markForCheck();
   }
 
   public addAutoConnectedInput() {
@@ -109,9 +110,9 @@ export class OrganizationDetailComponent implements OnDestroy {
     this.newACS = '';
   }
 
-  public removeAutoConnectedService(thiz: OrganizationDetailComponent, acs: string) {
-    thiz.organization.auto_connected_services = thiz.organization.auto_connected_services.filter(a => a !== acs);
-    thiz.cdRef.markForCheck();
+  public removeAutoConnectedService(acs: string) {
+    this.organization.auto_connected_services = this.organization.auto_connected_services.filter(a => a !== acs);
+    this.cdRef.markForCheck();
   }
 
   public addRole() {
@@ -132,13 +133,13 @@ export class OrganizationDetailComponent implements OnDestroy {
   }
 
   public showConfirmRemoveModule(m: string) {
-    let msg = this.translate.get('do_you_want_to_delete_module', {m: m});
-    this.showConfirmDialog(this.translate.get('confirmation'), msg, this.removeModule, m);
+    let msg = this.translate.get('iyo.do_you_want_to_delete_module', { m: m });
+    this.showConfirmDialog(this.translate.get('iyo.confirmation'), msg, this.removeModule, m);
   }
 
   public showConfirmRemoveACS(acs: string) {
-    let msg = this.translate.get('do_you_want_to_delete_auto_connected_service', {acs: acs});
-    this.showConfirmDialog(this.translate.get('confirmation'), msg, this.removeAutoConnectedService, acs);
+    let msg = this.translate.get('iyo.do_you_want_to_delete_auto_connected_service', { acs: acs });
+    this.showConfirmDialog(this.translate.get('iyo.confirmation'), msg, this.removeAutoConnectedService, acs);
   }
 
   public showConfirmDialog(title: any, message: any, callback: any, callback_param: string) {
@@ -157,10 +158,12 @@ export class OrganizationDetailComponent implements OnDestroy {
       // TODO: https://github.com/angular/material2/pull/2266
       this.dialogRef.componentInstance[ 'title' ] = title;
       this.dialogRef.componentInstance[ 'message' ] = message;
+    this.dialogRef.componentInstance[ 'ok' ] = this.translate.get('iyo.yes');
+    this.dialogRef.componentInstance[ 'cancel' ] = this.translate.get('iyo.no');
       this.dialogRef.afterClosed().subscribe((confirmed: boolean) => {
           this.dialogRef = null;
           if (confirmed) {
-              callback(this, callback_param);
+            callback(callback_param);
           }
       });
   }

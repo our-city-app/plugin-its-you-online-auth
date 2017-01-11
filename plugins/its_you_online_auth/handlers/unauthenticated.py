@@ -81,11 +81,11 @@ class PickOrganizationHandler(webapp2.RequestHandler):
                 self.redirect('/login/redirect?%s' % urllib.urlencode(params))
                 return
 
-        template_dict = dict(source=self.request.GET.get('source', SOURCE_WEB),
+        template_parameters = dict(source=self.request.GET.get('source', SOURCE_WEB),
                              error=error)
 
         render_page(self.response, os.path.join('unauthenticated', 'organization.html'), plugin_name=NAMESPACE,
-                    template_dict=template_dict)
+                    template_parameters=template_parameters)
 
 
 class DoLoginHandler(webapp2.RequestHandler):
