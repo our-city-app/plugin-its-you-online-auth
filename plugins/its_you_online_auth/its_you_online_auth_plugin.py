@@ -62,7 +62,7 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
         return ['/itsyouonlinesettings<route:.*>']
 
     def get_modules(self):
-        yield Module(name=u'its_you_online_settings', scopes=[Scopes.ADMIN, Scopes.ORGANIZATION_ADMIN])
+        yield Module(u'its_you_online_settings', [Scopes.ADMIN, Scopes.ORGANIZATION_ADMIN], 10000)
 
     def get_login_url(self):
         return self.configuration.login_url
@@ -107,9 +107,9 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
                     if module.scopes and not any(module_scopes):
                         continue
 
-                    visible_modules.add(module.name)
+                    visible_modules.add(module)
 
-            return list(visible_modules)
+            return map(lambda m: m.name, sorted(visible_modules, key=lambda m: m.sort_order))
         except:
             logging.debug('Failed to get visible modules', exc_info=True)
             return []

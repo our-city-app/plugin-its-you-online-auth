@@ -9,9 +9,9 @@
     "invalid_roles": "Ongeldige rol (len). Rollen moet een lijst van gehele getallen zijn, gescheiden met komma's.",
     "itsyouonline_settings": "It's You Online Instellingen",
     "modules": "Modules",
-    "no": "Nee",
     "new_auto_connected_service": "Nieuwe auto verbonden dienst",
     "new_module": "Nieuwe module",
+    "no": "Nee",
     "organization_added": "Organisatie toegevoegd!",
     "organization_edited": "Organisatie bewerkt!",
     "organization_id": "Organizatie id",
@@ -20,7 +20,7 @@
     "role_ids_x": "Rol ids: {{ ids }}",
     "roles": "Rollen",
     "service": "Service",
-    "update_organization": "organisatie bijwerken",
+    "update_organization": "Organisatie bijwerken",
     "yes": "Ja"
   }
 }
