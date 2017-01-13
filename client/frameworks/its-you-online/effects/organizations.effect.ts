@@ -7,7 +7,7 @@ import { Observable } from 'rxjs/Observable';
 // module
 import { OrganizationsService } from '../services/organizations.service';
 import * as organizationActions from '../actions/organizations.action';
-import { Organization } from '../types/organization.types';
+import { Organization } from '../index';
 
 @Injectable()
 export class OrganizationsEffects {

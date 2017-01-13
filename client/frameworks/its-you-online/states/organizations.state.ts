@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs/Observable';
-import { Organization } from '../types/organization.types';
+import { Organization } from '../index';
 
 export interface IOrganizationsState {
   organizations: Array<Organization>;

@@ -3,9 +3,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import * as states from '../its-you-online.state';
 import * as actions from '../actions/organizations.action';
-import { Organization } from '../types/organization.types';
-import { IOrganizationsState } from '../states/organizations.state';
-
+import { Organization, IOrganizationsState } from '../index';
 
 @Component({
   moduleId: module.id,

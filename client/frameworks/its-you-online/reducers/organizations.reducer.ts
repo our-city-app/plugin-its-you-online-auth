@@ -1,6 +1,6 @@
 import { IOrganizationsState, initialState } from '../states/index';
 import * as actions from '../actions/organizations.action';
-import { Organization } from '../types/organization.types';
+import { Organization } from '../index';
 
 export function organizationsReducer(state: IOrganizationsState = initialState,
                                      action: actions.Actions): IOrganizationsState {

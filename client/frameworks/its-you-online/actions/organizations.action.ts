@@ -1,7 +1,7 @@
 import { Action } from '@ngrx/store';
 import { type } from '../../core/utils/type';
 import { ITS_YOU_ONLINE_CATEGORY } from '../common/category.common';
-import { Organization } from '../types/organization.types';
+import { Organization } from '../index';
 
 /**
  * For each action type in an action group, make a simple

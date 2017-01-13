@@ -7,7 +7,7 @@ import {
   OnDestroy,
   ChangeDetectorRef
 } from '@angular/core';
-import { Organization, RegistrationResultRoles } from '../types/organization.types';
+import { Organization, RegistrationResultRoles } from '../index';
 import { ActionTypes, IOrganizationsActions } from '../actions/organizations.action';
 import { Store } from '@ngrx/store';
 import { IOrganizationsState } from '../states/organizations.state';

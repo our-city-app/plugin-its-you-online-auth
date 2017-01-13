@@ -8,7 +8,7 @@ import { Config } from '../../core/index';
 import { Analytics, AnalyticsService } from '../../analytics/index';
 import { ITS_YOU_ONLINE_CATEGORY } from '../common/category.common';
 // module
-import { Organization } from '../types/organization.types';
+import { Organization } from '../index';
 import { ItsYouOnlineConfig } from './its-you-online-config';
 
 @Injectable()

@@ -7,7 +7,7 @@ import * as states from '../its-you-online.state';
 import { IOrganizationsState } from '../states';
 import { RouterExtensions, LogService } from '../../core/index';
 import * as itsyouonline from '../index';
-import { Organization } from '../types/organization.types';
+import { Organization } from '../index';
 
 @Component({
   moduleId: module.id,

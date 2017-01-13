@@ -12,3 +12,6 @@ export * from './reducers/index';
 
 // state
 export * from './states/index';
+
+// interfaces
+export * from './interfaces/index';

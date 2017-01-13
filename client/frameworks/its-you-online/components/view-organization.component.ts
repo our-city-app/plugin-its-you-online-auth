@@ -6,7 +6,8 @@ import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs/Subscription';
 
 import * as organizationActions from '../actions/organizations.action';
-import { IOrganizationsState } from '../states/organizations.state';
+import { IOrganizationsState } from '../index';
+
 @Component({
   moduleId: module.id,
   selector: 'view-organization',
