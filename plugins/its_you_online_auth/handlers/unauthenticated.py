@@ -75,15 +75,17 @@ class PickOrganizationHandler(webapp2.RequestHandler):
                     error = e.message
 
             if not error:
-                params = dict()
-                params['source'] = source
-                params['organization_id'] = organization_id
+                params = {
+                    'source': source,
+                    'organization_id': organization_id
+                }
                 self.redirect('/login/redirect?%s' % urllib.urlencode(params))
                 return
 
-        template_parameters = dict(source=self.request.GET.get('source', SOURCE_WEB),
-                             error=error)
-
+        template_parameters = {
+            'source': self.request.GET.get('source', SOURCE_WEB),
+            'error': error
+        }
         render_page(self.response, os.path.join('unauthenticated', 'organization.html'), plugin_name=NAMESPACE,
                     template_parameters=template_parameters)
 

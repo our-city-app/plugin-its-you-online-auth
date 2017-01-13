@@ -113,3 +113,13 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
         except:
             logging.debug('Failed to get visible modules', exc_info=True)
             return []
+
+    def set_user_language(self, language):
+        session = get_current_session()
+        profile = Profile.create_key(SOURCE_WEB, session.user_id).get()
+        profile.language = language
+        profile.put()
+
+    def get_user_language(self):
+        session = get_current_session()
+        return Profile.create_key(SOURCE_WEB, session.user_id).get().language

@@ -38,6 +38,7 @@ class Profile(ndb.Model):
     access_token = ndb.StringProperty(indexed=False)
     organization_id = ndb.StringProperty(indexed=False)
     app_email = ndb.StringProperty(indexed=False)
+    language = ndb.StringProperty(indexed=False)
 
     @property
     def source(self):
