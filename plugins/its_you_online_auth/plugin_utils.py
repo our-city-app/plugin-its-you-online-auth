@@ -17,4 +17,4 @@
 
 
 def get_sub_organization(config, organization_id):
-    return "%s.organizations.%s" % (config.root_organization.name, organization_id)
+    return '%s.organizations.%s.users' % (config.root_organization.name, organization_id)

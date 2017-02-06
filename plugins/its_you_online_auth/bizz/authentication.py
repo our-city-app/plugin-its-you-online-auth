@@ -85,11 +85,12 @@ def get_user_scopes(code, state):
         if login_state.source == "app":
             raise HttpForbiddenException()
         else:
-            sub_org = login_state.organization_id
+            users_organization = login_state.organization_id
     else:
-        sub_org = get_sub_organization(config, login_state.organization_id)
+        users_organization = get_sub_organization(config, login_state.organization_id)
 
-    expected_scope = 'user:memberof:%s' % sub_org
+    admins_organization = users_organization.replace('.users', '.admins')
+    expected_scope = 'user:memberof:%s' % users_organization
     if not scope or expected_scope not in scope:
         raise HttpForbiddenException()
 
@@ -106,12 +107,11 @@ def get_user_scopes(code, state):
 
     scopes = []
     uber_admin_organization = '%s.admins' % config.root_organization.name
-    admin_organization = '%s.admins' % sub_org
     if has_access_to_organization(client, uber_admin_organization, username):
         scopes.append(Scopes.ADMIN)
-    if has_access_to_organization(client, admin_organization, username):
+    if has_access_to_organization(client, admins_organization, username):
         scopes.append(Scopes.get_organization_scope(Scopes.ORGANIZATION_ADMIN, login_state.organization_id))
         scopes.append(Scopes.get_organization_scope(Scopes.ORGANIZATION_MEMBER, login_state.organization_id))
-    elif not has_access_to_organization(client, sub_org, username):
+    elif not has_access_to_organization(client, users_organization, username):
         raise HttpForbiddenException()
     return username, scopes
