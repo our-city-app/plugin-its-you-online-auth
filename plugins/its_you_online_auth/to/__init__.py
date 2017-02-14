@@ -44,6 +44,7 @@ class RootOrganization(object):
 class ItsYouOnlineConfiguration(object):
     def __init__(self, config):
         self.login_url = config['login_url']
+        self.login_with_organization = config.get('login_with_organization', True)
         self.cookie_name = config['cookie_name'].encode('utf8')
         self.cookie_key = config['cookie_key'].encode('utf8')
         self.root_organization = RootOrganization(config['root_organization'])

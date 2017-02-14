@@ -21,18 +21,19 @@ import urllib
 import uuid
 
 import webapp2
+from framework.handlers import render_error_page, render_page
+from framework.utils import now
 
-from auth import login_user, logout_user, get_current_user_id
-from handlers import render_error_page, render_page
+from framework.bizz.authentication import login_user, logout_user, get_current_user_id
+from framework.plugin_loader import get_config
 from mcfw.exceptions import HttpException
-from plugin_loader import get_config
-from plugins.its_you_online_auth.bizz.authentication import get_user_scopes
+from plugins.its_you_online_auth.bizz.authentication import get_user_scopes_from_access_token, get_jwt
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
 from plugins.its_you_online_auth.models import OauthLoginState
 from plugins.its_you_online_auth.plugin_consts import OAUTH_BASE_URL, NAMESPACE, SOURCE_WEB, SOURCE_APP
 from plugins.its_you_online_auth.plugin_utils import get_sub_organization
-from utils import now
+from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
 
 
 class SigninHandler(webapp2.RequestHandler):
@@ -95,36 +96,43 @@ class DoLoginHandler(webapp2.RequestHandler):
         organization_id = self.request.GET.get('organization_id', None)
         source = self.request.GET.get('source', SOURCE_WEB)
 
-        if not organization_id:
+        config = get_config(NAMESPACE)
+        assert isinstance(config, ItsYouOnlineConfiguration)
+
+        if not organization_id and config.login_with_organization:
             self.redirect('/login/organization')
             return
 
-        config = get_config(NAMESPACE)
-        if organization_id != config.root_organization.name:
-            try:
-                get_organization(organization_id)
-            except OrganizationNotFoundException as e:
-                render_error_page(self.response, httplib.BAD_REQUEST, e.message)
-                return
+        if config.login_with_organization:
+            if organization_id != config.root_organization.name:
+                try:
+                    get_organization(organization_id)
+                except OrganizationNotFoundException as e:
+                    render_error_page(self.response, httplib.BAD_REQUEST, e.message)
+                    return
 
         if source not in [SOURCE_WEB, SOURCE_APP]:
             render_error_page(self.response, httplib.BAD_REQUEST, 'Bad Request')
             return
 
-        if organization_id == config.root_organization.name:
-            if source == SOURCE_APP:
-                render_error_page(self.response, httplib.BAD_REQUEST, 'Bad Request')
-                return
+        if config.login_with_organization:
+            if organization_id == config.root_organization.name:
+                if source == SOURCE_APP:
+                    render_error_page(self.response, httplib.BAD_REQUEST, 'Bad Request')
+                    return
+                else:
+                    sub_org = organization_id
             else:
-                sub_org = organization_id
+                sub_org = get_sub_organization(config, organization_id)
+            scope = 'user:memberof:%s' % sub_org
         else:
-            sub_org = get_sub_organization(config, organization_id)
+            scope = 'user:memberof:%s' % config.root_organization.name
 
         params = {
             'response_type': 'code',
             'client_id': config.root_organization.name,
             'redirect_uri': config.root_organization[source].redirect_uri,
-            'scope': 'user:memberof:%s' % sub_org,
+            'scope': scope,
             'state': str(uuid.uuid4())
         }
 
@@ -145,10 +153,31 @@ class Oauth2CallbackHandler(webapp2.RequestHandler):
         code = self.request.GET.get('code', None)
         state = self.request.GET.get('state', None)
         try:
-            username, scopes = get_user_scopes(code, state)
+            config = get_config(NAMESPACE)
+            assert isinstance(config, ItsYouOnlineConfiguration)
+            if config.login_with_organization:
+                username, scopes = get_user_scopes_from_access_token(code, state)
+                jwt = None
+            else:
+                scope = u'user:memberof:{}'.format(config.root_organization.name)
+                jwt, username, scopes = get_jwt(code, state, scope)
         except HttpException as e:
             render_error_page(self.response, e.http_code, e.error)
             return
 
-        login_user(self.response, username, scopes)
+        login_user(self.response, username, scopes, jwt)
         self.redirect('/')
+
+
+class ContinueLoginHandler(webapp2.RequestHandler):
+    def get(self):
+        # Redirect to /login/organization if an organization is required to login
+        # else immediately redirect to to itsyou.online
+        config = get_config(NAMESPACE)  # type: ItsYouOnlineConfiguration
+        if config.login_with_organization:
+            self.redirect('/login/organization')
+        else:
+            params = {
+                'source': self.request.GET.get('source', SOURCE_WEB)
+            }
+            self.redirect('/login/redirect?%s' % urllib.urlencode(params))

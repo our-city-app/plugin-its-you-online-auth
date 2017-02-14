@@ -70,10 +70,6 @@ export function organizationsReducer(state: IOrganizationsState = initialState,
     case actions.ActionTypes.DELETE:
       return Object.assign({}, state, {organizationStatus: action.type});
     default:
-      return {
-        organizations: state.organizations,
-        selectedOrganization: state.selectedOrganization,
-        organizationStatus: action.type
-      };
+      return state;
   }
 }

@@ -35,7 +35,7 @@ class OauthLoginState(ndb.Model):
 
 
 class Profile(ndb.Model):
-    access_token = ndb.StringProperty(indexed=False)
+    access_token = ndb.StringProperty(indexed=False)  # This can also contain a JWT
     organization_id = ndb.StringProperty(indexed=False)
     app_email = ndb.StringProperty(indexed=False)
     language = ndb.StringProperty(indexed=False)

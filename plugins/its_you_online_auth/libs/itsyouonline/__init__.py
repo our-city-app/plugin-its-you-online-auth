@@ -17,7 +17,6 @@
 
 from .client import Client as APIClient
 import requests
-import urllib
 from urlparse import urljoin
 BASE_URI = "https://itsyou.online/"
 

@@ -19,15 +19,16 @@ import json
 import logging
 
 from google.appengine.ext import ndb
+
+from framework.plugin_loader import get_config
 from mcfw.rpc import serialize_complex_value, parse_complex_value
-from plugin_loader import get_config
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
 from plugins.its_you_online_auth.models import Profile, OauthLoginState
+from plugins.its_you_online_auth.plugin_consts import NAMESPACE
 from plugins.its_you_online_auth.plugin_utils import get_sub_organization
 from plugins.rogerthat_api.to.friends import RegistrationResultTO, ACCEPT_ID, DECLINE_ID, REGISTRATION_ORIGIN_OAUTH, \
     RegistrationResultRolesTO
-from plugins.its_you_online_auth.plugin_consts import NAMESPACE
 
 
 def friend_register(rt_settings, id_, service_identity, user_details, origin, data, **kwargs):

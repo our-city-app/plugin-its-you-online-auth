@@ -22,15 +22,18 @@ import urllib
 from google.appengine.ext import ndb
 
 import requests
+from framework.plugin_loader import get_config
+from jose import jwt
 from mcfw.exceptions import HttpBadRequestException, HttpException, HttpForbiddenException
-from plugin_loader import get_config
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import OauthLoginState, Profile
-from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE, SOURCE_WEB
+from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE, SOURCE_WEB, \
+    ITS_YOU_ONLINE_PUBLIC_KEY, JWT_AUDIENCE, JWT_ISSUER
 from plugins.its_you_online_auth.plugin_utils import get_sub_organization
+from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
 
 
-def get_access_response(config, login_state, code):
+def get_access_response(config, login_state, code, use_jwt=None, scope=None, audience=None):
     params = {
         'client_id': config.root_organization.name,
         'client_secret': config.root_organization[SOURCE_WEB].client_secret,
@@ -38,12 +41,40 @@ def get_access_response(config, login_state, code):
         'redirect_uri': config.root_organization[SOURCE_WEB].redirect_uri,
         'state': login_state.state
     }
+    if use_jwt:
+        params['response_type'] = 'id_token'
+        params['scope'] = scope
+        params['aud'] = audience
     access_token_url = '%s/access_token?%s' % (OAUTH_BASE_URL, urllib.urlencode(params))
     response = requests.post(access_token_url, params)
 
-    content = response.json() if response.status_code == httplib.OK else response.content
+    if use_jwt:
+        content = response.content
+    else:
+        content = response.json() if response.status_code == httplib.OK else response.content
     logging.debug('access_response: code %d, content %s', response.status_code, content)
-    return response.status_code, content
+    if response.status_code != httplib.OK:
+        exception = HttpException()
+        exception.http_code = response.status_code
+        exception.error = content
+        if use_jwt and response.status_code == httplib.UNAUTHORIZED:
+            logging.error('https://github.com/itsyouonline/identityserver/issues/436')
+        raise exception
+    return content
+
+
+def refresh_jwt(old_jwt):
+    url = '{}/jwt/refresh'.format(OAUTH_BASE_URL)
+    headers = {
+        'Authorization': 'bearer {jwt}'.format(jwt=old_jwt)
+    }
+    data = requests.get(url, headers)
+    if data.status_code == 200:
+        return data.text
+    e = HttpException()
+    e.http_code = data.status_code
+    e.error = data.text
+    raise e
 
 
 def has_access_to_organization(client, organization_id, username):
@@ -54,7 +85,7 @@ def has_access_to_organization(client, organization_id, username):
     return False
 
 
-def get_user_scopes(code, state):
+def get_user_scopes_from_access_token(code, state):
     """
     Args:
         code (unicode)
@@ -70,13 +101,9 @@ def get_user_scopes(code, state):
         raise HttpBadRequestException()
 
     config = get_config(NAMESPACE)
+    assert isinstance(config, ItsYouOnlineConfiguration)
 
-    status_code, access_result = get_access_response(config, login_state, code)
-    if status_code != httplib.OK:
-        exception = HttpException()
-        exception.http_code = status_code
-        exception.error = access_result
-        raise exception
+    access_result = get_access_response(config, login_state, code)
 
     username = access_result['info']['username']
     scope = access_result.get('scope')
@@ -94,12 +121,7 @@ def get_user_scopes(code, state):
     if not scope or expected_scope not in scope:
         raise HttpForbiddenException()
 
-    profile_key = Profile.create_key(login_state.source, username)
-    profile = profile_key.get() or Profile(key=profile_key)
-    profile.access_token = access_result.get('access_token')
-    profile.organization_id = login_state.organization_id
-    login_state.completed = True
-    ndb.put_multi([profile, login_state])
+    save_profile_state(access_result.get('access_token'), login_state, username)
 
     client = Client()
     client.oauth.LoginViaClientCredentials(config.root_organization.name,
@@ -115,3 +137,41 @@ def get_user_scopes(code, state):
     elif not has_access_to_organization(client, users_organization, username):
         raise HttpForbiddenException()
     return username, scopes
+
+
+def save_profile_state(access_token_or_jwt, login_state, username):
+    profile_key = Profile.create_key(login_state.source, username)
+    profile = profile_key.get() or Profile(key=profile_key)
+    profile.access_token = access_token_or_jwt
+    profile.organization_id = login_state.organization_id
+    login_state.completed = True
+    ndb.put_multi([profile, login_state])
+
+
+def get_jwt(code, state, scope=''):
+    """
+    Args:
+        code (unicode)
+        state (unicode)
+        scope (unicode)
+    """
+    if not (code or state):
+        logging.debug('Code or state are missing.\nCode: %s\nState:%s', code, state)
+        raise HttpBadRequestException()
+
+    login_state = OauthLoginState.create_key(state).get()
+    if not login_state:
+        logging.debug('Login state not found')
+        raise HttpBadRequestException()
+
+    config = get_config(NAMESPACE)  # type: ItsYouOnlineConfiguration
+    json_web_token = get_access_response(config, login_state, code, True, scope, audience=JWT_AUDIENCE)
+    decoded_jwt = jwt.decode(json_web_token, str(ITS_YOU_ONLINE_PUBLIC_KEY), audience=JWT_AUDIENCE,
+                             issuer=JWT_ISSUER)
+    if decoded_jwt['azp'] != config.root_organization.name:
+        logging.error('Received invalid JWT: %s', decoded_jwt)
+        raise HttpForbiddenException()
+    username = decoded_jwt['username']
+    scopes = []
+    save_profile_state(json_web_token, login_state, username)
+    return json_web_token, username, scopes

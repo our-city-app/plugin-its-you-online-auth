@@ -17,23 +17,25 @@
 
 import logging
 
+from framework.utils.plugins import Handler, Module
+
 import requests_toolbelt.adapters.appengine
-from auth import get_current_session
+from framework.bizz.authentication import get_current_session
+from framework.plugin_loader import AuthPlugin, get_auth_plugin, get_plugin, get_plugins, get_config
+from jose import jwt, ExpiredSignatureError, JWSError
 from mcfw.consts import AUTHENTICATED
 from mcfw.restapi import rest_functions
-from plugin_loader import AuthPlugin
-from plugin_loader import get_plugin
-from plugin_loader import get_plugins, get_config
 from plugins.its_you_online_auth.api import authenticated
+from plugins.its_you_online_auth.bizz.authentication import refresh_jwt
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
-    PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler
+    PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler
 from plugins.its_you_online_auth.models import Profile
-from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_WEB
+from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_WEB, ITS_YOU_ONLINE_PUBLIC_KEY, \
+    JWT_AUDIENCE, JWT_ISSUER
 from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
 from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
 from plugins.rogerthat_api.rogerthat_api_plugin import RogerthatApiPlugin
-from utils.plugins import Handler, Module
 
 requests_toolbelt.adapters.appengine.monkeypatch()
 
@@ -52,6 +54,7 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
             yield Handler(url='/login', handler=SigninHandler)
             yield Handler(url='/logout', handler=LogoutHandler)
             yield Handler(url='/login/app', handler=AppLoginHandler)
+            yield Handler(url='/login/continue', handler=ContinueLoginHandler)
             yield Handler(url='/login/organization', handler=PickOrganizationHandler)
             yield Handler(url='/login/redirect', handler=DoLoginHandler)
             yield Handler(url='/oauth2_callback', handler=Oauth2CallbackHandler)
@@ -82,34 +85,39 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
         if not profile:
             return []
 
-        organization_id = profile.organization_id
-        if not organization_id:
-            return []
-
+        visible_modules = set()
         config = get_config(NAMESPACE)
-        if organization_id == config.root_organization.name:
-            return [u'its_you_online_settings']
-
         try:
-            organization = get_organization(organization_id)
-            visible_modules = set()
-            for plugin in get_plugins():
-                for module in plugin.get_modules():
-                    if module.name not in organization.modules:
-                        continue
-                    module_scopes = []
-                    for scope in module.scopes:
-                        if Scopes.get_organization_scope(scope, organization_id) in scopes:
-                            module_scopes.append(True)
-                        else:
-                            module_scopes.append(False)
+            if config.login_with_organization:
+                organization_id = profile.organization_id
+                if not organization_id:
+                    return []
 
-                    if module.scopes and not any(module_scopes):
-                        continue
+                if organization_id == config.root_organization.name:
+                    return [u'its_you_online_settings']
+                organization = get_organization(organization_id)
+                for plugin in get_plugins():
+                    for module in plugin.get_modules():
+                        if config.login_with_organization and module.name not in organization.modules:
+                            continue
+                        module_scopes = []
+                        for scope in module.scopes:
+                            if Scopes.get_organization_scope(scope, organization_id) in scopes:
+                                module_scopes.append(True)
+                            else:
+                                module_scopes.append(False)
 
-                    visible_modules.add(module)
-
+                        if module.scopes and not any(module_scopes):
+                            continue
+                        visible_modules.add(module)
+            else:
+                auth_plugin = get_auth_plugin()
+                for plugin in get_plugins():
+                    if plugin != auth_plugin:
+                        for module in plugin.get_modules():
+                            visible_modules.add(module)
             return map(lambda m: m.name, sorted(visible_modules, key=lambda m: m.sort_order))
+
         except:
             logging.debug('Failed to get visible modules', exc_info=True)
             return []
@@ -123,3 +131,20 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
     def get_user_language(self):
         session = get_current_session()
         return Profile.create_key(SOURCE_WEB, session.user_id).get().language
+
+    def validate_session(self, session):
+        """
+        Args:
+            session (models.Session)
+        """
+        if session.jwt:
+            try:
+                jwt.decode(session.jwt, str(ITS_YOU_ONLINE_PUBLIC_KEY), audience=JWT_AUDIENCE, issuer=JWT_ISSUER)
+            except ExpiredSignatureError:
+                new_jwt = refresh_jwt(session.jwt)
+                session.jwt = new_jwt
+                session.put()
+            except JWSError as e:
+                logging.exception(e)
+                return False
+        return True
