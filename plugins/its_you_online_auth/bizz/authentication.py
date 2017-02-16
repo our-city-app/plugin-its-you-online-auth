@@ -64,6 +64,7 @@ def get_access_response(config, login_state, code, use_jwt=None, scope=None, aud
 
 
 def refresh_jwt(old_jwt):
+    logging.debug('JWT expired, attempting to refresh')
     url = '{}/jwt/refresh'.format(OAUTH_BASE_URL)
     headers = {
         'Authorization': 'bearer {jwt}'.format(jwt=old_jwt)
@@ -71,6 +72,7 @@ def refresh_jwt(old_jwt):
     data = requests.get(url, headers)
     if data.status_code == 200:
         return data.text
+    logging.debug('Failed to refresh JWT\n{}: {}'.format(data.status_code, data.text))
     e = HttpException()
     e.http_code = data.status_code
     e.error = data.text
