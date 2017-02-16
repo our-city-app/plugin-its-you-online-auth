@@ -1,12 +1,12 @@
 <form (submit)="save(organization)" #organizationForm="ngForm">
   <div fxLayout="column" fxFlex="40" fxFlex.md="60" fxFlex.xs="100">
     <md-input-container>
-      <input md-input [(ngModel)]="organization.name" name="newOrganizationName"
+      <input mdInput [(ngModel)]="organization.name" name="newOrganizationName"
              [placeholder]="'iyo.organization_name' | translate" required>
     </md-input-container>
 
     <md-input-container>
-      <input md-input [(ngModel)]="organization.id" name="organization_id"
+      <input mdInput [(ngModel)]="organization.id" name="organization_id"
              [placeholder]="'iyo.organization_id' | translate"
              required [disabled]="!isNew" pattern="^[a-z\d\-_\s]{3,150}$">
     </md-input-container>
@@ -20,7 +20,7 @@
     <br/>
     <div fxLayout="row" fxLayoutAlign="center center">
       <md-input-container fxFlex>
-        <input md-input name="newModule" [(ngModel)]="newModule" type="text"
+        <input mdInput name="newModule" [(ngModel)]="newModule" type="text"
                placeholder="{{ 'iyo.new_module' | translate }}"
                #newModuleElem="ngModel"/>
       </md-input-container>
@@ -39,7 +39,7 @@
     <br/>
     <div fxLayout="row" fxLayoutAlign="center center">
       <md-input-container fxFlex>
-        <input md-input name="newACS" [(ngModel)]="newACS" type="email"
+        <input mdInput name="newACS" [(ngModel)]="newACS" type="email"
                placeholder="{{ 'iyo.new_auto_connected_service' | translate }}"
                pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
                #newACSElem="ngModel"/>
@@ -61,18 +61,18 @@
       </md-list-item>
     </md-list>
     <md-input-container>
-      <input md-input name="newRoleService" [(ngModel)]="newRole.service" type="email"
+      <input mdInput name="newRoleService" [(ngModel)]="newRole.service" type="email"
              placeholder="{{ 'iyo.service' | translate }}"
              pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
              #newRoleServiceElem="ngModel"/>
     </md-input-container>
     <md-input-container>
-      <input md-input name="newRoleIdentity" [(ngModel)]="newRole.identity" type="text"
+      <input mdInput name="newRoleIdentity" [(ngModel)]="newRole.identity" type="text"
              placeholder="{{ 'iyo.identity' | translate }}"
              #newRoleIdentityElem="ngModel"/>
     </md-input-container>
     <md-input-container>
-      <input md-input name="newRoleIds" [(ngModel)]="newRoleIds" type="text"
+      <input mdInput name="newRoleIds" [(ngModel)]="newRoleIds" type="text"
              placeholder="{{ 'iyo.role_ids' | translate }}"
              #newRoleIdsElem="ngModel"/>
     </md-input-container>

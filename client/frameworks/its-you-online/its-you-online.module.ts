@@ -23,7 +23,7 @@ import { OrganizationsEffects } from './effects/organizations.effect';
     HttpModule,
     RouterModule,
     MultilingualModule,
-    MaterialModule.forRoot(),
+    MaterialModule,
     EffectsModule.run(OrganizationsEffects)
   ],
   declarations: [
