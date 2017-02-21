@@ -16,7 +16,7 @@ import { RouterExtensions } from '../../core/services/router-extensions.service'
 import { LogService } from '../../core/services/log.service';
 import { ConfirmDialogComponent } from '../../sample/index';
 import { MdDialogConfig, MdDialog, MdDialogRef } from '@angular/material';
-import { TranslateService } from 'ng2-translate';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   moduleId: module.id,
