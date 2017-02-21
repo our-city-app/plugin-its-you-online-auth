@@ -4,14 +4,14 @@
 
 ## Permissions
 
-The organization structure is expecting to look like this:
+The organization structure is expected to look like this:
 
 ![Organization structure](docs/images/organization-structure.png)
 
 `root_org` is the name of your main organization in this case.
 
-Members of the `admins` organization on the left have permission to everything.
+Members of the top-level organization (`root_org` in this example) have permission to everything.
  
-Members of the `testing.users` organization can only login, and members of `testing.admins` have admin permissions on that organization.
+Members of the `example.users` organization can only login, and members of `example.admins` have admin permissions on that organization.
 
-The organization `root_org.organizations` should never have any members/owners, as that would imply that those users have permission to every organization.
+The organization `root_org.organizations` should never have any members/owners, as that would imply that those users have permission to every organization. Those users should just be added to the top-level organization(`root_org`) if this is what you want.

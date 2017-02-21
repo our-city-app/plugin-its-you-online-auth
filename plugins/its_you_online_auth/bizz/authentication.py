@@ -19,11 +19,13 @@ import httplib
 import logging
 import urllib
 
+from google.appengine.api import urlfetch
 from google.appengine.ext import ndb
 
 import requests
 from framework.plugin_loader import get_config
 from jose import jwt
+from mcfw.consts import DEBUG
 from mcfw.exceptions import HttpBadRequestException, HttpException, HttpForbiddenException
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import OauthLoginState, Profile
@@ -69,13 +71,15 @@ def refresh_jwt(old_jwt):
     headers = {
         'Authorization': 'bearer {jwt}'.format(jwt=old_jwt)
     }
-    data = requests.get(url, headers)
+    data = urlfetch.fetch(url, headers=headers)
     if data.status_code == 200:
-        return data.text
-    logging.debug('Failed to refresh JWT\n{}: {}'.format(data.status_code, data.text))
+        return data.content
+    logging.debug('Failed to refresh JWT\n{}: {}'.format(data.status_code, data.content))
+    if DEBUG:
+        logging.debug(old_jwt)
     e = HttpException()
     e.http_code = data.status_code
-    e.error = data.text
+    e.error = data.content
     raise e
 
 
@@ -130,8 +134,7 @@ def get_user_scopes_from_access_token(code, state):
                                            config.root_organization[SOURCE_WEB].client_secret)
 
     scopes = []
-    uber_admin_organization = '%s.admins' % config.root_organization.name
-    if has_access_to_organization(client, uber_admin_organization, username):
+    if has_access_to_organization(client, config.root_organization.name, username):
         scopes.append(Scopes.ADMIN)
     if has_access_to_organization(client, admins_organization, username):
         scopes.append(Scopes.get_organization_scope(Scopes.ORGANIZATION_ADMIN, login_state.organization_id))
