@@ -35,6 +35,13 @@ from plugins.its_you_online_auth.plugin_utils import get_sub_organization
 from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
 
 
+def get_itsyouonline_client(config):
+    client = Client()
+    client.oauth.LoginViaClientCredentials(config.root_organization.name,
+                                           config.root_organization[SOURCE_WEB].client_secret)
+    return client
+
+
 def get_access_response(config, login_state, code, use_jwt=None, scope=None, audience=None):
     params = {
         'client_id': config.root_organization.name,
@@ -129,9 +136,7 @@ def get_user_scopes_from_access_token(code, state):
 
     save_profile_state(access_result.get('access_token'), login_state, username)
 
-    client = Client()
-    client.oauth.LoginViaClientCredentials(config.root_organization.name,
-                                           config.root_organization[SOURCE_WEB].client_secret)
+    client = get_itsyouonline_client(config)
 
     scopes = []
     if has_access_to_organization(client, config.root_organization.name, username):
@@ -160,7 +165,7 @@ def get_jwt(code, state, scope=''):
         state (unicode)
         scope (unicode)
     """
-    if not (code or state):
+    if not (code and state):
         logging.debug('Code or state are missing.\nCode: %s\nState:%s', code, state)
         raise HttpBadRequestException()
 
@@ -178,5 +183,9 @@ def get_jwt(code, state, scope=''):
         raise HttpForbiddenException()
     username = decoded_jwt['username']
     scopes = []
+
+    client = get_itsyouonline_client(config)
+    if has_access_to_organization(client, config.root_organization.name, username):
+        scopes.append(Scopes.ADMIN)
     save_profile_state(json_web_token, login_state, username)
     return json_web_token, username, scopes
