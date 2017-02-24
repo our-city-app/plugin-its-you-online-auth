@@ -42,7 +42,7 @@ class Profile(ndb.Model):
 
     @property
     def source(self):
-        return self.parent_key().id().decode('utf8')
+        return self.key.parent().id().decode('utf8')
 
     @property
     def username(self):
