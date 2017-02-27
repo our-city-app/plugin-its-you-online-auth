@@ -16,8 +16,8 @@
 # @@license_version:1.1@@
 
 
-def get_organization(config, organization_id):
-    return '{}.organizations.{}.users'.format(config.root_organization.name, organization_id)
+def get_organization(root_organization, organization_id):
+    return '{}.organizations.{}.users'.format(root_organization, organization_id)
 
 
 def get_users_organization(config, organization_id):
