@@ -131,7 +131,7 @@ def get_user_scopes_from_access_token(code, state):
     else:
         users_organization = get_users_organization(config, login_state.organization_id)
 
-    admins_organization = get_organization(config, login_state.organization_id)
+    admins_organization = get_organization(config.root_organization.name, login_state.organization_id)
     expected_scope = 'user:memberof:%s' % users_organization
     if not scope or expected_scope not in scope:
         logging.debug('Missing or invalid scope.Expected: {} - Received: {}'.format(expected_scope, scope))
@@ -140,7 +140,6 @@ def get_user_scopes_from_access_token(code, state):
     save_profile_state(access_result.get('access_token'), login_state, username)
 
     client = get_itsyouonline_client(config)
-
     scopes = [Scopes.get_organization_scope(Scopes.ORGANIZATION_MEMBER, login_state.organization_id)]
     if has_access_to_organization(client, config.root_organization.name, username):
         scopes.append(Scopes.ADMIN)
