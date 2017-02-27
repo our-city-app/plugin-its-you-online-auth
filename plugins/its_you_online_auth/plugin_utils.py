@@ -17,7 +17,7 @@
 
 
 def get_organization(root_organization, organization_id):
-    return '{}.organizations.{}.users'.format(root_organization, organization_id)
+    return '{}.organizations.{}'.format(root_organization, organization_id)
 
 
 def get_users_organization(config, organization_id):
