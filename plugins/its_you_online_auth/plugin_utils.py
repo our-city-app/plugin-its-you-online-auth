@@ -16,5 +16,9 @@
 # @@license_version:1.1@@
 
 
-def get_sub_organization(config, organization_id):
-    return '%s.organizations.%s.users' % (config.root_organization.name, organization_id)
+def get_organization(config, organization_id):
+    return '{}.organizations.{}.users'.format(config.root_organization.name, organization_id)
+
+
+def get_users_organization(config, organization_id):
+    return '{}.users'.format(get_organization(config.root_organization.name, organization_id))

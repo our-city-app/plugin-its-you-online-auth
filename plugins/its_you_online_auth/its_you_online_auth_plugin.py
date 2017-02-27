@@ -17,22 +17,19 @@
 
 import logging
 
-from framework.utils.plugins import Handler, Module
-
 import requests_toolbelt.adapters.appengine
 from framework.bizz.authentication import get_current_session
 from framework.plugin_loader import AuthPlugin, get_auth_plugin, get_plugin, get_plugins, get_config
-from jose import jwt, ExpiredSignatureError, JWSError
+from framework.utils.plugins import Handler, Module
 from mcfw.consts import AUTHENTICATED
 from mcfw.restapi import rest_functions
 from plugins.its_you_online_auth.api import authenticated
-from plugins.its_you_online_auth.bizz.authentication import refresh_jwt
+from plugins.its_you_online_auth.bizz.authentication import validate_session
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
     PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler
 from plugins.its_you_online_auth.models import Profile
-from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_WEB, ITS_YOU_ONLINE_PUBLIC_KEY, \
-    JWT_AUDIENCE, JWT_ISSUER
+from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_WEB
 from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
 from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
 from plugins.rogerthat_api.rogerthat_api_plugin import RogerthatApiPlugin
@@ -135,16 +132,6 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
     def validate_session(self, session):
         """
         Args:
-            session (models.Session)
+            session (framework.models.session.Session)
         """
-        if session.jwt:
-            try:
-                jwt.decode(session.jwt, str(ITS_YOU_ONLINE_PUBLIC_KEY), audience=JWT_AUDIENCE, issuer=JWT_ISSUER)
-            except ExpiredSignatureError:
-                new_jwt = refresh_jwt(session.jwt)
-                session.jwt = new_jwt
-                session.put()
-            except JWSError as e:
-                logging.exception(e)
-                return False
-        return True
+        return validate_session(session)

@@ -14,23 +14,25 @@
 # limitations under the License.
 #
 # @@license_version:1.1@@
+import hashlib
 import httplib
 import logging
 import urllib
 
-from google.appengine.api import urlfetch
+from google.appengine.api import urlfetch, memcache
 from google.appengine.ext import ndb
 
 import requests
 from framework.plugin_loader import get_config
-from jose import jwt
+from framework.utils import now
+from jose import jwt, ExpiredSignatureError
 from mcfw.consts import DEBUG
 from mcfw.exceptions import HttpBadRequestException, HttpException, HttpForbiddenException
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import OauthLoginState, Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE, SOURCE_WEB, \
     ITS_YOU_ONLINE_PUBLIC_KEY, JWT_AUDIENCE, JWT_ISSUER
-from plugins.its_you_online_auth.plugin_utils import get_sub_organization
+from plugins.its_you_online_auth.plugin_utils import get_users_organization, get_organization
 from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
 
 
@@ -127,9 +129,9 @@ def get_user_scopes_from_access_token(code, state):
         else:
             users_organization = login_state.organization_id
     else:
-        users_organization = get_sub_organization(config, login_state.organization_id)
+        users_organization = get_users_organization(config, login_state.organization_id)
 
-    admins_organization = users_organization.replace('.users', '.admins')
+    admins_organization = get_organization(config, login_state.organization_id)
     expected_scope = 'user:memberof:%s' % users_organization
     if not scope or expected_scope not in scope:
         logging.debug('Missing or invalid scope.Expected: {} - Received: {}'.format(expected_scope, scope))
@@ -139,13 +141,13 @@ def get_user_scopes_from_access_token(code, state):
 
     client = get_itsyouonline_client(config)
 
-    scopes = []
+    scopes = [Scopes.get_organization_scope(Scopes.ORGANIZATION_MEMBER, login_state.organization_id)]
     if has_access_to_organization(client, config.root_organization.name, username):
         scopes.append(Scopes.ADMIN)
     if has_access_to_organization(client, admins_organization, username):
         scopes.append(Scopes.get_organization_scope(Scopes.ORGANIZATION_ADMIN, login_state.organization_id))
-        scopes.append(Scopes.get_organization_scope(Scopes.ORGANIZATION_MEMBER, login_state.organization_id))
     elif not has_access_to_organization(client, users_organization, username):
+        # Should never happen as the memberof scope requires this
         logging.debug('User is not a member of organization {}'.format(users_organization))
         raise HttpForbiddenException()
     return username, scopes
@@ -191,3 +193,41 @@ def get_jwt(code, state, scope=''):
         scopes.append(Scopes.ADMIN)
     save_profile_state(json_web_token, login_state, username)
     return json_web_token, username, scopes
+
+
+def decode_jwt_cached(token):
+    # memcache key should be shorter than 250 bytes
+    memcache_key = 'jwt-cache-{}'.format(hashlib.sha256(token).hexdigest())
+    decoded_jwt = memcache.get(key=memcache_key, namespace=NAMESPACE)
+    if decoded_jwt:
+        return decoded_jwt
+    timestamp = now()
+    decoded_jwt = jwt.decode(token, str(ITS_YOU_ONLINE_PUBLIC_KEY), audience=JWT_AUDIENCE, issuer=JWT_ISSUER)
+    # Cache JWT for as long as it's valid
+    memcache.set(key=memcache_key, value=decoded_jwt, time=decoded_jwt['exp'] - timestamp, namespace=NAMESPACE)
+    return decoded_jwt
+
+
+def validate_session(session):
+    """
+    Args:
+        session (framework.models.session.Session) 
+
+    Returns:
+        bool: True if the session is valid
+    """
+    session_expired = False
+    if session.jwt:
+        try:
+            decode_jwt_cached(session.jwt)
+        except ExpiredSignatureError:
+            logging.debug('JWT expired, refreshing...')
+            new_jwt = refresh_jwt(session.jwt)
+            session.jwt = new_jwt
+            session.put()
+        except Exception as e:
+            logging.exception(e)
+            session_expired = True
+            session.deleted = session_expired
+            session.put()
+    return not session_expired

@@ -26,7 +26,7 @@ from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
 from plugins.its_you_online_auth.models import Profile, OauthLoginState
 from plugins.its_you_online_auth.plugin_consts import NAMESPACE
-from plugins.its_you_online_auth.plugin_utils import get_sub_organization
+from plugins.its_you_online_auth.plugin_utils import get_users_organization
 from plugins.rogerthat_api.to.friends import RegistrationResultTO, ACCEPT_ID, DECLINE_ID, REGISTRATION_ORIGIN_OAUTH, \
     RegistrationResultRolesTO
 
@@ -53,7 +53,7 @@ def friend_register(rt_settings, id_, service_identity, user_details, origin, da
 
         scope = data.get("result", {}).get("scope")
         config = get_config(NAMESPACE)
-        expected_scope = "user:memberof:%s" % get_sub_organization(config, login_state.organization_id)
+        expected_scope = "user:memberof:%s" % get_users_organization(config, login_state.organization_id)
         if not scope or scope != expected_scope:
             return DECLINE_ID
 

@@ -32,7 +32,7 @@ from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
 from plugins.its_you_online_auth.models import OauthLoginState
 from plugins.its_you_online_auth.plugin_consts import OAUTH_BASE_URL, NAMESPACE, SOURCE_WEB, SOURCE_APP
-from plugins.its_you_online_auth.plugin_utils import get_sub_organization
+from plugins.its_you_online_auth.plugin_utils import get_users_organization
 from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
 
 
@@ -123,7 +123,7 @@ class DoLoginHandler(webapp2.RequestHandler):
                 else:
                     sub_org = organization_id
             else:
-                sub_org = get_sub_organization(config, organization_id)
+                sub_org = get_users_organization(config, organization_id)
             scope = 'user:memberof:%s' % sub_org
         else:
             scope = 'user:memberof:%s' % config.root_organization.name
