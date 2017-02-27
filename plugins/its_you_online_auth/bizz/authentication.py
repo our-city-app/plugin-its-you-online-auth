@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 # @@license_version:1.1@@
-
 import httplib
 import logging
 import urllib
@@ -123,6 +122,7 @@ def get_user_scopes_from_access_token(code, state):
 
     if login_state.organization_id == config.root_organization.name:
         if login_state.source == "app":
+            logging.debug('Invalid login source')
             raise HttpForbiddenException()
         else:
             users_organization = login_state.organization_id
@@ -132,6 +132,7 @@ def get_user_scopes_from_access_token(code, state):
     admins_organization = users_organization.replace('.users', '.admins')
     expected_scope = 'user:memberof:%s' % users_organization
     if not scope or expected_scope not in scope:
+        logging.debug('Missing or invalid scope.Expected: {} - Received: {}'.format(expected_scope, scope))
         raise HttpForbiddenException()
 
     save_profile_state(access_result.get('access_token'), login_state, username)
@@ -145,6 +146,7 @@ def get_user_scopes_from_access_token(code, state):
         scopes.append(Scopes.get_organization_scope(Scopes.ORGANIZATION_ADMIN, login_state.organization_id))
         scopes.append(Scopes.get_organization_scope(Scopes.ORGANIZATION_MEMBER, login_state.organization_id))
     elif not has_access_to_organization(client, users_organization, username):
+        logging.debug('User is not a member of organization {}'.format(users_organization))
         raise HttpForbiddenException()
     return username, scopes
 
