@@ -23,11 +23,12 @@ from google.appengine.api import urlfetch, memcache
 from google.appengine.ext import ndb
 
 import requests
-from framework.plugin_loader import get_config
+from framework.consts import BASE_URL
+from framework.plugin_loader import get_config, get_auth_plugin
 from framework.utils import now
 from jose import jwt, ExpiredSignatureError
 from mcfw.consts import DEBUG
-from mcfw.exceptions import HttpBadRequestException, HttpException, HttpForbiddenException
+from mcfw.exceptions import HttpBadRequestException, HttpException, HttpForbiddenException, HttpUnAuthorizedException
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import OauthLoginState, Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE, SOURCE_WEB, \
@@ -74,7 +75,6 @@ def get_access_response(config, login_state, code, use_jwt=None, scope=None, aud
 
 
 def refresh_jwt(old_jwt):
-    logging.debug('JWT expired, attempting to refresh')
     url = '{}/jwt/refresh'.format(OAUTH_BASE_URL)
     headers = {
         'Authorization': 'bearer {jwt}'.format(jwt=old_jwt)
@@ -85,10 +85,7 @@ def refresh_jwt(old_jwt):
     logging.debug('Failed to refresh JWT\n{}: {}'.format(data.status_code, data.content))
     if DEBUG:
         logging.debug(old_jwt)
-    e = HttpException()
-    e.http_code = data.status_code
-    e.error = data.content
-    raise e
+    raise HttpUnAuthorizedException(data={'login_url': BASE_URL + get_auth_plugin().get_login_url()})
 
 
 def has_access_to_organization(client, organization_id, username):
@@ -221,8 +218,13 @@ def validate_session(session):
             decode_jwt_cached(session.jwt)
         except ExpiredSignatureError:
             logging.debug('JWT expired, refreshing...')
-            new_jwt = refresh_jwt(session.jwt)
-            session.jwt = new_jwt
+            try:
+                new_jwt = refresh_jwt(session.jwt)
+                session.jwt = new_jwt
+            except Exception:
+                logging.debug('Error while refreshing jwt', exc_info=True)
+                session.deleted = True
+                session_expired = True
             session.put()
         except Exception as e:
             logging.exception(e)
