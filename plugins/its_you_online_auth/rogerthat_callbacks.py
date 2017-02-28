@@ -21,7 +21,7 @@ import logging
 from google.appengine.ext import ndb
 
 from framework.plugin_loader import get_config
-from mcfw.rpc import serialize_complex_value, parse_complex_value
+from mcfw.rpc import serialize_complex_value
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
 from plugins.its_you_online_auth.models import Profile, OauthLoginState
@@ -73,7 +73,12 @@ def friend_register(rt_settings, id_, service_identity, user_details, origin, da
             organization = get_organization(login_state.organization_id)
             result.auto_connected_services = organization.auto_connected_services
             if organization.roles:
-                result.roles = parse_complex_value(RegistrationResultRolesTO, json.loads(organization.roles), True)
+                for role in organization.roles:
+                    roleTO = RegistrationResultRolesTO()
+                    roleTO.service = role.service
+                    roleTO.identity = role.identity
+                    roleTO.ids = role.ids
+                    result.roles.append(roleTO)
         except OrganizationNotFoundException:
             pass
 
