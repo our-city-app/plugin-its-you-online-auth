@@ -11,10 +11,10 @@ import { Organization, RegistrationResultRoles } from '../index';
 import { ActionTypes, IOrganizationsActions } from '../actions/organizations.action';
 import { Store } from '@ngrx/store';
 import { IOrganizationsState } from '../states/organizations.state';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { RouterExtensions } from '../../core/services/router-extensions.service';
 import { LogService } from '../../core/services/log.service';
-import { ConfirmDialogComponent } from '../../sample/index';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../sample/index';
 import { MdDialogConfig, MdDialog, MdDialogRef } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -142,24 +142,16 @@ export class OrganizationDetailComponent implements OnDestroy {
     this.showConfirmDialog(this.translate.get('iyo.confirmation'), msg, this.removeAutoConnectedService, acs);
   }
 
-  public showConfirmDialog(title: any, message: any, callback: any, callback_param: string) {
+  public showConfirmDialog(title: Observable<string>, message: Observable<string>, callback: any, callback_param: string) {
       let config: MdDialogConfig = {
-          disableClose: false,
-          width: '',
-          height: '',
-          position: {
-            top: '',
-            bottom: '',
-            left: '',
-            right: ''
-          }
+        data: <ConfirmDialogData>{
+          title: title,
+          message: message,
+          ok: this.translate.get('iyo.yes'),
+          cancel: this.translate.get('iyo.no')
+        }
       };
       this.dialogRef = this.dialog.open(ConfirmDialogComponent, config);
-      // TODO: https://github.com/angular/material2/pull/2266
-      this.dialogRef.componentInstance[ 'title' ] = title;
-      this.dialogRef.componentInstance[ 'message' ] = message;
-    this.dialogRef.componentInstance[ 'ok' ] = this.translate.get('iyo.yes');
-    this.dialogRef.componentInstance[ 'cancel' ] = this.translate.get('iyo.no');
       this.dialogRef.afterClosed().subscribe((confirmed: boolean) => {
           this.dialogRef = null;
           if (confirmed) {
