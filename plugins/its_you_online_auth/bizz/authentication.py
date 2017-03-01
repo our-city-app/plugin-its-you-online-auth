@@ -44,7 +44,7 @@ def get_itsyouonline_client(config):
     return client
 
 
-def get_access_response(config, login_state, code, use_jwt=None, scope=None, audience=None):
+def get_access_response(config, login_state, code, use_jwt=None, audience=None):
     params = {
         'client_id': config.root_organization.name,
         'client_secret': config.root_organization[SOURCE_WEB].client_secret,
@@ -54,7 +54,7 @@ def get_access_response(config, login_state, code, use_jwt=None, scope=None, aud
     }
     if use_jwt:
         params['response_type'] = 'id_token'
-        params['scope'] = scope
+        params['scope'] = 'offline_access'
         params['aud'] = audience
     access_token_url = '%s/access_token?%s' % (OAUTH_BASE_URL, urllib.urlencode(params))
     response = requests.post(access_token_url, params)
@@ -158,12 +158,11 @@ def save_profile_state(access_token_or_jwt, login_state, username):
     ndb.put_multi([profile, login_state])
 
 
-def get_jwt(code, state, scope=''):
+def get_jwt(code, state):
     """
     Args:
         code (unicode)
         state (unicode)
-        scope (unicode)
     """
     if not (code and state):
         logging.debug('Code or state are missing.\nCode: %s\nState:%s', code, state)
@@ -175,7 +174,7 @@ def get_jwt(code, state, scope=''):
         raise HttpBadRequestException()
 
     config = get_config(NAMESPACE)  # type: ItsYouOnlineConfiguration
-    json_web_token = get_access_response(config, login_state, code, True, scope, audience=JWT_AUDIENCE)
+    json_web_token = get_access_response(config, login_state, code, True, audience=JWT_AUDIENCE)
     decoded_jwt = jwt.decode(json_web_token, str(ITS_YOU_ONLINE_PUBLIC_KEY), audience=JWT_AUDIENCE,
                              issuer=JWT_ISSUER)
     if decoded_jwt['azp'] != config.root_organization.name:

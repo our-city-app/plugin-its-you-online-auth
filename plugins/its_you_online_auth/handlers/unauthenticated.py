@@ -159,9 +159,7 @@ class Oauth2CallbackHandler(webapp2.RequestHandler):
                 username, scopes = get_user_scopes_from_access_token(code, state)
                 jwt = None
             else:
-                # offline_access is needed to be able to refresh the JWT
-                scope = u'user:memberof:{},offline_access'.format(config.root_organization.name)
-                jwt, username, scopes = get_jwt(code, state, scope)
+                jwt, username, scopes = get_jwt(code, state)
         except HttpException as e:
             render_error_page(self.response, e.http_code, e.error)
             return
