@@ -207,7 +207,7 @@ def decode_jwt_cached(token):
 def validate_session(session):
     """
     Args:
-        session (framework.models.session.Session) 
+        session (framework.models.session.Session)
 
     Returns:
         bool: True if the session is valid

@@ -142,7 +142,8 @@ export class OrganizationDetailComponent implements OnDestroy {
     this.showConfirmDialog(this.translate.get('iyo.confirmation'), msg, this.removeAutoConnectedService, acs);
   }
 
-  public showConfirmDialog(title: Observable<string>, message: Observable<string>, callback: any, callback_param: string) {
+  public showConfirmDialog(title: Observable<string>, message: Observable<string>, callback: any,
+                           callback_param: string) {
       let config: MdDialogConfig = {
         data: <ConfirmDialogData>{
           title: title,
