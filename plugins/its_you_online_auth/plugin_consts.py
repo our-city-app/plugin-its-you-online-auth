@@ -17,7 +17,6 @@
 from plugins.its_you_online_auth.libs.itsyouonline import BASE_URI
 
 NAMESPACE = 'its_you_online_auth'
-ITS_YOU_ONLINE_DOMAIN = 'itsyou.online'
 OAUTH_BASE_URL = '{}v1/oauth'.format(BASE_URI)
 ITS_YOU_ONLINE_PUBLIC_KEY = """-----BEGIN PUBLIC KEY-----
 MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
