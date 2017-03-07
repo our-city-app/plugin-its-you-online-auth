@@ -181,11 +181,7 @@ def get_jwt(code, state):
         logging.error('Received invalid JWT: %s', decoded_jwt)
         raise HttpForbiddenException()
     username = decoded_jwt['username']
-    scopes = []
-
-    client = get_itsyouonline_client(config)
-    if has_access_to_organization(client, config.root_organization.name, username):
-        scopes.append(Scopes.ADMIN)
+    scopes = decoded_jwt['scope']
     save_profile_state(json_web_token, login_state, username)
     return json_web_token, username, scopes
 
@@ -220,6 +216,7 @@ def validate_session(session):
             try:
                 new_jwt = refresh_jwt(session.jwt)
                 session.jwt = new_jwt
+                session.scopes = decode_jwt_cached(new_jwt)['scope']
             except Exception:
                 logging.debug('Error while refreshing jwt', exc_info=True)
                 session.deleted = True

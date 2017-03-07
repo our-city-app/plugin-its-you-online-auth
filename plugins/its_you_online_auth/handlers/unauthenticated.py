@@ -95,6 +95,7 @@ class DoLoginHandler(webapp2.RequestHandler):
     def get(self):
         organization_id = self.request.GET.get('organization_id', None)
         source = self.request.GET.get('source', SOURCE_WEB)
+        extra_scopes = self.request.GET.get('scope', '')
 
         config = get_config(NAMESPACE)
         assert isinstance(config, ItsYouOnlineConfiguration)
@@ -127,6 +128,7 @@ class DoLoginHandler(webapp2.RequestHandler):
             scope = 'user:memberof:%s' % sub_org
         else:
             scope = 'user:memberof:%s' % config.root_organization.name
+        scope += extra_scopes
 
         params = {
             'response_type': 'code',
