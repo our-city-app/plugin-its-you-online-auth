@@ -36,11 +36,24 @@ from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NA
 from plugins.its_you_online_auth.plugin_utils import get_users_organization, get_organization
 from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
 
+try:
+    from functools import lru_cache
+except ImportError:
+    from functools32 import lru_cache
 
-def get_itsyouonline_client(config):
+
+@lru_cache()
+def get_itsyouonline_client(config=None):
+    if not config:
+        config = get_config(NAMESPACE)
+    organization = config.root_organization.name
+    client_secret = config.root_organization[SOURCE_WEB].client_secret
+    if not organization:
+        raise Exception('Missing configuration: root_organization.name must be set')
+    if not client_secret:
+        raise Exception('Missing configuration: root_organization.web.client_secret must be set')
     client = Client()
-    client.oauth.LoginViaClientCredentials(config.root_organization.name,
-                                           config.root_organization[SOURCE_WEB].client_secret)
+    client.oauth.LoginViaClientCredentials(organization, client_secret)
     return client
 
 
@@ -68,8 +81,6 @@ def get_access_response(config, login_state, code, use_jwt=None, audience=None):
         exception = HttpException()
         exception.http_code = response.status_code
         exception.error = content
-        if use_jwt and response.status_code == httplib.UNAUTHORIZED:
-            logging.error('https://github.com/itsyouonline/identityserver/issues/436')
         raise exception
     return content
 
