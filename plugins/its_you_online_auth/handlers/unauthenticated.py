@@ -20,6 +20,7 @@ import os
 import urllib
 import uuid
 
+import logging
 import webapp2
 from framework.handlers import render_error_page, render_page
 from framework.utils import now
@@ -146,6 +147,7 @@ class DoLoginHandler(webapp2.RequestHandler):
         login_state.put()
 
         oauth_url = '%s/authorize?%s' % (OAUTH_BASE_URL, urllib.urlencode(params))
+        logging.info('Redirecting to %s', oauth_url)
         self.redirect(oauth_url)
 
 

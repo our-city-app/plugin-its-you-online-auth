@@ -12,6 +12,7 @@
     </md-input-container>
     <h3>{{ 'iyo.modules' | translate }}</h3>
     <md-chip-list>
+      <!-- Using click to remove until https://github.com/angular/material2/pull/2476 is merged -->
       <md-chip *ngFor="let m of organization.modules" class="md-primary"
                (click)="showConfirmRemoveModule(m)">
         {{ m }}
