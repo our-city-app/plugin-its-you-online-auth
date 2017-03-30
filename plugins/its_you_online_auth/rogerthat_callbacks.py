@@ -19,9 +19,9 @@ import json
 import logging
 
 from google.appengine.ext import ndb
+from mcfw.rpc import serialize_complex_value
 
 from framework.plugin_loader import get_config
-from mcfw.rpc import serialize_complex_value
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
 from plugins.its_you_online_auth.models import Profile, OauthLoginState
@@ -34,27 +34,27 @@ from plugins.rogerthat_api.to.friends import RegistrationResultTO, ACCEPT_ID, DE
 def friend_register(rt_settings, id_, service_identity, user_details, origin, data, **kwargs):
     try:
         if not data:
-            raise Exception("data was null")
+            raise Exception('data was null')
         if not origin:
-            raise Exception("origin was null")
+            raise Exception('origin was null')
         if origin != REGISTRATION_ORIGIN_OAUTH:
-            raise Exception("unknown origin %s" % origin)
+            raise Exception('unknown origin %s' % origin)
 
         data = json.loads(data)
-        access_token = data.get("result", {}).get("access_token")
-        username = data.get("result", {}).get("info", {}).get("username")
+        access_token = data.get('result', {}).get('access_token')
+        username = data.get('result', {}).get('info', {}).get('username')
         if not access_token or not username:
             return DECLINE_ID
 
-        state = data.get("state")
+        state = data.get('state')
         login_state = OauthLoginState.create_key(state).get() if state else None
         if not login_state:
             return DECLINE_ID
 
-        scope = data.get("result", {}).get("scope")
+        scope = data.get('result', {}).get('scope')
         config = get_config(NAMESPACE)
-        expected_scope = "user:memberof:%s" % get_users_organization(config, login_state.organization_id)
-        if not scope or scope != expected_scope:
+        expected_scope = 'user:memberof:%s' % get_users_organization(config, login_state.organization_id)
+        if not scope or expected_scope not in scope:
             return DECLINE_ID
 
         profile_key = Profile.create_key(login_state.source, username)
