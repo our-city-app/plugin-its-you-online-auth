@@ -1,11 +1,11 @@
 import {
-  Component,
-  Input,
-  Output,
-  EventEmitter,
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
   OnDestroy,
-  ChangeDetectorRef
+  Output
 } from '@angular/core';
 import { Organization, RegistrationResultRoles } from '../index';
 import { ActionTypes, IOrganizationsActions } from '../actions/organizations.action';
@@ -13,9 +13,9 @@ import { Store } from '@ngrx/store';
 import { IOrganizationsState } from '../states/organizations.state';
 import { Observable, Subscription } from 'rxjs';
 import { RouterExtensions } from '../../core/services/router-extensions.service';
-import { LogService } from '../../core/services/log.service';
+import { LogService } from '../../core/services/index';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../sample/index';
-import { MdDialogConfig, MdDialog, MdDialogRef } from '@angular/material';
+import { MdDialog, MdDialogConfig, MdDialogRef } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
