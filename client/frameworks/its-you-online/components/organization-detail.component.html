@@ -42,7 +42,7 @@
       <md-input-container fxFlex>
         <input mdInput name="newACS" [(ngModel)]="newACS" type="email"
                placeholder="{{ 'iyo.new_auto_connected_service' | translate }}"
-               pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+               [email]="true"
                #newACSElem="ngModel"/>
       </md-input-container>
       <button type="button" md-button md-raised-button (click)="addAutoConnectedInput();"
@@ -64,7 +64,7 @@
     <md-input-container>
       <input mdInput name="newRoleService" [(ngModel)]="newRole.service" type="email"
              placeholder="{{ 'iyo.service' | translate }}"
-             pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+             [email]="true"
              #newRoleServiceElem="ngModel"/>
     </md-input-container>
     <md-input-container>
