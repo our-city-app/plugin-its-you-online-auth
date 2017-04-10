@@ -15,6 +15,7 @@
 #
 # @@license_version:1.3@@
 
+
 def get_organization(root_organization, organization_id):
     return '{}.organizations.{}'.format(root_organization, organization_id)
 

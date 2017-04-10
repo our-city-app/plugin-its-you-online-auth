@@ -2,7 +2,6 @@ import { Route } from '@angular/router';
 import { ViewOrganizationComponent } from '../../frameworks/its-you-online/components/view-organization.component';
 import { CreateOrganizationComponent } from '../../frameworks/its-you-online/components/create-organization.component';
 import { ItsYouOnlineAuthComponent } from './its-you-online-auth.component';
-import { MetadataResolve } from '../../frameworks/i18n/index';
 
 export const ItsYouOnlineAuthRoutes: Array<Route> = [
   {
@@ -14,8 +13,7 @@ export const ItsYouOnlineAuthRoutes: Array<Route> = [
         title: 'iyo.itsyouonline_settings',
       }
     },
-    component: ItsYouOnlineAuthComponent,
-    resolve: { metadata: MetadataResolve }
+    component: ItsYouOnlineAuthComponent
   },
   {
     path: 'itsyouonlinesettings/organizations/create',
@@ -24,8 +22,7 @@ export const ItsYouOnlineAuthRoutes: Array<Route> = [
         title: 'iyo.add_organization',
       }
     },
-    component: CreateOrganizationComponent,
-    resolve: { metadata: MetadataResolve }
+    component: CreateOrganizationComponent
   },
   {
     path: 'itsyouonlinesettings/organizations/:organization_id',
@@ -34,7 +31,6 @@ export const ItsYouOnlineAuthRoutes: Array<Route> = [
         title: 'iyo.update_organization',
       }
     },
-    component: ViewOrganizationComponent,
-    resolve: { metadata: MetadataResolve }
+    component: ViewOrganizationComponent
   }
 ];

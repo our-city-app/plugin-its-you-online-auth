@@ -15,6 +15,7 @@
 #
 # @@license_version:1.3@@
 
+
 class OrganizationNotFoundException(Exception):
     def __init__(self, organization_id):
         self.organization_id = organization_id
