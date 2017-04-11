@@ -3,11 +3,8 @@ import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 // app
-import * as states from '../its-you-online.state';
-import { IOrganizationsState } from '../states';
-import { RouterExtensions, LogService } from '../../core/index';
-import * as itsyouonline from '../index';
-import { Organization } from '../index';
+import { GetOrganizationsAction, IOrganizationsState, Organization, RemoveOrganizationAction } from '../index';
+import { getOrganizations } from '../its-you-online.state';
 
 @Component({
   moduleId: module.id,
@@ -17,9 +14,9 @@ import { Organization } from '../index';
 export class OrganizationSettingsComponent {
   public organizations$: Observable<any>;
 
-  constructor(private log: LogService, private store: Store<IOrganizationsState>, public routerext: RouterExtensions) {
-    this.store.dispatch(new itsyouonline.GetOrganizationsAction());
-    this.organizations$ = store.let(states.getOrganizations);
+  constructor(private store: Store<IOrganizationsState>) {
+    this.store.dispatch(new GetOrganizationsAction());
+    this.organizations$ = store.let(getOrganizations);
   }
 
   public organizationId(organization: Organization) {
@@ -27,6 +24,6 @@ export class OrganizationSettingsComponent {
   }
 
   public deleteOrganization(organization: Organization) {
-    this.store.dispatch(new itsyouonline.RemoveOrganizationAction(organization));
+    this.store.dispatch(new RemoveOrganizationAction(organization));
   }
 }
