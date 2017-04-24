@@ -16,18 +16,18 @@
 # @@license_version:1.3@@
 
 import httplib
-import os
+import logging
 import urllib
 import uuid
 
-import logging
+import os
 import webapp2
-from framework.handlers import render_error_page, render_page
-from framework.utils import now
+from mcfw.exceptions import HttpException
 
 from framework.bizz.authentication import login_user, logout_user, get_current_user_id, get_current_session
+from framework.handlers import render_error_page, render_page
 from framework.plugin_loader import get_config
-from mcfw.exceptions import HttpException
+from framework.utils import now
 from plugins.its_you_online_auth.bizz.authentication import get_user_scopes_from_access_token, get_jwt
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
@@ -44,6 +44,10 @@ class SigninHandler(webapp2.RequestHandler):
             self.redirect('/')
             return
 
+        config = get_config(NAMESPACE)
+        if not config.login_with_organization:
+            self.redirect('/login/continue')
+            return
         render_page(self.response, os.path.join('unauthenticated', 'signin.html'), plugin_name=NAMESPACE)
 
 

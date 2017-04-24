@@ -18,11 +18,12 @@
 import logging
 
 import requests_toolbelt.adapters.appengine
+from mcfw.consts import AUTHENTICATED
+from mcfw.restapi import rest_functions
+
 from framework.bizz.authentication import get_current_session
 from framework.plugin_loader import AuthPlugin, get_auth_plugin, get_plugin, get_plugins, get_config
 from framework.utils.plugins import Handler, Module
-from mcfw.consts import AUTHENTICATED
-from mcfw.restapi import rest_functions
 from plugins.its_you_online_auth.api import authenticated
 from plugins.its_you_online_auth.bizz.authentication import validate_session
 from plugins.its_you_online_auth.bizz.settings import get_organization
@@ -127,6 +128,8 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
 
     def get_user_language(self):
         session = get_current_session()
+        if not session or session.deleted:
+            return None
         return Profile.create_key(SOURCE_WEB, session.user_id).get().language
 
     def validate_session(self, session):
