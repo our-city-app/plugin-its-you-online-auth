@@ -15,24 +15,28 @@
 #
 # @@license_version:1.3@@
 
+from __future__ import unicode_literals
+
 import logging
 
 import requests_toolbelt.adapters.appengine
 from mcfw.consts import AUTHENTICATED
 from mcfw.restapi import rest_functions
+from mcfw.rpc import parse_complex_value
+from plugins.its_you_online_auth.api import authenticated
+from plugins.its_you_online_auth.models import Profile
 
 from framework.bizz.authentication import get_current_session
+from framework.configuration import get_configuration
 from framework.plugin_loader import AuthPlugin, get_auth_plugin, get_plugin, get_plugins, get_config
 from framework.utils.plugins import Handler, Module
-from plugins.its_you_online_auth.api import authenticated
 from plugins.its_you_online_auth.bizz.authentication import validate_session
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
     PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler
-from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_WEB
 from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
-from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
+from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 from plugins.rogerthat_api.rogerthat_api_plugin import RogerthatApiPlugin
 
 requests_toolbelt.adapters.appengine.monkeypatch()
@@ -41,7 +45,8 @@ requests_toolbelt.adapters.appengine.monkeypatch()
 class ItsYouOnlineAuthPlugin(AuthPlugin):
     def __init__(self, configuration):
         super(ItsYouOnlineAuthPlugin, self).__init__(configuration)
-        self.configuration = ItsYouOnlineConfiguration(configuration)
+        self.configuration = parse_complex_value(ItsYouOnlineConfiguration, configuration,
+                                                 False)  # type: ItsYouOnlineConfiguration
         rogerthat_api_plugin = get_plugin('rogerthat_api')
         assert isinstance(rogerthat_api_plugin, RogerthatApiPlugin)
         rogerthat_api_plugin.subscribe('friend.register', friend_register)
@@ -63,16 +68,25 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
         return ['/itsyouonlinesettings<route:.*>']
 
     def get_modules(self):
-        yield Module(u'its_you_online_settings', [Scopes.ADMIN, Scopes.ORGANIZATION_ADMIN], 10000)
+        yield Module('its_you_online_settings', [Scopes.ADMIN, Scopes.ORGANIZATION_ADMIN], 10000)
 
     def get_login_url(self):
         return self.configuration.login_url
+
+    def get_logout_url(self):
+        server_url = get_configuration().server_url
+        if not server_url:
+            raise Exception('server_url is not set in the configuration.json file')
+        return '%s/logout' % server_url
+
+    def get_profile_url(self):
+        return 'https://itsyou.online'
 
     def get_cookie_name(self):
         return self.configuration.cookie_name
 
     def get_cookie_key(self):
-        return self.configuration.cookie_key
+        return self.configuration.cookie_key.encode('utf-8')
 
     def get_visible_modules(self):
         session = get_current_session()

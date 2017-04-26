@@ -22,19 +22,19 @@ import uuid
 
 import os
 import webapp2
+from framework.handlers import render_error_page, render_page
+from framework.utils import now
 from mcfw.exceptions import HttpException
+from plugins.its_you_online_auth.models import OauthLoginState
 
 from framework.bizz.authentication import login_user, logout_user, get_current_user_id, get_current_session
-from framework.handlers import render_error_page, render_page
 from framework.plugin_loader import get_config
-from framework.utils import now
 from plugins.its_you_online_auth.bizz.authentication import get_user_scopes_from_access_token, get_jwt
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
-from plugins.its_you_online_auth.models import OauthLoginState
 from plugins.its_you_online_auth.plugin_consts import OAUTH_BASE_URL, NAMESPACE, SOURCE_WEB, SOURCE_APP
 from plugins.its_you_online_auth.plugin_utils import get_users_organization
-from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
+from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 
 
 class SigninHandler(webapp2.RequestHandler):

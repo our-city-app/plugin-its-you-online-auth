@@ -14,37 +14,3 @@
 # limitations under the License.
 #
 # @@license_version:1.3@@
-
-from mcfw.consts import DEBUG
-from plugins.its_you_online_auth.plugin_consts import SOURCE_WEB, SOURCE_APP, SOURCE_DEV
-
-
-class OauthConfig(object):
-    def __init__(self, config):
-        self.client_secret = config['client_secret']
-        self.redirect_uri = config['redirect_uri']
-
-
-class RootOrganization(object):
-    def __init__(self, config):
-        self.name = config['name']
-        self.dev = OauthConfig(config[SOURCE_DEV])
-        self.web = OauthConfig(config[SOURCE_WEB])
-        self.app = OauthConfig(config[SOURCE_APP])
-
-    def __getitem__(self, key):
-        if isinstance(key, (str, unicode)):
-            if key == SOURCE_WEB:
-                return self.dev if DEBUG else self.web
-            if key == SOURCE_APP:
-                return self.app
-        raise KeyError(key)
-
-
-class ItsYouOnlineConfiguration(object):
-    def __init__(self, config):
-        self.login_url = config['login_url']
-        self.login_with_organization = config.get('login_with_organization', True)
-        self.cookie_name = config['cookie_name'].encode('utf8')
-        self.cookie_key = config['cookie_key'].encode('utf8')
-        self.root_organization = RootOrganization(config['root_organization'])

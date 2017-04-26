@@ -20,22 +20,22 @@ import httplib
 import logging
 import urllib
 
+import requests
+from framework.utils import now
 from google.appengine.api import urlfetch, memcache
 from google.appengine.ext import ndb
-
-import requests
-from framework.consts import BASE_URL
-from framework.plugin_loader import get_config, get_auth_plugin
-from framework.utils import now
 from jose import jwt, ExpiredSignatureError
 from mcfw.consts import DEBUG
 from mcfw.exceptions import HttpBadRequestException, HttpException, HttpForbiddenException, HttpUnAuthorizedException
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import OauthLoginState, Profile
-from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE, SOURCE_WEB, \
-    ITS_YOU_ONLINE_PUBLIC_KEY, JWT_AUDIENCE, JWT_ISSUER
+
+from framework.consts import BASE_URL
+from framework.plugin_loader import get_config, get_auth_plugin
+from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE, ITS_YOU_ONLINE_PUBLIC_KEY, \
+    JWT_AUDIENCE, JWT_ISSUER, SOURCE_WEB
 from plugins.its_you_online_auth.plugin_utils import get_users_organization, get_organization
-from plugins.its_you_online_auth.to import ItsYouOnlineConfiguration
+from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 
 try:
     from functools import lru_cache
