@@ -27,6 +27,7 @@ from plugins.its_you_online_auth.api import authenticated
 from plugins.its_you_online_auth.models import Profile
 
 from framework.bizz.authentication import get_current_session
+from framework.bizz.session import is_valid_session
 from framework.configuration import get_configuration
 from framework.plugin_loader import AuthPlugin, get_auth_plugin, get_plugin, get_plugins, get_config
 from framework.utils.plugins import Handler, Module
@@ -142,7 +143,7 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
 
     def get_user_language(self):
         session = get_current_session()
-        if not session or session.deleted:
+        if not is_valid_session(session):
             return None
         return Profile.create_key(SOURCE_WEB, session.user_id).get().language
 

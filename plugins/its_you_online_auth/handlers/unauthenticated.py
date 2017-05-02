@@ -28,6 +28,7 @@ from mcfw.exceptions import HttpException
 from plugins.its_you_online_auth.models import OauthLoginState
 
 from framework.bizz.authentication import login_user, logout_user, get_current_user_id, get_current_session
+from framework.bizz.session import is_valid_session
 from framework.plugin_loader import get_config
 from plugins.its_you_online_auth.bizz.authentication import get_user_scopes_from_access_token, get_jwt
 from plugins.its_you_online_auth.bizz.settings import get_organization
@@ -40,7 +41,7 @@ from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 class SigninHandler(webapp2.RequestHandler):
     def get(self):
         session = get_current_session()
-        if session and not session.deleted:
+        if not is_valid_session(session):
             self.redirect('/')
             return
 

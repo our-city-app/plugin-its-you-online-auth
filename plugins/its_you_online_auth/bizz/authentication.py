@@ -231,12 +231,14 @@ def validate_session(session):
                 session.scopes = decode_jwt_cached(new_jwt)['scope']
             except Exception:
                 logging.debug('Error while refreshing jwt', exc_info=True)
-                session.deleted = True
+                session.key.delete()
                 session_expired = True
             session.put()
         except Exception as e:
             logging.exception(e)
             session_expired = True
-            session.deleted = session_expired
-            session.put()
+            if session_expired:
+                session.key.delete()
+            else:
+                session.put()
     return not session_expired
