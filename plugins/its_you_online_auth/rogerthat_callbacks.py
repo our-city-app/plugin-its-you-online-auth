@@ -44,17 +44,22 @@ def friend_register(rt_settings, id_, service_identity, user_details, origin, da
         access_token = data.get('result', {}).get('access_token')
         username = data.get('result', {}).get('info', {}).get('username')
         if not access_token or not username:
+            logging.warn('Could not find access token or username, denying installation.\nAccess token: %s\n',
+                         access_token)
             return DECLINE_ID
 
         state = data.get('state')
         login_state = OauthLoginState.create_key(state).get() if state else None
         if not login_state:
+            logging.warn('Could not find login state, denying installation.')
             return DECLINE_ID
 
         scope = data.get('result', {}).get('scope')
         config = get_config(NAMESPACE)
         expected_scope = 'user:memberof:%s' % get_users_organization(config, login_state.organization_id)
         if not scope or expected_scope not in scope:
+            logging.warn('Could not find expected organization scope %s in scope %s. Denying installation.',
+                         expected_scope, scope)
             return DECLINE_ID
 
         profile_key = Profile.create_key(login_state.source, username)
