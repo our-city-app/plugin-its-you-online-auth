@@ -18,20 +18,21 @@
 import hashlib
 import httplib
 import logging
+import time
 import urllib
 
 import requests
-from framework.utils import now
 from google.appengine.api import urlfetch, memcache
 from google.appengine.ext import ndb
 from jose import jwt, ExpiredSignatureError
 from mcfw.consts import DEBUG
 from mcfw.exceptions import HttpBadRequestException, HttpException, HttpForbiddenException, HttpUnAuthorizedException
-from plugins.its_you_online_auth.libs.itsyouonline import Client
-from plugins.its_you_online_auth.models import OauthLoginState, Profile
 
 from framework.consts import BASE_URL
 from framework.plugin_loader import get_config, get_auth_plugin
+from framework.utils import now
+from plugins.its_you_online_auth.libs.itsyouonline import Client
+from plugins.its_you_online_auth.models import OauthLoginState, Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE, ITS_YOU_ONLINE_PUBLIC_KEY, \
     JWT_AUDIENCE, JWT_ISSUER, SOURCE_WEB
 from plugins.its_you_online_auth.plugin_utils import get_users_organization, get_organization
@@ -205,7 +206,9 @@ def decode_jwt_cached(token):
     if decoded_jwt:
         return decoded_jwt
     timestamp = now()
+    t = time.time()
     decoded_jwt = jwt.decode(token, str(ITS_YOU_ONLINE_PUBLIC_KEY), audience=JWT_AUDIENCE, issuer=JWT_ISSUER)
+    logging.debug('Decoding JWT took %ss', time.time() - t)
     # Cache JWT for as long as it's valid
     memcache.set(key=memcache_key, value=decoded_jwt, time=decoded_jwt['exp'] - timestamp, namespace=NAMESPACE)
     return decoded_jwt

@@ -23,18 +23,18 @@ import requests_toolbelt.adapters.appengine
 from mcfw.consts import AUTHENTICATED
 from mcfw.restapi import rest_functions
 from mcfw.rpc import parse_complex_value
-from plugins.its_you_online_auth.api import authenticated
-from plugins.its_you_online_auth.models import Profile
 
 from framework.bizz.authentication import get_current_session
 from framework.bizz.session import is_valid_session
 from framework.configuration import get_configuration
 from framework.plugin_loader import AuthPlugin, get_auth_plugin, get_plugin, get_plugins, get_config
 from framework.utils.plugins import Handler, Module
+from plugins.its_you_online_auth.api import authenticated
 from plugins.its_you_online_auth.bizz.authentication import validate_session
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
     PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler
+from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_WEB
 from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
 from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
