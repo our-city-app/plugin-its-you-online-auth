@@ -32,6 +32,7 @@ from framework.utils.plugins import Handler, Module
 from plugins.its_you_online_auth.api import authenticated
 from plugins.its_you_online_auth.bizz.authentication import validate_session
 from plugins.its_you_online_auth.bizz.settings import get_organization
+from plugins.its_you_online_auth.cron.refresh_jwts import RefreshJwtsHandler
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
     PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler
 from plugins.its_you_online_auth.models import Profile
@@ -64,6 +65,8 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
             yield Handler(url='/oauth2_callback', handler=Oauth2CallbackHandler)
             for url, handler in rest_functions(authenticated, authentication=AUTHENTICATED):
                 yield Handler(url=url, handler=handler)
+        if auth == Handler.AUTH_ADMIN:
+            yield Handler(url='/admin/cron/its_you_online_auth/refresh_jwts', handler=RefreshJwtsHandler)
 
     def get_client_routes(self):
         return ['/itsyouonlinesettings<route:.*>']

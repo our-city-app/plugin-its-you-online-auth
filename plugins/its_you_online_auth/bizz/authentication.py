@@ -227,7 +227,7 @@ def validate_session(session):
         try:
             decode_jwt_cached(session.jwt)
         except ExpiredSignatureError:
-            logging.debug('JWT expired, refreshing...')
+            logging.debug('JWT for user %s expired, refreshing...', session.user_id)
             try:
                 new_jwt = refresh_jwt(session.jwt)
                 session.jwt = new_jwt
@@ -240,8 +240,8 @@ def validate_session(session):
         except Exception as e:
             logging.exception(e)
             session_expired = True
-            if session_expired:
-                session.key.delete()
-            else:
-                session.put()
+        if session_expired:
+            session.key.delete()
+        else:
+            session.put()
     return not session_expired
