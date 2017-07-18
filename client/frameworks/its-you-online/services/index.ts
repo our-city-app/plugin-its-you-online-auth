@@ -21,4 +21,4 @@ export const ITS_YOU_ONLINE_COMPONENTS: any[] = [
 ];
 
 export * from './organizations.service';
-export * from './its-you-online-config'
+export * from './its-you-online-config';
