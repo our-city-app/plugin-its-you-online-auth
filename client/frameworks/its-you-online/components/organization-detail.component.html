@@ -21,7 +21,7 @@
     <br/>
     <div fxLayout="row" fxLayoutAlign="center center">
       <md-input-container fxFlex>
-        <input mdInput name="newModule" [(ngModel)]="newModule" type="text"
+        <input mdInput name="newModule" [(ngModel)]="newModule"
                placeholder="{{ 'iyo.new_module' | translate }}"
                #newModuleElem="ngModel"/>
       </md-input-container>
@@ -68,12 +68,12 @@
              #newRoleServiceElem="ngModel"/>
     </md-input-container>
     <md-input-container>
-      <input mdInput name="newRoleIdentity" [(ngModel)]="newRole.identity" type="text"
+      <input mdInput name="newRoleIdentity" [(ngModel)]="newRole.identity"
              placeholder="{{ 'iyo.identity' | translate }}"
              #newRoleIdentityElem="ngModel"/>
     </md-input-container>
     <md-input-container>
-      <input mdInput name="newRoleIds" [(ngModel)]="newRoleIds" type="text"
+      <input mdInput name="newRoleIds" [(ngModel)]="newRoleIds"
              placeholder="{{ 'iyo.role_ids' | translate }}"
              #newRoleIdsElem="ngModel"/>
     </md-input-container>
@@ -86,7 +86,7 @@
   </div>
   <br/>
   <div>
-    <button type="submit" md-button md-raised-button color="primary" [disabled]="!organizationForm.form.valid">
+    <button md-button md-raised-button color="primary" [disabled]="!organizationForm.form.valid">
       {{(isNew ? 'iyo.add_organization' : 'iyo.update_organization') | translate}}
     </button>
     <p *ngIf="status">{{ status | translate }}</p>
