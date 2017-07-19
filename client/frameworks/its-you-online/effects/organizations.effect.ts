@@ -1,13 +1,13 @@
 // angular
 import { Injectable } from '@angular/core';
+import { Actions, Effect } from '@ngrx/effects';
 // libs
-import { Store, Action } from '@ngrx/store';
-import { Effect, Actions } from '@ngrx/effects';
+import { Action } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-// module
-import { OrganizationsService } from '../services/organizations.service';
 import * as organizationActions from '../actions/organizations.action';
 import { Organization } from '../index';
+// module
+import { OrganizationsService } from '../services/organizations.service';
 
 @Injectable()
 export class OrganizationsEffects {
@@ -44,8 +44,7 @@ export class OrganizationsEffects {
     .map(organization => new organizationActions.OrganizationRemovedAction(organization))
     .catch((payload: Organization) => Observable.of(new organizationActions.RemoveOrganizationFailedAction(payload)));
 
-  constructor(private store: Store<any>,
-              private actions$: Actions,
+  constructor(private actions$: Actions,
               private organizationsService: OrganizationsService) {
   }
 }
