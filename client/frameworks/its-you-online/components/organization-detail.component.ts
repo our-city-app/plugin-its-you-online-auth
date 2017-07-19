@@ -5,18 +5,19 @@ import {
   EventEmitter,
   Input,
   OnDestroy,
-  Output
+  Output,
 } from '@angular/core';
-import { Organization, RegistrationResultRoles } from '../index';
-import { ActionTypes, IOrganizationsActions } from '../actions/organizations.action';
+import { FormControl } from '@angular/forms';
+import { MdChipInputEvent, MdDialog, MdDialogConfig, MdDialogRef } from '@angular/material';
 import { Store } from '@ngrx/store';
-import { IOrganizationsState } from '../states/organizations.state';
-import { Observable, Subscription } from 'rxjs';
-import { RouterExtensions } from '../../core/services/router-extensions.service';
-import { LogService } from '../../core/services/index';
-import { ConfirmDialogComponent, ConfirmDialogData } from '../../sample/index';
-import { MdDialog, MdDialogConfig, MdDialogRef } from '@angular/material';
 import { TranslateService } from '@ngx-translate/core';
+import { Observable, Subscription } from 'rxjs';
+import { LogService } from '../../core/services/index';
+import { RouterExtensions } from '../../core/services/router-extensions.service';
+import { IAppState } from '../../ngrx/state/app.state';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../sample/index';
+import { ActionTypes } from '../actions/organizations.action';
+import { Organization, RegistrationResultRoles } from '../index';
 
 @Component({
   moduleId: module.id,
@@ -25,36 +26,26 @@ import { TranslateService } from '@ngx-translate/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrganizationDetailComponent implements OnDestroy {
-  _organization: Organization;
+  addModuleFormControl = new FormControl();
+  addAcsFormControl = new FormControl();
   status: string;
-  ActionTypes: IOrganizationsActions = ActionTypes;
   statusSubscription: Subscription;
   dialogRef: MdDialogRef<ConfirmDialogComponent>;
-  newModule: string;
-  newACS: string;
   newRole: RegistrationResultRoles;
   newRoleIds: string;
   emptyRole: RegistrationResultRoles = {
     service: '',
     identity: '+default+',
-    ids: []
+    ids: [],
   };
 
-  /**
-   * Presentational components receive data through @Input() and communicate events
-   * through @Output() but generally maintain no internal state of their
-   * own. All decisions are delegated to 'container', or 'smart'
-   * components before data updates flow back down.
-   *
-   * More on 'smart' and 'presentational' components see
-   * https://gist.github.com/btroncone/a6e4347326749f938510#utilizing-container-components
-   */
   @Input() isNew: boolean;
   @Output() add = new EventEmitter<Organization>();
   @Output() update = new EventEmitter<Organization>();
   @Output() remove = new EventEmitter<Organization>();
+  private _organization: Organization;
 
-  constructor(private log: LogService, private store: Store<IOrganizationsState>, public routerext: RouterExtensions,
+  constructor(private log: LogService, private store: Store<IAppState>,
               public dialog: MdDialog, public translate: TranslateService, private cdRef: ChangeDetectorRef) {
     this.newRole = Object.assign({}, this.emptyRole);
     this.statusSubscription = store.select((state: any) => state.organizations.organizationStatus)
@@ -82,7 +73,6 @@ export class OrganizationDetailComponent implements OnDestroy {
     return this._organization;
   }
 
-
   public save(organization: Organization) {
     if (this.isNew) {
       this.add.emit(organization);
@@ -91,28 +81,30 @@ export class OrganizationDetailComponent implements OnDestroy {
     }
   }
 
-  public addModuleInput() {
-      if (this.organization.modules.indexOf(this.newModule) === -1) {
-        this.organization.modules = [ ...this.organization.modules, this.newModule ];
+  public addModuleInput(event: MdChipInputEvent) {
+    if (this.organization.modules.indexOf(event.value) === -1) {
+      this.organization.modules = [ ...this.organization.modules, event.value ];
       }
-      this.newModule = '';
+    this.addModuleFormControl.reset();
     }
 
-  public removeModule(m: string) {
-    this.organization.modules = this.organization.modules.filter(a => a !== m);
-    this.cdRef.markForCheck();
+  public removeModule(module: string) {
+    this.organization.modules = this.organization.modules.filter(a => a !== module);
   }
 
-  public addAutoConnectedInput() {
-    if (this.organization.auto_connected_services.indexOf(this.newACS) === -1) {
-      this.organization.auto_connected_services = [ ...this.organization.auto_connected_services, this.newACS ];
+  public addAutoConnectedInput(event: MdChipInputEvent) {
+    if (!this.addAcsFormControl.valid) {
+      this.addAcsFormControl.markAsTouched();
+      return;
     }
-    this.newACS = '';
+    if (this.organization.auto_connected_services.indexOf(event.value) === -1) {
+      this.organization.auto_connected_services = [ ...this.organization.auto_connected_services, event.value ];
+    }
+    this.addAcsFormControl.reset();
   }
 
   public removeAutoConnectedService(acs: string) {
     this.organization.auto_connected_services = this.organization.auto_connected_services.filter(a => a !== acs);
-    this.cdRef.markForCheck();
   }
 
   public addRole() {
@@ -132,33 +124,28 @@ export class OrganizationDetailComponent implements OnDestroy {
     this.organization.roles = this.organization.roles.filter(a => a !== role);
   }
 
-  public showConfirmRemoveModule(m: string) {
-    let msg = this.translate.get('iyo.do_you_want_to_delete_module', { m: m });
-    this.showConfirmDialog(this.translate.get('iyo.confirmation'), msg, this.removeModule, m);
+  public showConfirmRemoveModule(module: string) {
+    let msg = this.translate.get('iyo.do_you_want_to_delete_module', { m: module });
+    this.showConfirmDialog(this.translate.get('iyo.confirmation'), msg)
+      .filter(confirmed => confirmed).subscribe(confirmed => this.removeModule(module));
   }
 
   public showConfirmRemoveACS(acs: string) {
     let msg = this.translate.get('iyo.do_you_want_to_delete_auto_connected_service', { acs: acs });
-    this.showConfirmDialog(this.translate.get('iyo.confirmation'), msg, this.removeAutoConnectedService, acs);
+    this.showConfirmDialog(this.translate.get('iyo.confirmation'), msg)
+      .filter(confirmed => confirmed).subscribe(confirmed => this.removeAutoConnectedService(acs));
   }
 
-  public showConfirmDialog(title: Observable<string>, message: Observable<string>, callback: any,
-                           callback_param: string) {
-      let config: MdDialogConfig = {
-        data: <ConfirmDialogData>{
-          title: title,
-          message: message,
-          ok: this.translate.get('iyo.yes'),
-          cancel: this.translate.get('iyo.no')
-        }
-      };
-      this.dialogRef = this.dialog.open(ConfirmDialogComponent, config);
-      this.dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-          this.dialogRef = null;
-          if (confirmed) {
-            callback(callback_param);
-          }
-      });
+  public showConfirmDialog(title: Observable<string>, message: Observable<string>) {
+    let config: MdDialogConfig = {
+      data: <ConfirmDialogData>{
+        title: title,
+        message: message,
+        ok: this.translate.get('iyo.yes'),
+        cancel: this.translate.get('iyo.no'),
+      },
+    };
+    return this.dialog.open(ConfirmDialogComponent, config).afterClosed();
   }
 
   ngOnDestroy(): void {

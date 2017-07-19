@@ -10,6 +10,7 @@ export const ItsYouOnlineAuthRoutes: Array<Route> = [
     canActivate: [ MetaGuard ],
     data: {
       label: 'iyo.itsyouonline_settings',
+      icon: 'perm_identity',
       id: 'its_you_online_settings',
       meta: {
         title: 'iyo.itsyouonline_settings',

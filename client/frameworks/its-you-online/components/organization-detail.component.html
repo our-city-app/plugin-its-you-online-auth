@@ -11,45 +11,35 @@
              required [disabled]="!isNew" pattern="^[a-z\d\-_\s]{3,150}$">
     </md-input-container>
     <h3>{{ 'iyo.modules' | translate }}</h3>
-    <md-chip-list>
-      <!-- Using click to remove until https://github.com/angular/material2/pull/2476 is merged -->
-      <md-chip *ngFor="let m of organization.modules" class="md-primary"
-               (click)="showConfirmRemoveModule(m)">
-        {{ m }}
+    <md-chip-list #moduleChips>
+      <md-chip *ngFor="let module of organization.modules" (remove)="showConfirmRemoveModule(module)">
+        {{ module }}
+        <md-icon mdChipRemove>cancel</md-icon>
       </md-chip>
     </md-chip-list>
-    <br/>
-    <div fxLayout="row" fxLayoutAlign="center center">
-      <md-input-container fxFlex>
-        <input mdInput name="newModule" [(ngModel)]="newModule"
-               placeholder="{{ 'iyo.new_module' | translate }}"
-               #newModuleElem="ngModel"/>
+    <md-input-container>
+      <input mdInput
+             [formControl]="addModuleFormControl"
+             [placeholder]="'iyo.new_module' | translate"
+             [mdChipInputFor]="moduleChips"
+             (mdChipInputTokenEnd)="addModuleInput($event)"/>
       </md-input-container>
-      <button type="button" md-button md-raised-button (click)="addModuleInput();"
-              [disabled]="!newModule || !newModuleElem.valid">
-        {{ 'iyo.add' | translate }}
-      </button>
-    </div>
+
     <h3>{{ 'iyo.auto_connected_services' | translate }}</h3>
-    <md-chip-list>
+    <md-chip-list #acsChips>
       <md-chip *ngFor="let acs of organization.auto_connected_services" class="md-primary"
-               (click)="showConfirmRemoveACS(acs)">
+               (remove)="showConfirmRemoveACS(acs)">
         {{ acs }}
+        <md-icon mdChipRemove>cancel</md-icon>
       </md-chip>
     </md-chip-list>
-    <br/>
-    <div fxLayout="row" fxLayoutAlign="center center">
-      <md-input-container fxFlex>
-        <input mdInput name="newACS" [(ngModel)]="newACS" type="email"
-               placeholder="{{ 'iyo.new_auto_connected_service' | translate }}"
-               [email]="true"
-               #newACSElem="ngModel"/>
+    <md-input-container>
+      <input mdInput type="email"
+             [formControl]="addAcsFormControl"
+             placeholder="{{ 'iyo.new_auto_connected_service' | translate }}"
+             [mdChipInputFor]="acsChips"
+             (mdChipInputTokenEnd)="addAutoConnectedInput($event)"/>
       </md-input-container>
-      <button type="button" md-button md-raised-button (click)="addAutoConnectedInput();"
-              [disabled]="!newACS || !newACSElem.valid">
-        {{ 'iyo.add' | translate }}
-      </button>
-    </div>
     <h3>{{ 'iyo.roles' | translate }}</h3>
     <md-list>
       <md-list-item *ngFor="let role of organization.roles">

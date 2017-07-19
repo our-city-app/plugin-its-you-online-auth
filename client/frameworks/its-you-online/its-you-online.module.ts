@@ -1,15 +1,15 @@
+import { CommonModule } from '@angular/common';
 // angular
 import { NgModule, Optional, SkipSelf } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+import { MdButtonModule, MdChipsModule, MdIconModule, MdInputModule, MdListModule } from '@angular/material';
 import { RouterModule } from '@angular/router';
+import { EffectsModule } from '@ngrx/effects';
+import { MultilingualModule } from '../i18n/multilingual.module';
+import { OrganizationsEffects } from './effects/organizations.effect';
 // app
 import { ITS_YOU_ONLINE_COMPONENTS, ITSYOU_ONLINE_PROVIDERS } from './services/index';
-import { MultilingualModule } from '../i18n/multilingual.module';
-import { EffectsModule } from '@ngrx/effects';
-import { OrganizationsEffects } from './effects/organizations.effect';
-import { MdButtonModule, MdChipsModule, MdIconModule, MdInputModule, MdListModule } from '@angular/material';
 
 /**
  * Do not specify providers for modules that might be imported by a lazy loaded module.
@@ -23,6 +23,7 @@ const MATERIAL_IMPORTS = [
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpModule,
     RouterModule,
     MultilingualModule,
@@ -36,7 +37,6 @@ const MATERIAL_IMPORTS = [
     ITSYOU_ONLINE_PROVIDERS
   ],
   exports: [
-    MultilingualModule,
     ITS_YOU_ONLINE_COMPONENTS
   ]
 })
