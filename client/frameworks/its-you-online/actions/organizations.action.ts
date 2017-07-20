@@ -3,32 +3,7 @@ import { type } from '../../core/utils/type';
 import { ITS_YOU_ONLINE_CATEGORY } from '../common/category.common';
 import { Organization } from '../index';
 
-/**
- * For each action type in an action group, make a simple
- * enum object for all of this group's action types.
- *
- * The 'type' utility function coerces strings into string
- * literal types and runs a simple check to guarantee all
- * action types in the application are unique.
- */
-export interface IOrganizationsActions {
-  GET_ORGANIZATIONS: string;
-  GET_ORGANIZATIONS_COMPLETE: string;
-  GET_ORGANIZATIONS_FAILED: string;
-  GET_ORGANIZATION: string;
-  GET_ORGANIZATION_COMPLETE: string;
-  GET_ORGANIZATION_FAILED: string;
-  CREATE: string;
-  ADD: string;
-  ORGANIZATION_ADDED: string;
-  EDIT: string;
-  EDITED: string;
-  EDIT_FAILED: string;
-  DELETE: string;
-  DELETED: string;
-}
-
-export const ActionTypes: IOrganizationsActions = {
+export const ActionTypes = {
   GET_ORGANIZATIONS: type(`${ITS_YOU_ONLINE_CATEGORY} Get organizations`),
   GET_ORGANIZATIONS_COMPLETE: type(`${ITS_YOU_ONLINE_CATEGORY} Get organizations succeeded`),
   GET_ORGANIZATIONS_FAILED: type(`${ITS_YOU_ONLINE_CATEGORY} Get organizations failed`),
@@ -54,7 +29,7 @@ export const ActionTypes: IOrganizationsActions = {
  */
 export class GetOrganizationsAction implements Action {
   type = ActionTypes.GET_ORGANIZATIONS;
-  payload: string = null;
+  payload: null = null;
 }
 
 export class GetOrganizationsCompleteAction implements Action {
@@ -66,7 +41,7 @@ export class GetOrganizationsCompleteAction implements Action {
 
 export class GetOrganizationsFailedAction implements Action {
   type = ActionTypes.GET_ORGANIZATIONS_FAILED;
-  payload: string = null;
+  payload: null = null;
 }
 
 export class GetOrganizationAction implements Action {
@@ -78,7 +53,7 @@ export class GetOrganizationAction implements Action {
 
 export class CreateAction implements Action {
   type = ActionTypes.CREATE;
-  payload: string = null;
+  payload: null = null;
 }
 
 export class GetOrganizationCompleteAction implements Action {
@@ -90,7 +65,7 @@ export class GetOrganizationCompleteAction implements Action {
 
 export class GetOrganizationFailedAction implements Action {
   type = ActionTypes.GET_ORGANIZATION_FAILED;
-  payload: string = null;
+  payload: null = null;
 }
 
 export class AddOrganizationAction implements Action {
@@ -123,7 +98,7 @@ export class OrganizationEditedAction implements Action {
 
 export class EditOrganizationFailedAction implements Action {
   type = ActionTypes.EDIT_FAILED;
-  payload: string = null;
+  payload: null = null;
 }
 
 export class RemoveOrganizationAction implements Action {
