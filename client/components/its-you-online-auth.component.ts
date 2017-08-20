@@ -1,18 +1,17 @@
-// libs
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs/Subscription';
-// app
-import { RouterExtensions } from '../../frameworks/core/index';
-import { getIdentity } from '../../frameworks/identity/identity.state';
-import { AuthenticationService, Identity } from '../../frameworks/identity/index';
-import { IAppState } from '../../frameworks/ngrx/index';
+import { RouterExtensions } from '../../../framework/client/core/index';
+import { getIdentity } from '../../../framework/client/identity/identity.state';
+import { Identity } from '../../../framework/client/identity/index';
+import { IAppState } from '../../../framework/client/ngrx/index';
 
 @Component({
   moduleId: module.id,
   selector: 'settings-component',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <organization-settings *ngIf="isAdmin"></organization-settings>`
+    <organization-settings *ngIf='isAdmin'></organization-settings>`
 })
 export class ItsYouOnlineAuthComponent implements OnInit, OnDestroy {
   isAdmin: boolean = false;

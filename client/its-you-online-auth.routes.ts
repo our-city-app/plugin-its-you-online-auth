@@ -1,8 +1,6 @@
 import { Route } from '@angular/router';
 import { MetaGuard } from '@ngx-meta/core';
-import { CreateOrganizationComponent } from '../../frameworks/its-you-online/components/create-organization.component';
-import { ViewOrganizationComponent } from '../../frameworks/its-you-online/components/view-organization.component';
-import { ItsYouOnlineAuthComponent } from './its-you-online-auth.component';
+import { CreateOrganizationComponent, ItsYouOnlineAuthComponent, ViewOrganizationComponent } from './components/index';
 
 export const ItsYouOnlineAuthRoutes: Array<Route> = [
   {

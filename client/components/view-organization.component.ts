@@ -4,13 +4,14 @@ import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs/Subscription';
 
 import * as organizationActions from '../actions/organizations.action';
-import { IOrganizationsState } from '../index';
+import { IOrganizationsState } from '../states/index';
 
 @Component({
   moduleId: module.id,
   selector: 'view-organization',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<selected-organization [isNewOrganization]="false"></selected-organization>`
+  template: `
+    <selected-organization [isNewOrganization]="false"></selected-organization>`
 })
 export class ViewOrganizationComponent implements OnDestroy {
   actionsSubscription: Subscription;

@@ -4,8 +4,7 @@ import { Http } from '@angular/http';
 // libs
 import { Observable } from 'rxjs/Observable';
 // app
-import { Config } from '../../core/index';
-import { Analytics, AnalyticsService } from '../../analytics/index';
+import { Analytics, AnalyticsService } from '../../../framework/client/analytics/index';
 import { ITS_YOU_ONLINE_CATEGORY } from '../common/category.common';
 // module
 import { Organization } from '../index';

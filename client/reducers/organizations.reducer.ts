@@ -1,4 +1,4 @@
-import { IOrganizationsState, initialState } from '../states/index';
+import { initialState, IOrganizationsState } from '../states/index';
 import * as actions from '../actions/organizations.action';
 import { Organization } from '../index';
 
@@ -37,7 +37,7 @@ export function organizationsReducer(state: IOrganizationsState = initialState,
 
       if (state.organizations.find(organization => organization.id === organization.id)) {
         // already present in the state
-        return Object.assign({}, state, {organizationStatus: action.type});
+        return Object.assign({}, state, { organizationStatus: action.type });
       }
 
       return Object.assign({}, state, {
@@ -68,7 +68,7 @@ export function organizationsReducer(state: IOrganizationsState = initialState,
     case actions.ActionTypes.EDIT:
     case actions.ActionTypes.EDIT_FAILED:
     case actions.ActionTypes.DELETE:
-      return Object.assign({}, state, {organizationStatus: action.type});
+      return Object.assign({}, state, { organizationStatus: action.type });
     default:
       return state;
   }

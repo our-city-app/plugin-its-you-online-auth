@@ -3,6 +3,7 @@ export interface RegistrationResultRoles {
   identity: string;
   ids: number[];
 }
+
 export interface Organization {
   name: string;
   id: string;

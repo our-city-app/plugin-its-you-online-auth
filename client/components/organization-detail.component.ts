@@ -12,12 +12,11 @@ import { MdChipInputEvent, MdDialog, MdDialogConfig, MdDialogRef } from '@angula
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
-import { LogService } from '../../core/services/index';
-import { RouterExtensions } from '../../core/services/router-extensions.service';
-import { IAppState } from '../../ngrx/state/app.state';
-import { ConfirmDialogComponent, ConfirmDialogData } from '../../sample/index';
 import { ActionTypes } from '../actions/organizations.action';
-import { Organization, RegistrationResultRoles } from '../index';
+import { Organization, RegistrationResultRoles } from '../interfaces/index';
+import { IAppState } from '../../../framework/client/ngrx/index';
+import { LogService } from '../../../framework/client/core/index';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../../framework/client/sample/index';
 
 @Component({
   moduleId: module.id,
@@ -40,9 +39,9 @@ export class OrganizationDetailComponent implements OnDestroy {
   };
 
   @Input() isNew: boolean;
-  @Output() add = new EventEmitter<Organization>();
-  @Output() update = new EventEmitter<Organization>();
-  @Output() remove = new EventEmitter<Organization>();
+  @Output() onAdd = new EventEmitter<Organization>();
+  @Output() onUpdate = new EventEmitter<Organization>();
+  @Output() onRemove = new EventEmitter<Organization>();
   private _organization: Organization;
 
   constructor(private log: LogService, private store: Store<IAppState>,
@@ -51,21 +50,22 @@ export class OrganizationDetailComponent implements OnDestroy {
     this.statusSubscription = store.select((state: any) => state.organizations.organizationStatus)
       .subscribe((status: string) => {
         // We need a better way to do this...
-      if (ActionTypes.EDITED === status) {
-        this.status = 'iyo.organization_edited';
-      } else if (ActionTypes.ORGANIZATION_ADDED === status) {
-        this.status = 'iyo.organization_added';
-      } else {
-        return;
-      }
-      setTimeout(() => {
-        this.status = null;
-        cdRef.markForCheck();
-      }, 5000);
-    });
+        if (ActionTypes.EDITED === status) {
+          this.status = 'iyo.organization_edited';
+        } else if (ActionTypes.ORGANIZATION_ADDED === status) {
+          this.status = 'iyo.organization_added';
+        } else {
+          return;
+        }
+        setTimeout(() => {
+          this.status = null;
+          cdRef.markForCheck();
+        }, 5000);
+      });
   }
 
-  @Input() set organization(value: Organization) {
+  @Input()
+  set organization(value: Organization) {
     this._organization = Object.assign({}, value);
   }
 
@@ -75,18 +75,18 @@ export class OrganizationDetailComponent implements OnDestroy {
 
   public save(organization: Organization) {
     if (this.isNew) {
-      this.add.emit(organization);
+      this.onAdd.emit(organization);
     } else {
-      this.update.emit(organization);
+      this.onUpdate.emit(organization);
     }
   }
 
   public addModuleInput(event: MdChipInputEvent) {
     if (this.organization.modules.indexOf(event.value) === -1) {
       this.organization.modules = [ ...this.organization.modules, event.value ];
-      }
-    this.addModuleFormControl.reset();
     }
+    this.addModuleFormControl.reset();
+  }
 
   public removeModule(module: string) {
     this.organization.modules = this.organization.modules.filter(a => a !== module);

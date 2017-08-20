@@ -23,7 +23,7 @@
              [placeholder]="'iyo.new_module' | translate"
              [mdChipInputFor]="moduleChips"
              (mdChipInputTokenEnd)="addModuleInput($event)"/>
-      </md-input-container>
+    </md-input-container>
 
     <h3>{{ 'iyo.auto_connected_services' | translate }}</h3>
     <md-chip-list #acsChips>
@@ -39,7 +39,7 @@
              placeholder="{{ 'iyo.new_auto_connected_service' | translate }}"
              [mdChipInputFor]="acsChips"
              (mdChipInputTokenEnd)="addAutoConnectedInput($event)"/>
-      </md-input-container>
+    </md-input-container>
     <h3>{{ 'iyo.roles' | translate }}</h3>
     <md-list>
       <md-list-item *ngFor="let role of organization.roles">
@@ -77,7 +77,7 @@
   <br/>
   <div>
     <button md-button md-raised-button color="primary" [disabled]="!organizationForm.form.valid">
-      {{(isNew ? 'iyo.add_organization' : 'iyo.update_organization') | translate}}
+      {{ (isNew ? 'iyo.add_organization' : 'iyo.update_organization') | translate}}
     </button>
     <p *ngIf="status">{{ status | translate }}</p>
   </div>

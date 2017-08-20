@@ -1,18 +1,21 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 // libs
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 // app
-import { GetOrganizationsAction, IOrganizationsState, Organization, RemoveOrganizationAction } from '../index';
-import { getOrganizations } from '../its-you-online.state';
+import { GetOrganizationsAction, RemoveOrganizationAction } from '../actions/index';
+import { getOrganizations } from '../its-you-online-auth.state';
+import { Organization } from '../interfaces/organization.interfaces';
+import { IOrganizationsState } from '../states/organizations.state';
 
 @Component({
   moduleId: module.id,
   selector: 'organization-settings',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: 'organization-settings.component.html'
 })
 export class OrganizationSettingsComponent {
-  public organizations$: Observable<any>;
+  public organizations$: Observable<Organization[]>;
 
   constructor(private store: Store<IOrganizationsState>) {
     this.store.dispatch(new GetOrganizationsAction());

@@ -1,6 +1,4 @@
-// app
-import { Config, PluginConfig } from '../../core/utils/config';
-
+import { Config, PluginConfig } from '../../../framework/client/core/utils/config';
 
 export class ItsYouOnlineConfig extends PluginConfig {
   public static NAME: string = 'its_you_online_auth';
