@@ -1,8 +1,8 @@
-import { Route } from '@angular/router';
 import { MetaGuard } from '@ngx-meta/core';
+import { Route } from '../../framework/client/app.routes';
 import { CreateOrganizationComponent, ItsYouOnlineAuthComponent, ViewOrganizationComponent } from './components/index';
 
-export const ItsYouOnlineAuthRoutes: Array<Route> = [
+export const ItsYouOnlineAuthRoutes: Route[] = [
   {
     path: 'itsyouonlinesettings',
     canActivate: [ MetaGuard ],

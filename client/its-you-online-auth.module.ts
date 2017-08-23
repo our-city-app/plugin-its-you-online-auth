@@ -6,25 +6,29 @@ import { HttpModule } from '@angular/http';
 import { MdButtonModule, MdChipsModule, MdIconModule, MdInputModule, MdListModule } from '@angular/material';
 import { RouterModule } from '@angular/router';
 import { EffectsModule } from '@ngrx/effects';
-import { OrganizationsEffects } from './effects/organizations.effect';
-// app
-import { ItsYouOnlineConfig, OrganizationsService } from './services/index';
+import { Store } from '@ngrx/store';
 import { MultilingualModule } from '../../framework/client/i18n/multilingual.module';
+import { IAppState } from '../../framework/client/ngrx/state/app.state';
+import { AddRoutesAction } from '../../framework/client/sidebar/actions/sidebar.action';
 import { CreateOrganizationComponent } from './components/create-organization.component';
 import {
   ItsYouOnlineAuthComponent,
   OrganizationDetailComponent,
-  SelectedOrganizationComponent
+  SelectedOrganizationComponent,
 } from './components/index';
-import { ViewOrganizationComponent } from './components/view-organization.component';
 import { OrganizationSettingsComponent } from './components/organization-settings.component';
+import { ViewOrganizationComponent } from './components/view-organization.component';
+import { OrganizationsEffects } from './effects/organizations.effect';
+import { ItsYouOnlineAuthRoutes } from './its-you-online-auth.routes';
+// app
+import { ItsYouOnlineConfig, OrganizationsService } from './services/index';
 
 /**
  * Do not specify providers for modules that might be imported by a lazy loaded module.
  */
 
 const MATERIAL_IMPORTS = [
-  MdButtonModule, MdChipsModule, MdIconModule, MdInputModule, MdListModule
+  MdButtonModule, MdChipsModule, MdIconModule, MdInputModule, MdListModule,
 ];
 export const ITS_YOU_ONLINE_COMPONENTS: any[] = [
   CreateOrganizationComponent,
@@ -32,12 +36,12 @@ export const ITS_YOU_ONLINE_COMPONENTS: any[] = [
   SelectedOrganizationComponent,
   ViewOrganizationComponent,
   OrganizationSettingsComponent,
-  ItsYouOnlineAuthComponent
+  ItsYouOnlineAuthComponent,
 ];
 
 export const ITSYOU_ONLINE_PROVIDERS: any[] = [
   OrganizationsService,
-  ItsYouOnlineConfig
+  ItsYouOnlineConfig,
 ];
 
 
@@ -49,24 +53,26 @@ export const ITSYOU_ONLINE_PROVIDERS: any[] = [
     HttpModule,
     RouterModule,
     MultilingualModule,
+    RouterModule.forChild(ItsYouOnlineAuthRoutes),
     EffectsModule.run(OrganizationsEffects),
-    MATERIAL_IMPORTS
+    MATERIAL_IMPORTS,
   ],
   declarations: [
     ...ITS_YOU_ONLINE_COMPONENTS
   ],
   providers: [
-    ITSYOU_ONLINE_PROVIDERS
+    ITSYOU_ONLINE_PROVIDERS,
   ],
   exports: [
     ...ITS_YOU_ONLINE_COMPONENTS
-  ]
+  ],
 })
 export class ItsYouOnlineAuthModule {
 
-  constructor(@Optional() @SkipSelf() parentModule: ItsYouOnlineAuthModule) {
+  constructor(@Optional() @SkipSelf() parentModule: ItsYouOnlineAuthModule, private store: Store<IAppState>) {
     if (parentModule) {
       throw new Error('ItsYouOnlineAuthModule already loaded; Import in root module only.');
     }
+    this.store.dispatch(new AddRoutesAction(ItsYouOnlineAuthRoutes));
   }
 }
