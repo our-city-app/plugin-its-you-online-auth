@@ -21,16 +21,18 @@ import logging
 import time
 import urllib
 
-import requests
 from google.appengine.api import urlfetch, memcache
 from google.appengine.ext import ndb
+
+import requests
+from framework.bizz.authentication import get_current_session
+from framework.consts import BASE_URL
+from framework.models.session import Session
+from framework.plugin_loader import get_config, get_auth_plugin
+from framework.utils import now
 from jose import jwt, ExpiredSignatureError
 from mcfw.consts import DEBUG
 from mcfw.exceptions import HttpBadRequestException, HttpException, HttpForbiddenException, HttpUnAuthorizedException
-
-from framework.consts import BASE_URL
-from framework.plugin_loader import get_config, get_auth_plugin
-from framework.utils import now
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import OauthLoginState, Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE, ITS_YOU_ONLINE_PUBLIC_KEY, \
@@ -56,6 +58,21 @@ def get_itsyouonline_client(config=None):
         raise Exception('Missing configuration: root_organization.web.client_secret must be set')
     client = Client()
     client.oauth.LoginViaClientCredentials(organization, client_secret)
+    return client
+
+
+def get_itsyouonline_client_from_username(username):
+    session = get_current_session()
+    if not session:
+        session = Session.list_active_user(username).get()
+    jwt = session and session.jwt
+    client = get_itsyouonline_client_from_jwt(jwt)
+    return client
+
+
+def get_itsyouonline_client_from_jwt(jwt):
+    client = Client()
+    client.oauth.session.headers['Authorization'] = 'bearer {jwt}'.format(jwt=jwt)
     return client
 
 
@@ -87,6 +104,22 @@ def get_access_response(config, login_state, code, use_jwt=None, audience=None):
     return content
 
 
+def create_jwt(access_token, scope):
+    url = '{}/jwt?scope={}'.format(OAUTH_BASE_URL, scope)
+    headers = {
+        'Authorization': 'token {token}'.format(token=access_token)
+    }
+    data = urlfetch.fetch(url, headers=headers)
+    if data.status_code == 200:
+        return data.content
+
+    msg = 'Failed to create JWT\n{}: {}'.format(data.status_code, data.content)
+    logging.debug(msg)
+    if DEBUG:
+        logging.debug(access_token)
+    raise Exception(msg)
+
+
 def refresh_jwt(old_jwt):
     url = '{}/jwt/refresh'.format(OAUTH_BASE_URL)
     headers = {
@@ -102,11 +135,8 @@ def refresh_jwt(old_jwt):
 
 
 def has_access_to_organization(client, organization_id, username):
-    r = client.api.organizations.GetOrganizationUsers(organization_id).json()
-    for u in r.get('users', []):
-        if u['username'] == username:
-            return True
-    return False
+    r = client.api.organizations.UserIsMember(username, organization_id).json()
+    return r['IsMember']
 
 
 def get_user_scopes_from_access_token(code, state):
@@ -202,7 +232,7 @@ def get_jwt(code, state):
 def decode_jwt_cached(token):
     # memcache key should be shorter than 250 bytes
     memcache_key = 'jwt-cache-{}'.format(hashlib.sha256(token).hexdigest())
-    decoded_jwt = memcache.get(key=memcache_key, namespace=NAMESPACE)
+    decoded_jwt = memcache.get(key=memcache_key, namespace=NAMESPACE)  # @UndefinedVariable
     if decoded_jwt:
         return decoded_jwt
     timestamp = now()
@@ -210,7 +240,9 @@ def decode_jwt_cached(token):
     decoded_jwt = jwt.decode(token, str(ITS_YOU_ONLINE_PUBLIC_KEY), audience=JWT_AUDIENCE, issuer=JWT_ISSUER)
     logging.debug('Decoding JWT took %ss', time.time() - t)
     # Cache JWT for as long as it's valid
-    memcache.set(key=memcache_key, value=decoded_jwt, time=decoded_jwt['exp'] - timestamp, namespace=NAMESPACE)
+
+    memcache.set(key=memcache_key, value=decoded_jwt, time=decoded_jwt['exp'] - timestamp,
+                 namespace=NAMESPACE)  # @UndefinedVariable
     return decoded_jwt
 
 

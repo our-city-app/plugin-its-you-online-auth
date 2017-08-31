@@ -20,21 +20,20 @@ from __future__ import unicode_literals
 import logging
 
 import requests_toolbelt.adapters.appengine
-from mcfw.consts import AUTHENTICATED
-from mcfw.restapi import rest_functions
-from mcfw.rpc import parse_complex_value
-
 from framework.bizz.authentication import get_current_session
 from framework.bizz.session import is_valid_session
 from framework.configuration import get_configuration
 from framework.plugin_loader import AuthPlugin, get_auth_plugin, get_plugin, get_plugins, get_config
 from framework.utils.plugins import Handler, Module
+from mcfw.consts import AUTHENTICATED, MISSING
+from mcfw.restapi import rest_functions
+from mcfw.rpc import parse_complex_value
 from plugins.its_you_online_auth.api import authenticated
 from plugins.its_you_online_auth.bizz.authentication import validate_session
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.cron.refresh_jwts import RefreshJwtsHandler
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
-    PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler
+    PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler, RegisterHandler
 from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_WEB
 from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
@@ -62,10 +61,11 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
             yield Handler(url='/login/continue', handler=ContinueLoginHandler)
             yield Handler(url='/login/organization', handler=PickOrganizationHandler)
             yield Handler(url='/login/redirect', handler=DoLoginHandler)
+            yield Handler(url='/register', handler=RegisterHandler)
             yield Handler(url='/oauth2_callback', handler=Oauth2CallbackHandler)
             for url, handler in rest_functions(authenticated, authentication=AUTHENTICATED):
                 yield Handler(url=url, handler=handler)
-        if auth == Handler.AUTH_ADMIN:
+        elif auth == Handler.AUTH_ADMIN:
             yield Handler(url='/admin/cron/its_you_online_auth/refresh_jwts', handler=RefreshJwtsHandler)
 
     def get_client_routes(self):
@@ -79,8 +79,9 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
 
     def get_logout_url(self):
         server_url = get_configuration().server_url
-        if not server_url:
-            raise Exception('server_url is not set in the configuration.json file')
+        if not server_url or server_url is MISSING:
+            server_url = ''
+            logging.debug('Using default logout url')
         return '%s/logout' % server_url
 
     def get_profile_url(self):

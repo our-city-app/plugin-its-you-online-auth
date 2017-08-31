@@ -1,20 +1,3 @@
-# -*- coding: utf-8 -*-
-# Copyright 2017 GIG Technology NV
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# @@license_version:1.3@@
-
 import datetime
 import time
 
@@ -60,7 +43,7 @@ def _calculate_offset(date, local_tz):
     otherwise return 0
     """
     if local_tz:
-        # handle year before 1970 most sytem there is no timezone information before 1970.
+        #handle year before 1970 most sytem there is no timezone information before 1970.
         if date.year < 1970:
             # Use 1972 because 1970 doesn't have a leap day
             t = time.mktime(date.replace(year=1972).timetuple)

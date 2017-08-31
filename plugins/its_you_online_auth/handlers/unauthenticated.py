@@ -17,22 +17,23 @@
 
 import httplib
 import logging
+import os
 import urllib
 import uuid
 
-import os
 import webapp2
-from framework.handlers import render_error_page, render_page
-from framework.utils import now
-from mcfw.exceptions import HttpException
-from plugins.its_you_online_auth.models import OauthLoginState
 
 from framework.bizz.authentication import login_user, logout_user, get_current_user_id, get_current_session
 from framework.bizz.session import is_valid_session
+from framework.handlers import render_error_page, render_page
 from framework.plugin_loader import get_config
+from framework.utils import now
+from mcfw.consts import MISSING
+from mcfw.exceptions import HttpException
 from plugins.its_you_online_auth.bizz.authentication import get_user_scopes_from_access_token, get_jwt
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
+from plugins.its_you_online_auth.models import OauthLoginState
 from plugins.its_you_online_auth.plugin_consts import OAUTH_BASE_URL, NAMESPACE, SOURCE_WEB, SOURCE_APP
 from plugins.its_you_online_auth.plugin_utils import get_users_organization
 from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
@@ -41,13 +42,13 @@ from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 class SigninHandler(webapp2.RequestHandler):
     def get(self):
         session = get_current_session()
-        if not is_valid_session(session):
+        if is_valid_session(session):
             self.redirect('/')
             return
 
         config = get_config(NAMESPACE)
         if not config.login_with_organization:
-            self.redirect('/login/continue')
+            self.redirect('/login/continue?%s' % self.request.query)
             return
         render_page(self.response, os.path.join('unauthenticated', 'signin.html'), plugin_name=NAMESPACE)
 
@@ -62,9 +63,18 @@ class LogoutHandler(webapp2.RequestHandler):
 
 class AppLoginHandler(webapp2.RequestHandler):
     def get(self):
-        params = dict()
-        params['source'] = 'app'
-        self.redirect('/login/organization?%s' % urllib.urlencode(params))
+        params = {
+            'source': SOURCE_APP
+        }
+        config = get_config(NAMESPACE)
+        if config.login_with_organization:
+            self.redirect('/login/organization?%s' % urllib.urlencode(params))
+        else:
+            params['organization_id'] = config.root_organization.name
+            if config.required_scopes and config.required_scopes is not MISSING:
+                # provide extra scopes
+                params['scope'] = config.required_scopes
+            self.redirect('/login/redirect?%s' % urllib.urlencode(params))
 
 
 class PickOrganizationHandler(webapp2.RequestHandler):
@@ -82,26 +92,22 @@ class PickOrganizationHandler(webapp2.RequestHandler):
                     error = e.message
 
             if not error:
-                params = {
-                    'source': source,
-                    'organization_id': organization_id
-                }
-                self.redirect('/login/redirect?%s' % urllib.urlencode(params))
+                self.redirect('/login/redirect?%s' % self.request.query)
                 return
 
         template_parameters = {
-            'source': self.request.GET.get('source', SOURCE_WEB),
+            'source': source,
             'error': error
         }
         render_page(self.response, os.path.join('unauthenticated', 'organization.html'), plugin_name=NAMESPACE,
                     template_parameters=template_parameters)
 
 
-class DoLoginHandler(webapp2.RequestHandler):
-    def get(self):
+class OauthAuthorizeHandler(webapp2.RequestHandler):
+    def get(self, register=False):
         organization_id = self.request.GET.get('organization_id', None)
         source = self.request.GET.get('source', SOURCE_WEB)
-        extra_scopes = self.request.GET.get('scope', '')
+        extra_scopes = self.request.GET.get('scope', '').lstrip(',')
 
         config = get_config(NAMESPACE)
         assert isinstance(config, ItsYouOnlineConfiguration)
@@ -132,8 +138,13 @@ class DoLoginHandler(webapp2.RequestHandler):
             else:
                 sub_org = get_users_organization(config, organization_id)
             scope = 'user:memberof:%s' % sub_org
-        else:
+        elif config.require_memberof:
             scope = 'user:memberof:%s' % config.root_organization.name
+        else:
+            scope = ''
+
+        if scope:
+            scope += ','
         scope += extra_scopes
 
         params = {
@@ -151,9 +162,21 @@ class DoLoginHandler(webapp2.RequestHandler):
         login_state.completed = False
         login_state.put()
 
+        if register:
+            params['register'] = 1
         oauth_url = '%s/authorize?%s' % (OAUTH_BASE_URL, urllib.urlencode(params))
         logging.info('Redirecting to %s', oauth_url)
         self.redirect(oauth_url)
+
+
+class DoLoginHandler(OauthAuthorizeHandler):
+    def get(self, **kwargs):
+        super(DoLoginHandler, self).get(False)
+
+
+class RegisterHandler(OauthAuthorizeHandler):
+    def get(self, **kwargs):
+        super(RegisterHandler, self).get(True)
 
 
 class Oauth2CallbackHandler(webapp2.RequestHandler):
@@ -186,6 +209,13 @@ class ContinueLoginHandler(webapp2.RequestHandler):
             self.redirect('/login/organization')
         else:
             params = {
-                'source': self.request.GET.get('source', SOURCE_WEB)
+                'source': self.request.GET.get('source', SOURCE_WEB),
+                'organization_id': config.root_organization.name,
+                'scope': self.request.GET.get('scope') or ''
             }
+            if config.required_scopes and config.required_scopes is not MISSING:
+                # provide extra scopes
+                if params['scope']:
+                    params['scope'] += ','
+                params['scope'] += config.required_scopes
             self.redirect('/login/redirect?%s' % urllib.urlencode(params))

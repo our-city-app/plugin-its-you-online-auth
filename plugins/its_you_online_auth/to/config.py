@@ -45,4 +45,6 @@ class ItsYouOnlineConfiguration(object):
     login_with_organization = bool_property('login_with_organization', default=True)
     cookie_name = unicode_property('cookie_name')
     cookie_key = unicode_property('cookie_key')
-    root_organization = typed_property('root_organization', RootOrganization)
+    root_organization = typed_property('root_organization', RootOrganization)  # type: RootOrganization
+    require_memberof = bool_property('require_memberof', default=True)
+    required_scopes = unicode_property('required_scopes', default=None)

@@ -1,13 +1,12 @@
 import { MetaGuard } from '@ngx-meta/core';
-import { Route } from '../../framework/client/app.routes';
 import { CreateOrganizationComponent, ItsYouOnlineAuthComponent, ViewOrganizationComponent } from './components/index';
+import { Route } from '../../framework/client/app.routes';
 
 export const ItsYouOnlineAuthRoutes: Route[] = [
   {
     path: 'itsyouonlinesettings',
     canActivate: [ MetaGuard ],
     data: {
-      label: 'iyo.itsyouonline_settings',
       icon: 'perm_identity',
       id: 'its_you_online_settings',
       meta: {

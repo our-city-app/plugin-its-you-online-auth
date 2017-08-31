@@ -54,13 +54,14 @@ def friend_register(rt_settings, id_, service_identity, user_details, origin, da
             logging.warn('Could not find login state, denying installation.')
             return DECLINE_ID
 
-        scope = data.get('result', {}).get('scope')
         config = get_config(NAMESPACE)
-        expected_scope = 'user:memberof:%s' % get_users_organization(config, login_state.organization_id)
-        if not scope or expected_scope not in scope:
-            logging.warn('Could not find expected organization scope %s in scope %s. Denying installation.',
-                         expected_scope, scope)
-            return DECLINE_ID
+        if config.require_memberof:
+            scope = data.get('result', {}).get('scope')
+            expected_scope = 'user:memberof:%s' % get_users_organization(config, login_state.organization_id)
+            if not scope or expected_scope not in scope:
+                logging.warn('Could not find expected organization scope %s in scope %s. Denying installation.',
+                             expected_scope, scope)
+                return DECLINE_ID
 
         profile_key = Profile.create_key(login_state.source, username)
         profile = profile_key.get() or Profile(key=profile_key)
@@ -74,18 +75,20 @@ def friend_register(rt_settings, id_, service_identity, user_details, origin, da
         result.result = ACCEPT_ID
         result.auto_connected_services = []
         result.roles = []
-        try:
-            organization = get_organization(login_state.organization_id)
-            result.auto_connected_services = organization.auto_connected_services
-            if organization.roles:
-                for role in organization.roles:
-                    roleTO = RegistrationResultRolesTO()
-                    roleTO.service = role.service
-                    roleTO.identity = role.identity
-                    roleTO.ids = role.ids
-                    result.roles.append(roleTO)
-        except OrganizationNotFoundException:
-            pass
+
+        if login_state.organization_id:
+            try:
+                organization = get_organization(login_state.organization_id)
+                result.auto_connected_services = organization.auto_connected_services
+                if organization.roles:
+                    for role in organization.roles:
+                        roleTO = RegistrationResultRolesTO()
+                        roleTO.service = role.service
+                        roleTO.identity = role.identity
+                        roleTO.ids = role.ids
+                        result.roles.append(roleTO)
+            except OrganizationNotFoundException:
+                pass
 
         return serialize_complex_value(result, RegistrationResultTO, False)
     except:
