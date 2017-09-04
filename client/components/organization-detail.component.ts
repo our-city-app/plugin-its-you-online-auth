@@ -8,15 +8,15 @@ import {
   Output,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MdChipInputEvent, MdDialog, MdDialogConfig, MdDialogRef } from '@angular/material';
+import { MdChipInputEvent } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { ActionTypes } from '../actions/organizations.action';
 import { Organization, RegistrationResultRoles } from '../interfaces/index';
 import { IAppState } from '../../../framework/client/ngrx/index';
 import { LogService } from '../../../framework/client/core/index';
-import { ConfirmDialogComponent, ConfirmDialogData } from '../../../framework/client/sample/index';
+import { DialogService } from '../../../framework/client/dialog/services/dialog.service';
 
 @Component({
   moduleId: module.id,
@@ -29,7 +29,6 @@ export class OrganizationDetailComponent implements OnDestroy {
   addAcsFormControl = new FormControl();
   status: string;
   statusSubscription: Subscription;
-  dialogRef: MdDialogRef<ConfirmDialogComponent>;
   newRole: RegistrationResultRoles;
   newRoleIds: string;
   emptyRole: RegistrationResultRoles = {
@@ -45,7 +44,7 @@ export class OrganizationDetailComponent implements OnDestroy {
   private _organization: Organization;
 
   constructor(private log: LogService, private store: Store<IAppState>,
-              public dialog: MdDialog, public translate: TranslateService, private cdRef: ChangeDetectorRef) {
+              public dialog: DialogService, public translate: TranslateService, private cdRef: ChangeDetectorRef) {
     this.newRole = Object.assign({}, this.emptyRole);
     this.statusSubscription = store.select((state: any) => state.organizations.organizationStatus)
       .subscribe((status: string) => {
@@ -125,32 +124,28 @@ export class OrganizationDetailComponent implements OnDestroy {
   }
 
   public showConfirmRemoveModule(module: string) {
-    let msg = this.translate.get('iyo.do_you_want_to_delete_module', { m: module });
-    this.showConfirmDialog(this.translate.get('iyo.confirmation'), msg)
+    let msg = this.translate.instant('iyo.do_you_want_to_delete_module', { m: module });
+    this.showConfirmDialog(this.translate.instant('iyo.confirmation'), msg)
       .filter(confirmed => confirmed).subscribe(confirmed => this.removeModule(module));
   }
 
   public showConfirmRemoveACS(acs: string) {
-    let msg = this.translate.get('iyo.do_you_want_to_delete_auto_connected_service', { acs: acs });
-    this.showConfirmDialog(this.translate.get('iyo.confirmation'), msg)
+    let msg = this.translate.instant('iyo.do_you_want_to_delete_auto_connected_service', { acs: acs });
+    this.showConfirmDialog(this.translate.instant('iyo.confirmation'), msg)
       .filter(confirmed => confirmed).subscribe(confirmed => this.removeAutoConnectedService(acs));
   }
 
-  public showConfirmDialog(title: Observable<string>, message: Observable<string>) {
-    let config: MdDialogConfig = {
-      data: <ConfirmDialogData>{
-        title: title,
-        message: message,
-        ok: this.translate.get('iyo.yes'),
-        cancel: this.translate.get('iyo.no'),
-      },
+  public showConfirmDialog(title: string, message: string) {
+    let config = {
+      title: title,
+      message: message,
+      ok: this.translate.instant('iyo.yes'),
+      cancel: this.translate.instant('iyo.no'),
     };
-    return this.dialog.open(ConfirmDialogComponent, config).afterClosed();
+    return this.dialog.openConfirm(config).afterClosed();
   }
 
   ngOnDestroy(): void {
     this.statusSubscription.unsubscribe();
   }
-
-
 }
