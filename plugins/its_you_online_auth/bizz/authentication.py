@@ -231,6 +231,15 @@ def get_jwt(code, state):
 
 def decode_jwt_cached(token):
     # memcache key should be shorter than 250 bytes
+    """
+    Args:
+        token (unicode): jwt
+
+    Returns:
+        decoded jwt
+    Raises:
+        ExpiredSignatureError: In case the JWT has expired
+    """
     memcache_key = 'jwt-cache-{}'.format(hashlib.sha256(token).hexdigest())
     decoded_jwt = memcache.get(key=memcache_key, namespace=NAMESPACE)  # @UndefinedVariable
     if decoded_jwt:
@@ -254,26 +263,25 @@ def validate_session(session):
     Returns:
         bool: True if the session is valid
     """
-    session_expired = False
     if session.jwt:
         try:
-            decode_jwt_cached(session.jwt)
+            logging.info('Validating JWT %s', session.jwt)
+            jwt = decode_jwt_cached(session.jwt)
+            # This function is executed every 12 hours and JWT's are only valid for 24h
+            if jwt['exp'] > now() - 3600 * 12:
+                logging.debug('JWT is fine %s', jwt)
+                return True
         except ExpiredSignatureError:
-            logging.debug('JWT for user %s expired, refreshing...', session.user_id)
-            try:
-                new_jwt = refresh_jwt(session.jwt)
-                session.jwt = new_jwt
-                session.scopes = decode_jwt_cached(new_jwt)['scope']
-            except Exception:
-                logging.debug('Error while refreshing jwt', exc_info=True)
-                session.key.delete()
-                session_expired = True
+            pass
+        logging.debug('Refreshing JWT for session %s', session)
+        try:
+            new_jwt = refresh_jwt(session.jwt)
+            session.jwt = new_jwt
+            session.scopes = decode_jwt_cached(new_jwt)['scope']
             session.put()
-        except Exception as e:
-            logging.exception(e)
-            session_expired = True
-        if session_expired:
+            return True
+        except Exception:
+            # This probably happens because the JWT did not contain a refresh_token.
+            logging.debug('Error while refreshing JWT', exc_info=True)
             session.key.delete()
-        else:
-            session.put()
-    return not session_expired
+            return False
