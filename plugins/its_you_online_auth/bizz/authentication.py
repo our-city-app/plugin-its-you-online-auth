@@ -36,7 +36,7 @@ from mcfw.exceptions import HttpBadRequestException, HttpException, HttpForbidde
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import OauthLoginState, Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE, ITS_YOU_ONLINE_PUBLIC_KEY, \
-    JWT_AUDIENCE, JWT_ISSUER, SOURCE_WEB
+    JWT_ISSUER, SOURCE_WEB
 from plugins.its_you_online_auth.plugin_utils import get_users_organization, get_organization
 from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 
@@ -76,7 +76,7 @@ def get_itsyouonline_client_from_jwt(jwt):
     return client
 
 
-def get_access_response(config, login_state, code, use_jwt=None, audience=None):
+def get_access_response(config, login_state, code, use_jwt=None):
     params = {
         'client_id': config.root_organization.name,
         'client_secret': config.root_organization[SOURCE_WEB].client_secret,
@@ -87,7 +87,6 @@ def get_access_response(config, login_state, code, use_jwt=None, audience=None):
     if use_jwt:
         params['response_type'] = 'id_token'
         params['scope'] = 'offline_access'
-        params['aud'] = audience
     access_token_url = '%s/access_token?%s' % (OAUTH_BASE_URL, urllib.urlencode(params))
     response = requests.post(access_token_url, params)
 
@@ -217,9 +216,8 @@ def get_jwt(code, state):
         raise HttpBadRequestException()
 
     config = get_config(NAMESPACE)  # type: ItsYouOnlineConfiguration
-    json_web_token = get_access_response(config, login_state, code, True, audience=JWT_AUDIENCE)
-    decoded_jwt = jwt.decode(json_web_token, str(ITS_YOU_ONLINE_PUBLIC_KEY), audience=JWT_AUDIENCE,
-                             issuer=JWT_ISSUER)
+    json_web_token = get_access_response(config, login_state, code, True)
+    decoded_jwt = jwt.decode(json_web_token, str(ITS_YOU_ONLINE_PUBLIC_KEY), issuer=JWT_ISSUER)
     if decoded_jwt['azp'] != config.root_organization.name:
         logging.error('Received invalid JWT: %s', decoded_jwt)
         raise HttpForbiddenException()
@@ -246,7 +244,7 @@ def decode_jwt_cached(token):
         return decoded_jwt
     timestamp = now()
     t = time.time()
-    decoded_jwt = jwt.decode(token, str(ITS_YOU_ONLINE_PUBLIC_KEY), audience=JWT_AUDIENCE, issuer=JWT_ISSUER)
+    decoded_jwt = jwt.decode(token, str(ITS_YOU_ONLINE_PUBLIC_KEY), issuer=JWT_ISSUER)
     logging.debug('Decoding JWT took %ss', time.time() - t)
     # Cache JWT for as long as it's valid
 
