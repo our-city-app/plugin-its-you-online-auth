@@ -24,6 +24,7 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
 7MjiGYvqalizeSWTHEpnd7oea9IQ8T5oJjMVH5cc0H5tFSKilFFeh//wngxIyny6
 6+Vq5t5B0V0Ehy01+2ceEon2Y0XDkIKv
 -----END PUBLIC KEY-----"""
+JWT_AUDIENCE = 'rogerthat-control-center'
 JWT_ISSUER = 'itsyouonline'
 
 SOURCE_DEV = 'dev'
