@@ -48,3 +48,4 @@ class ItsYouOnlineConfiguration(object):
     root_organization = typed_property('root_organization', RootOrganization)  # type: RootOrganization
     require_memberof = bool_property('require_memberof', default=True)
     required_scopes = unicode_property('required_scopes', default=None)
+    jwt_audience = unicode_property('jwt_audience', default=None)
