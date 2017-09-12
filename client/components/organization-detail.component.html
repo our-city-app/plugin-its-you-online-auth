@@ -1,15 +1,15 @@
 <form (submit)="save(organization)" #organizationForm="ngForm">
   <div fxLayout="column" fxFlex="40" fxFlex.md="60" fxFlex.xs="100">
-    <md-input-container>
+    <md-form-field>
       <input mdInput [(ngModel)]="organization.name" name="newOrganizationName"
              [placeholder]="'iyo.organization_name' | translate" required>
-    </md-input-container>
+    </md-form-field>
 
-    <md-input-container>
+    <md-form-field>
       <input mdInput [(ngModel)]="organization.id" name="organization_id"
              [placeholder]="'iyo.organization_id' | translate"
              required [disabled]="!isNew" pattern="^[a-z\d\-_\s]{3,150}$">
-    </md-input-container>
+    </md-form-field>
     <h3>{{ 'iyo.modules' | translate }}</h3>
     <md-chip-list #moduleChips>
       <md-chip *ngFor="let module of organization.modules" (remove)="showConfirmRemoveModule(module)">
@@ -17,13 +17,13 @@
         <md-icon mdChipRemove>cancel</md-icon>
       </md-chip>
     </md-chip-list>
-    <md-input-container>
+    <md-form-field>
       <input mdInput
              [formControl]="addModuleFormControl"
              [placeholder]="'iyo.new_module' | translate"
              [mdChipInputFor]="moduleChips"
              (mdChipInputTokenEnd)="addModuleInput($event)"/>
-    </md-input-container>
+    </md-form-field>
 
     <h3>{{ 'iyo.auto_connected_services' | translate }}</h3>
     <md-chip-list #acsChips>
@@ -33,13 +33,13 @@
         <md-icon mdChipRemove>cancel</md-icon>
       </md-chip>
     </md-chip-list>
-    <md-input-container>
+    <md-form-field>
       <input mdInput type="email"
              [formControl]="addAcsFormControl"
              placeholder="{{ 'iyo.new_auto_connected_service' | translate }}"
              [mdChipInputFor]="acsChips"
              (mdChipInputTokenEnd)="addAutoConnectedInput($event)"/>
-    </md-input-container>
+    </md-form-field>
     <h3>{{ 'iyo.roles' | translate }}</h3>
     <md-list>
       <md-list-item *ngFor="let role of organization.roles">
@@ -51,22 +51,22 @@
         </button>
       </md-list-item>
     </md-list>
-    <md-input-container>
+    <md-form-field>
       <input mdInput name="newRoleService" [(ngModel)]="newRole.service" type="email"
              placeholder="{{ 'iyo.service' | translate }}"
              [email]="true"
              #newRoleServiceElem="ngModel"/>
-    </md-input-container>
-    <md-input-container>
+    </md-form-field>
+    <md-form-field>
       <input mdInput name="newRoleIdentity" [(ngModel)]="newRole.identity"
              placeholder="{{ 'iyo.identity' | translate }}"
              #newRoleIdentityElem="ngModel"/>
-    </md-input-container>
-    <md-input-container>
+    </md-form-field>
+    <md-form-field>
       <input mdInput name="newRoleIds" [(ngModel)]="newRoleIds"
              placeholder="{{ 'iyo.role_ids' | translate }}"
              #newRoleIdsElem="ngModel"/>
-    </md-input-container>
+    </md-form-field>
     <div fxLayoutAlign="end center">
       <button type="button" md-button md-raised-button (click)="addRole();"
               [disabled]="!newRole.service || !newRole.identity ||  !newRoleServiceElem.valid || !newRoleIdentityElem.valid">
