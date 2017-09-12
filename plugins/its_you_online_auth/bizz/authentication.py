@@ -21,16 +21,16 @@ import logging
 import time
 import urllib
 
-from google.appengine.api import urlfetch, memcache
-from google.appengine.ext import ndb
-
+from jose import jwt, ExpiredSignatureError
 import requests
+
 from framework.bizz.authentication import get_current_session
 from framework.consts import BASE_URL
 from framework.models.session import Session
 from framework.plugin_loader import get_config, get_auth_plugin
-from framework.utils import now
-from jose import jwt, ExpiredSignatureError
+from framework.utils import now, urlencode
+from google.appengine.api import urlfetch, memcache
+from google.appengine.ext import ndb
 from mcfw.consts import DEBUG
 from mcfw.exceptions import HttpBadRequestException, HttpException, HttpForbiddenException, HttpUnAuthorizedException
 from plugins.its_you_online_auth.libs.itsyouonline import Client
@@ -39,6 +39,7 @@ from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NA
     JWT_ISSUER, SOURCE_WEB
 from plugins.its_you_online_auth.plugin_utils import get_users_organization, get_organization
 from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
+
 
 try:
     from functools import lru_cache
@@ -120,8 +121,11 @@ def create_jwt(access_token, scope):
     raise Exception(msg)
 
 
-def refresh_jwt(old_jwt):
-    url = '{}/jwt/refresh'.format(OAUTH_BASE_URL)
+def refresh_jwt(old_jwt, validity=24 * 60 * 60):
+    args = {
+        "validity": validity
+    }
+    url = '{}/jwt/refresh?{}'.format(OAUTH_BASE_URL, urlencode(args))
     headers = {
         'Authorization': 'bearer {jwt}'.format(jwt=old_jwt)
     }
