@@ -104,10 +104,11 @@ class PickOrganizationHandler(webapp2.RequestHandler):
 
 
 class OauthAuthorizeHandler(webapp2.RequestHandler):
-    def get(self, register=False):
+    def get(self):
         organization_id = self.request.GET.get('organization_id', None)
         source = self.request.GET.get('source', SOURCE_WEB)
         extra_scopes = self.request.GET.get('scope', '').lstrip(',')
+        register = self.request.GET.get('register', False)
 
         config = get_config(NAMESPACE)
         assert isinstance(config, ItsYouOnlineConfiguration)
@@ -171,12 +172,7 @@ class OauthAuthorizeHandler(webapp2.RequestHandler):
 
 class DoLoginHandler(OauthAuthorizeHandler):
     def get(self, **kwargs):
-        super(DoLoginHandler, self).get(False)
-
-
-class RegisterHandler(OauthAuthorizeHandler):
-    def get(self, **kwargs):
-        super(RegisterHandler, self).get(True)
+        super(DoLoginHandler, self).get()
 
 
 class Oauth2CallbackHandler(webapp2.RequestHandler):
@@ -201,7 +197,7 @@ class Oauth2CallbackHandler(webapp2.RequestHandler):
 
 
 class ContinueLoginHandler(webapp2.RequestHandler):
-    def get(self):
+    def get(self, register=False, **kwargs):
         # Redirect to /login/organization if an organization is required to login
         # else immediately redirect to to itsyou.online
         config = get_config(NAMESPACE)  # type: ItsYouOnlineConfiguration
@@ -213,9 +209,16 @@ class ContinueLoginHandler(webapp2.RequestHandler):
                 'organization_id': config.root_organization.name,
                 'scope': self.request.GET.get('scope') or ''
             }
+            if register:
+                params['register'] = 1
             if config.required_scopes and config.required_scopes is not MISSING:
                 # provide extra scopes
                 if params['scope']:
                     params['scope'] += ','
                 params['scope'] += config.required_scopes
             self.redirect('/login/redirect?%s' % urllib.urlencode(params))
+
+
+class RegisterHandler(ContinueLoginHandler):
+    def get(self, **kwargs):
+        super(RegisterHandler, self).get(register=True, **kwargs)
