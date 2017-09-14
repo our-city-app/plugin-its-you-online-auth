@@ -25,7 +25,7 @@ from plugins.its_you_online_auth.bizz.authentication import validate_session
 
 class RefreshJwtsHandler(webapp2.RequestHandler):
     def get(self):
-        run_job(_get_all_sessions, [], _refresh_jwt_if_needed, [])
+        run_job(_get_all_sessions, [], _refresh_jwt_if_needed, [], batch_size=5, batch_timeout=5)
 
 
 def _get_all_sessions():
