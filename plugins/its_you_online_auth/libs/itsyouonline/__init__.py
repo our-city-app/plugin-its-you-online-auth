@@ -1,10 +1,10 @@
 from urlparse import urljoin
 
 import requests
+from .client import Client as APIClient
 
-from plugins.its_you_online_auth.libs.itsyouonline.client import Client as APIClient
+BASE_URI = 'https://itsyou.online/'
 
-BASE_URI = "https://itsyou.online/"
 
 class Oauth:
     def __init__(self):

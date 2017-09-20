@@ -42,10 +42,12 @@ class RootOrganization(object):
 
 class ItsYouOnlineConfiguration(object):
     login_url = unicode_property('login_url')
-    login_with_organization = bool_property('login_with_organization', default=True)
+    login_with_organization = bool_property('login_with_organization')
     cookie_name = unicode_property('cookie_name')
     cookie_key = unicode_property('cookie_key')
     root_organization = typed_property('root_organization', RootOrganization)  # type: RootOrganization
-    require_memberof = bool_property('require_memberof', default=True)
-    required_scopes = unicode_property('required_scopes', default=None)
-    jwt_audience = unicode_property('jwt_audience', default=None)
+    require_memberof = bool_property('require_memberof')
+    required_scopes = unicode_property('required_scopes')
+    jwt_audience = unicode_property('jwt_audience')
+    # e.g. staging.itsyou.online
+    api_domain = unicode_property('api_domain')

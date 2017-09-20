@@ -34,6 +34,7 @@ from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.cron.refresh_jwts import RefreshJwtsHandler
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
     PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler, RegisterHandler
+from plugins.its_you_online_auth.libs import itsyouonline
 from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_WEB
 from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
@@ -48,10 +49,13 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
         super(ItsYouOnlineAuthPlugin, self).__init__(configuration)
         self.configuration = parse_complex_value(ItsYouOnlineConfiguration, configuration,
                                                  False)  # type: ItsYouOnlineConfiguration
+        if self.configuration.api_domain is MISSING:
+            self.configuration.api_domain = u'itsyou.online'
         rogerthat_api_plugin = get_plugin('rogerthat_api')
         assert isinstance(rogerthat_api_plugin, RogerthatApiPlugin)
         rogerthat_api_plugin.subscribe('friend.register', friend_register)
         rogerthat_api_plugin.subscribe('friend.register_result', friend_register_result)
+        itsyouonline.BASE_URI = u'https://%s/' % self.configuration.api_domain
 
     def get_handlers(self, auth):
         if auth == Handler.AUTH_UNAUTHENTICATED:
@@ -85,7 +89,7 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
         return '%s/logout' % server_url
 
     def get_profile_url(self):
-        return 'https://itsyou.online'
+        return itsyouonline.BASE_URI
 
     def get_cookie_name(self):
         return self.configuration.cookie_name

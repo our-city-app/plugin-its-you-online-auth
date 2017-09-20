@@ -1,12 +1,14 @@
-import requests
+from urlparse import urljoin
 
+import requests
 from .organizations_service import OrganizationsService
 from .users_service import UsersService
 
 
 class Client:
-    def __init__(self, base_uri="https://itsyou.online/api"):
-        self.base_url = base_uri
+    def __init__(self):
+        from . import BASE_URI
+        self.base_url = urljoin(BASE_URI, '/api')
         self.session = requests.Session()
 
         self.organizations = OrganizationsService(self)
