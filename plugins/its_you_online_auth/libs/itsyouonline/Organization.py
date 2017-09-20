@@ -1,7 +1,7 @@
 """
 Auto-generated class for Organization
 """
-from plugins.its_you_online_auth.libs.itsyouonline import client_support
+from . import client_support
 from .RequiredScope import RequiredScope
 
 

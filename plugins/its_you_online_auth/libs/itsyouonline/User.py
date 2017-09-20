@@ -1,7 +1,7 @@
 """
 Auto-generated class for User
 """
-from plugins.its_you_online_auth.libs.itsyouonline import client_support
+from . import client_support
 from .Address import Address
 from .BankAccount import BankAccount
 from .DigitalAssetAddress import DigitalAssetAddress

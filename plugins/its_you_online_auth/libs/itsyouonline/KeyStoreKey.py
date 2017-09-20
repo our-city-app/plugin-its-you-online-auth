@@ -1,7 +1,7 @@
 """
 Auto-generated class for KeyStoreKey
 """
-from plugins.its_you_online_auth.libs.itsyouonline import client_support
+from . import client_support
 from .KeyData import KeyData
 from .Label import Label
 

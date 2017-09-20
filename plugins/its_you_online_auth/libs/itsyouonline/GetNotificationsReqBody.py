@@ -1,7 +1,7 @@
 """
 Auto-generated class for GetNotificationsReqBody
 """
-from plugins.its_you_online_auth.libs.itsyouonline import client_support
+from . import client_support
 from .ContractSigningRequest import ContractSigningRequest
 from .JoinOrganizationInvitation import JoinOrganizationInvitation
 from .MissingScopes import MissingScopes

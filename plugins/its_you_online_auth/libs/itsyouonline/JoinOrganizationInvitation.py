@@ -1,7 +1,7 @@
 """
 Auto-generated class for JoinOrganizationInvitation
 """
-from plugins.its_you_online_auth.libs.itsyouonline import client_support
+from . import client_support
 from .EnumJoinOrganizationInvitationMethod import EnumJoinOrganizationInvitationMethod
 from .EnumJoinOrganizationInvitationRole import EnumJoinOrganizationInvitationRole
 from .EnumJoinOrganizationInvitationStatus import EnumJoinOrganizationInvitationStatus

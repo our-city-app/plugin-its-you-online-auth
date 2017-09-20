@@ -1,7 +1,7 @@
 """
 Auto-generated class for CreateUserBankAccountReqBody
 """
-from plugins.its_you_online_auth.libs.itsyouonline import client_support
+from . import client_support
 from .BankAccount import BankAccount
 
 

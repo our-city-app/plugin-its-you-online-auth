@@ -1,7 +1,7 @@
 """
 Auto-generated class for Authorization
 """
-from plugins.its_you_online_auth.libs.itsyouonline import client_support
+from . import client_support
 from .AuthorizationMap import AuthorizationMap
 
 

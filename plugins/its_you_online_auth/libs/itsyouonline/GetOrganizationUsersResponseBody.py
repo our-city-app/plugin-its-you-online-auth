@@ -1,7 +1,7 @@
 """
 Auto-generated class for GetOrganizationUsersResponseBody
 """
-from plugins.its_you_online_auth.libs.itsyouonline import client_support
+from . import client_support
 from .OrganizationUser import OrganizationUser
 
 

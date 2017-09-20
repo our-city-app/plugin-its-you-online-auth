@@ -1,8 +1,9 @@
 """
 Auto-generated class for See
 """
-from plugins.its_you_online_auth.libs.itsyouonline import client_support
 from .SeeVersion import SeeVersion
+
+from . import client_support
 
 
 class See(object):

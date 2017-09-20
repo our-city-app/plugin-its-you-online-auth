@@ -2,7 +2,7 @@
 Auto-generated class for DnsAddress
 """
 
-from plugins.its_you_online_auth.libs.itsyouonline import client_support
+from . import client_support
 
 
 class DnsAddress(object):

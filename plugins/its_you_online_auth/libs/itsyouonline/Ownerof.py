@@ -1,42 +1,43 @@
 """
-Auto-generated class for SetOrganizationLogoReqBody
+Auto-generated class for Ownerof
 """
+from .EmailAddress import EmailAddress
 
 from . import client_support
 
 
-class SetOrganizationLogoReqBody(object):
+class Ownerof(object):
     """
     auto-generated. don't touch.
     """
 
     @staticmethod
-    def create(logo):
+    def create(emailaddresses):
         """
-        :type logo: str
-        :rtype: SetOrganizationLogoReqBody
+        :type emailaddresses: list[EmailAddress]
+        :rtype: Ownerof
         """
 
-        return SetOrganizationLogoReqBody(
-            logo=logo,
+        return Ownerof(
+            emailaddresses=emailaddresses,
         )
 
     def __init__(self, json=None, **kwargs):
         if json is None and not kwargs:
             raise ValueError('No data or kwargs present')
 
-        class_name = 'SetOrganizationLogoReqBody'
+        class_name = 'Ownerof'
         create_error = '{cls}: unable to create {prop} from value: {val}: {err}'
         required_error = '{cls}: missing required property {prop}'
 
         data = json or kwargs
 
-        property_name = 'logo'
+        property_name = 'emailaddresses'
         val = data.get(property_name)
         if val is not None:
-            datatypes = [str]
+            datatypes = [EmailAddress]
             try:
-                self.logo = client_support.val_factory(val, datatypes)
+                self.emailaddresses = client_support.list_factory(val, datatypes)
             except ValueError as err:
                 raise ValueError(create_error.format(cls=class_name, prop=property_name, val=val, err=err))
         else:
