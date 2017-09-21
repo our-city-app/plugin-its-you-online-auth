@@ -19,12 +19,14 @@ from google.appengine.ext import ndb
 from plugins.its_you_online_auth import plugin_consts
 
 
-class OauthLoginState(ndb.Model):
+class OauthState(ndb.Model):
     timestamp = ndb.IntegerProperty(indexed=False)
     organization_id = ndb.StringProperty(indexed=False)
     source = ndb.StringProperty(indexed=False)
     completed = ndb.BooleanProperty(indexed=False)
 
+    app_redirect_uri = ndb.StringProperty(indexed=False)
+    
     @property
     def state(self):
         return self.key.id().decode('utf8')

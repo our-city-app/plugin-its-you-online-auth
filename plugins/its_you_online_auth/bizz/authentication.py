@@ -32,9 +32,9 @@ from framework.utils import now, urlencode
 from google.appengine.api import urlfetch, memcache
 from google.appengine.ext import ndb
 from mcfw.consts import DEBUG
-from mcfw.exceptions import HttpBadRequestException, HttpException, HttpForbiddenException, HttpUnAuthorizedException
+from mcfw.exceptions import HttpException, HttpForbiddenException, HttpUnAuthorizedException
 from plugins.its_you_online_auth.libs.itsyouonline import Client
-from plugins.its_you_online_auth.models import OauthLoginState, Profile
+from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE, ITS_YOU_ONLINE_PUBLIC_KEY, \
     JWT_ISSUER, SOURCE_WEB
 from plugins.its_you_online_auth.plugin_utils import get_users_organization, get_organization
@@ -77,13 +77,13 @@ def get_itsyouonline_client_from_jwt(jwt):
     return client
 
 
-def get_access_response(config, login_state, code, use_jwt=None, audience=None):
+def get_access_response(config, state, code, use_jwt=None, audience=None, redirect_uri=None):
     params = {
         'client_id': config.root_organization.name,
         'client_secret': config.root_organization[SOURCE_WEB].client_secret,
         'code': code,
-        'redirect_uri': config.root_organization[SOURCE_WEB].redirect_uri,
-        'state': login_state.state
+        'redirect_uri': redirect_uri or config.root_organization[SOURCE_WEB].redirect_uri,
+        'state': state
     }
     if use_jwt:
         params['response_type'] = 'id_token'
@@ -143,52 +143,38 @@ def has_access_to_organization(client, organization_id, username):
     return r['IsMember']
 
 
-def get_user_scopes_from_access_token(code, state):
-    """
-    Args:
-        code (unicode)
-        state (unicode)
-    """
-    if not (code or state):
-        logging.debug('Code or state are missing.\nCode: %s\nState:%s', code, state)
-        raise HttpBadRequestException()
-
-    login_state = OauthLoginState.create_key(state).get()
-    if not login_state:
-        logging.debug('Login state not found')
-        raise HttpBadRequestException()
-
+def get_user_scopes_from_access_token(code, state_model):
     config = get_config(NAMESPACE)
     assert isinstance(config, ItsYouOnlineConfiguration)
 
-    access_result = get_access_response(config, login_state, code)
+    access_result = get_access_response(config, state_model.state, code)
 
     username = access_result['info']['username']
     scope = access_result.get('scope')
 
-    if login_state.organization_id == config.root_organization.name:
-        if login_state.source == "app":
+    if state_model.organization_id == config.root_organization.name:
+        if state_model.source == "app":
             logging.debug('Invalid login source')
             raise HttpForbiddenException()
         else:
-            users_organization = login_state.organization_id
+            users_organization = state_model.organization_id
     else:
-        users_organization = get_users_organization(config, login_state.organization_id)
+        users_organization = get_users_organization(config, state_model.organization_id)
 
-    admins_organization = get_organization(config.root_organization.name, login_state.organization_id)
+    admins_organization = get_organization(config.root_organization.name, state_model.organization_id)
     expected_scope = 'user:memberof:%s' % users_organization
     if not scope or expected_scope not in scope:
         logging.debug('Missing or invalid scope.Expected: {} - Received: {}'.format(expected_scope, scope))
         raise HttpForbiddenException()
 
-    save_profile_state(access_result.get('access_token'), login_state, username)
+    save_profile_state(access_result.get('access_token'), state_model, username)
 
     client = get_itsyouonline_client(config)
-    scopes = [Scopes.get_organization_scope(Scopes.ORGANIZATION_MEMBER, login_state.organization_id)]
+    scopes = [Scopes.get_organization_scope(Scopes.ORGANIZATION_MEMBER, state_model.organization_id)]
     if has_access_to_organization(client, config.root_organization.name, username):
         scopes.append(Scopes.ADMIN)
     if has_access_to_organization(client, admins_organization, username):
-        scopes.append(Scopes.get_organization_scope(Scopes.ORGANIZATION_ADMIN, login_state.organization_id))
+        scopes.append(Scopes.get_organization_scope(Scopes.ORGANIZATION_ADMIN, state_model.organization_id))
     elif not has_access_to_organization(client, users_organization, username):
         # Should never happen as the memberof scope requires this
         logging.debug('User is not a member of organization {}'.format(users_organization))
@@ -196,32 +182,19 @@ def get_user_scopes_from_access_token(code, state):
     return username, scopes
 
 
-def save_profile_state(access_token_or_jwt, login_state, username):
-    profile_key = Profile.create_key(login_state.source, username)
+def save_profile_state(access_token_or_jwt, state_model, username):
+    profile_key = Profile.create_key(state_model.source, username)
     profile = profile_key.get() or Profile(key=profile_key)
     profile.access_token = access_token_or_jwt
-    profile.organization_id = login_state.organization_id
-    login_state.completed = True
-    ndb.put_multi([profile, login_state])
+    profile.organization_id = state_model.organization_id
+    state_model.completed = True
+    ndb.put_multi([profile, state_model])
 
 
-def get_jwt(code, state):
-    """
-    Args:
-        code (unicode)
-        state (unicode)
-    """
-    if not (code and state):
-        logging.debug('Code or state are missing.\nCode: %s\nState:%s', code, state)
-        raise HttpBadRequestException()
-
-    login_state = OauthLoginState.create_key(state).get()
-    if not login_state:
-        logging.debug('Login state not found')
-        raise HttpBadRequestException()
-
+def get_jwt(code, state_model, redirect_uri=None):
     config = get_config(NAMESPACE)  # type: ItsYouOnlineConfiguration
-    json_web_token = get_access_response(config, login_state, code, True, audience=config.jwt_audience)
+    json_web_token = get_access_response(config, state_model.state, code, True, audience=config.jwt_audience,
+                                         redirect_uri=redirect_uri)
     decoded_jwt = jwt.decode(json_web_token, str(ITS_YOU_ONLINE_PUBLIC_KEY), audience=config.jwt_audience,
                              issuer=JWT_ISSUER)
     if decoded_jwt['azp'] != config.root_organization.name:
@@ -229,7 +202,7 @@ def get_jwt(code, state):
         raise HttpForbiddenException()
     username = decoded_jwt['username']
     scopes = decoded_jwt['scope']
-    save_profile_state(json_web_token, login_state, username)
+    save_profile_state(json_web_token, state_model, username)
     return json_web_token, username, scopes
 
 

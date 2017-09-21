@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 import logging
 
 import requests_toolbelt.adapters.appengine
+
 from framework.bizz.authentication import get_current_session
 from framework.bizz.session import is_valid_session
 from framework.configuration import get_configuration
@@ -33,13 +34,15 @@ from plugins.its_you_online_auth.bizz.authentication import validate_session
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.cron.refresh_jwts import RefreshJwtsHandler
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
-    PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler, RegisterHandler
+    PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler, RegisterHandler,\
+    RefreshHandler, RefreshCallbackHandler
 from plugins.its_you_online_auth.libs import itsyouonline
 from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_WEB
 from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
 from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 from plugins.rogerthat_api.rogerthat_api_plugin import RogerthatApiPlugin
+
 
 requests_toolbelt.adapters.appengine.monkeypatch()
 
@@ -67,6 +70,8 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
             yield Handler(url='/login/redirect', handler=DoLoginHandler)
             yield Handler(url='/register', handler=RegisterHandler)
             yield Handler(url='/oauth2_callback', handler=Oauth2CallbackHandler)
+            yield Handler(url='/refresh', handler=RefreshHandler)
+            yield Handler(url='/refresh/callback', handler=RefreshCallbackHandler)
             for url, handler in rest_functions(authenticated, authentication=AUTHENTICATED):
                 yield Handler(url=url, handler=handler)
         elif auth == Handler.AUTH_ADMIN:
