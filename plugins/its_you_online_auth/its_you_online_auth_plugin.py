@@ -20,7 +20,6 @@ from __future__ import unicode_literals
 import logging
 
 import requests_toolbelt.adapters.appengine
-
 from framework.bizz.authentication import get_current_session
 from framework.bizz.session import is_valid_session
 from framework.configuration import get_configuration
@@ -34,7 +33,7 @@ from plugins.its_you_online_auth.bizz.authentication import validate_session
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.cron.refresh_jwts import RefreshJwtsHandler
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
-    PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler, RegisterHandler,\
+    PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler, RegisterHandler, \
     RefreshHandler, RefreshCallbackHandler
 from plugins.its_you_online_auth.libs import itsyouonline
 from plugins.its_you_online_auth.models import Profile
@@ -42,7 +41,6 @@ from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_
 from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
 from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 from plugins.rogerthat_api.rogerthat_api_plugin import RogerthatApiPlugin
-
 
 requests_toolbelt.adapters.appengine.monkeypatch()
 
@@ -54,11 +52,19 @@ class ItsYouOnlineAuthPlugin(AuthPlugin):
                                                  False)  # type: ItsYouOnlineConfiguration
         if self.configuration.api_domain is MISSING:
             self.configuration.api_domain = u'itsyou.online'
+        if self.configuration.iyo_public_key is MISSING:
+            # key from https://itsyou.online by default
+            self.configuration.iyo_public_key = """-----BEGIN PUBLIC KEY-----
+MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
+7MjiGYvqalizeSWTHEpnd7oea9IQ8T5oJjMVH5cc0H5tFSKilFFeh//wngxIyny6
+6+Vq5t5B0V0Ehy01+2ceEon2Y0XDkIKv
+-----END PUBLIC KEY-----"""
         rogerthat_api_plugin = get_plugin('rogerthat_api')
         assert isinstance(rogerthat_api_plugin, RogerthatApiPlugin)
         rogerthat_api_plugin.subscribe('friend.register', friend_register)
         rogerthat_api_plugin.subscribe('friend.register_result', friend_register_result)
         itsyouonline.BASE_URI = u'https://%s/' % self.configuration.api_domain
+        self.oauth_base_url = '%sv1/oauth' % itsyouonline.BASE_URI
 
     def get_handlers(self, auth):
         if auth == Handler.AUTH_UNAUTHENTICATED:

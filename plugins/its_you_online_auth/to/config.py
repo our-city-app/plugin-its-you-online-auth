@@ -51,3 +51,4 @@ class ItsYouOnlineConfiguration(object):
     jwt_audience = unicode_property('jwt_audience')
     # e.g. staging.itsyou.online
     api_domain = unicode_property('api_domain')
+    iyo_public_key = unicode_property('iyo_public_key')

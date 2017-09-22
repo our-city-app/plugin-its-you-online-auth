@@ -21,25 +21,24 @@ import logging
 import time
 import urllib
 
-from jose import jwt, ExpiredSignatureError
-import requests
+from google.appengine.api import urlfetch, memcache
+from google.appengine.ext import ndb
 
+import requests
 from framework.bizz.authentication import get_current_session
 from framework.consts import BASE_URL
 from framework.models.session import Session
 from framework.plugin_loader import get_config, get_auth_plugin
 from framework.utils import now, urlencode
-from google.appengine.api import urlfetch, memcache
-from google.appengine.ext import ndb
+from jose import jwt, ExpiredSignatureError
 from mcfw.consts import DEBUG
 from mcfw.exceptions import HttpException, HttpForbiddenException, HttpUnAuthorizedException
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import Profile
-from plugins.its_you_online_auth.plugin_consts import Scopes, OAUTH_BASE_URL, NAMESPACE, ITS_YOU_ONLINE_PUBLIC_KEY, \
-    JWT_ISSUER, SOURCE_WEB
+from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, JWT_ISSUER, \
+    SOURCE_WEB
 from plugins.its_you_online_auth.plugin_utils import get_users_organization, get_organization
 from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
-
 
 try:
     from functools import lru_cache
@@ -89,7 +88,7 @@ def get_access_response(config, state, code, use_jwt=None, audience=None, redire
         params['response_type'] = 'id_token'
         params['scope'] = 'offline_access'
         params['aud'] = audience
-    access_token_url = '%s/access_token?%s' % (OAUTH_BASE_URL, urllib.urlencode(params))
+    access_token_url = '%s/access_token?%s' % (get_auth_plugin().oauth_base_url, urllib.urlencode(params))
     response = requests.post(access_token_url, params)
 
     if use_jwt:
@@ -106,7 +105,7 @@ def get_access_response(config, state, code, use_jwt=None, audience=None, redire
 
 
 def create_jwt(access_token, scope):
-    url = '{}/jwt?scope={}'.format(OAUTH_BASE_URL, scope)
+    url = '{}/jwt?scope={}'.format(get_auth_plugin().oauth_base_url, scope)
     headers = {
         'Authorization': 'token {token}'.format(token=access_token)
     }
@@ -125,14 +124,14 @@ def refresh_jwt(old_jwt, validity=24 * 60 * 60):
     args = {
         "validity": validity
     }
-    url = '{}/jwt/refresh?{}'.format(OAUTH_BASE_URL, urlencode(args))
+    url = '%s/jwt/refresh?%s' % (get_auth_plugin().oauth_base_url, urlencode(args))
     headers = {
         'Authorization': 'bearer {jwt}'.format(jwt=old_jwt)
     }
     data = urlfetch.fetch(url, headers=headers)
     if data.status_code == 200:
         return data.content
-    logging.debug('Failed to refresh JWT\n{}: {}'.format(data.status_code, data.content))
+    logging.debug('Failed to refresh JWT\n%s: %s', data.status_code, data.content)
     if DEBUG:
         logging.debug(old_jwt)
     raise HttpUnAuthorizedException(data={'login_url': BASE_URL + get_auth_plugin().get_login_url()})
@@ -195,7 +194,7 @@ def get_jwt(code, state_model, redirect_uri=None):
     config = get_config(NAMESPACE)  # type: ItsYouOnlineConfiguration
     json_web_token = get_access_response(config, state_model.state, code, True, audience=config.jwt_audience,
                                          redirect_uri=redirect_uri)
-    decoded_jwt = jwt.decode(json_web_token, str(ITS_YOU_ONLINE_PUBLIC_KEY), audience=config.jwt_audience,
+    decoded_jwt = jwt.decode(json_web_token, str(config.iyo_public_key), audience=config.jwt_audience,
                              issuer=JWT_ISSUER)
     if decoded_jwt['azp'] != config.root_organization.name:
         logging.error('Received invalid JWT: %s', decoded_jwt)
@@ -224,7 +223,7 @@ def decode_jwt_cached(token):
     timestamp = now()
     t = time.time()
     config = get_config(NAMESPACE)
-    decoded_jwt = jwt.decode(token, str(ITS_YOU_ONLINE_PUBLIC_KEY), audience=config.jwt_audience, issuer=JWT_ISSUER)
+    decoded_jwt = jwt.decode(token, str(config.iyo_public_key), audience=config.jwt_audience, issuer=JWT_ISSUER)
     logging.debug('Decoding JWT took %ss', time.time() - t)
     # Cache JWT for as long as it's valid
 
@@ -246,7 +245,7 @@ def validate_session(session):
             logging.info('Validating JWT %s', session.jwt)
             jwt = decode_jwt_cached(session.jwt)
             # This function is executed every 12 hours and JWT's are only valid for 24h
-            if jwt['exp'] > now() - 3600 * 12:
+            if jwt['exp'] > now() + 3600 * 12:
                 logging.debug('JWT is fine %s', jwt)
                 return True
         except ExpiredSignatureError:
