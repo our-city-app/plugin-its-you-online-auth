@@ -33,8 +33,7 @@ from plugins.its_you_online_auth.bizz.authentication import validate_session
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.cron.refresh_jwts import RefreshJwtsHandler
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
-    PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler, RegisterHandler, \
-    RefreshHandler, RefreshCallbackHandler
+    PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler, RegisterHandler
 from plugins.its_you_online_auth.libs import itsyouonline
 from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_WEB
@@ -76,8 +75,6 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
             yield Handler(url='/login/redirect', handler=DoLoginHandler)
             yield Handler(url='/register', handler=RegisterHandler)
             yield Handler(url='/oauth2_callback', handler=Oauth2CallbackHandler)
-            yield Handler(url='/refresh', handler=RefreshHandler)
-            yield Handler(url='/refresh/callback', handler=RefreshCallbackHandler)
             for url, handler in rest_functions(authenticated, authentication=AUTHENTICATED):
                 yield Handler(url=url, handler=handler)
         elif auth == Handler.AUTH_ADMIN:

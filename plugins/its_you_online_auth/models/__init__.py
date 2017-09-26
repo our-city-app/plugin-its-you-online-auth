@@ -16,6 +16,7 @@
 # @@license_version:1.3@@
 
 from google.appengine.ext import ndb
+
 from plugins.its_you_online_auth import plugin_consts
 
 
@@ -26,7 +27,7 @@ class OauthState(ndb.Model):
     completed = ndb.BooleanProperty(indexed=False)
 
     app_redirect_uri = ndb.StringProperty(indexed=False)
-    
+
     @property
     def state(self):
         return self.key.id().decode('utf8')

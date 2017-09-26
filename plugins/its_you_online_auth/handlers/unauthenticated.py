@@ -27,9 +27,9 @@ from framework.bizz.authentication import login_user, logout_user, get_current_u
 from framework.bizz.session import is_valid_session
 from framework.handlers import render_error_page, render_page
 from framework.plugin_loader import get_config, get_auth_plugin
-from framework.utils import now, get_server_url
+from framework.utils import now
 from mcfw.consts import MISSING
-from mcfw.exceptions import HttpException, HttpBadRequestException, HttpNotFoundException
+from mcfw.exceptions import HttpException, HttpBadRequestException
 from plugins.its_you_online_auth.bizz.authentication import get_user_scopes_from_access_token, get_jwt
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
@@ -231,80 +231,3 @@ class ContinueLoginHandler(webapp2.RequestHandler):
 class RegisterHandler(ContinueLoginHandler):
     def get(self, **kwargs):
         super(RegisterHandler, self).get(register=True, **kwargs)
-
-
-class RefreshHandler(webapp2.RequestHandler):
-
-    def get(self):
-        app_redirect_uri = self.request.GET.get('app_redirect_uri', None)
-
-        try:
-            if not app_redirect_uri:
-                logging.debug('app_redirect_uri is missing')
-                raise HttpNotFoundException()
-
-        except HttpException as e:
-            render_error_page(self.response, e.http_code, e.error)
-            return
-
-        config = get_config(NAMESPACE)  # type: ItsYouOnlineConfiguration
-        if config.required_scopes and config.required_scopes is not MISSING:
-            scope = config.required_scopes
-        else:
-            scope = ''
-
-        organization_id = config.root_organization.name
-
-        params = {
-            'response_type': 'code',
-            'client_id': config.root_organization.name,
-            'redirect_uri': '%s/refresh/callback' % get_server_url(),
-            'scope': scope,
-            'state': str(uuid.uuid4())
-        }
-
-        refresh_state = OauthState(key=OauthState.create_key(params['state']))
-        refresh_state.timestamp = now()
-        refresh_state.organization_id = organization_id
-        refresh_state.source = SOURCE_APP
-        refresh_state.app_redirect_uri = app_redirect_uri
-        refresh_state.completed = False
-        refresh_state.put()
-
-        oauth_url = '%s/authorize?%s' % (get_auth_plugin().oauth_base_url, urllib.urlencode(params))
-        logging.info('Redirecting to %s', oauth_url)
-        self.redirect(oauth_url)
-
-
-class RefreshCallbackHandler(webapp2.RequestHandler):
-    def get(self):
-        code = self.request.GET.get('code', None)
-        state = self.request.GET.get('state', None)
-        try:
-            if not (code and state):
-                logging.debug('Code or state are missing.\nCode: %s\nState:%s', code, state)
-                raise HttpBadRequestException()
-
-            refresh_state = OauthState.create_key(state).get()
-            if not refresh_state:
-                logging.debug('Refresh state not found')
-                raise HttpBadRequestException()
-
-        except HttpException as e:
-            render_error_page(self.response, e.http_code, e.error)
-            return
-
-        try:
-            jwt, username, scopes = get_jwt(code, refresh_state, '%s/refresh/callback' % get_server_url())
-            login_user(self.response, username, scopes, jwt)
-            params = {'success': 'OK'}
-
-        except HttpException as e:
-            params = {
-                'error': e.error,
-                'error_description': 'An error occurred. Please try again.'
-            }
-
-        url = '%s?%s' % (refresh_state.app_redirect_uri, urllib.urlencode(params))
-        logging.info('Redirecting to %s', url)
-        self.redirect(str(url))
