@@ -161,7 +161,10 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
         session = get_current_session()
         if not is_valid_session(session):
             return None
-        return Profile.create_key(SOURCE_WEB, session.user_id).get().language
+        profile = Profile.create_key(SOURCE_WEB, session.user_id).get()
+        if not profile:
+            return None
+        return profile.language
 
     def validate_session(self, session):
         """
