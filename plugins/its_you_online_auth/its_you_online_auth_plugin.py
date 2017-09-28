@@ -23,13 +23,15 @@ import requests_toolbelt.adapters.appengine
 from framework.bizz.authentication import get_current_session
 from framework.bizz.session import is_valid_session
 from framework.configuration import get_configuration
+from framework.models.session import Session
 from framework.plugin_loader import AuthPlugin, get_auth_plugin, get_plugin, get_plugins, get_config
 from framework.utils.plugins import Handler, Module
+from jose import JWSError
 from mcfw.consts import AUTHENTICATED, MISSING
 from mcfw.restapi import rest_functions
 from mcfw.rpc import parse_complex_value
 from plugins.its_you_online_auth.api import authenticated
-from plugins.its_you_online_auth.bizz.authentication import validate_session
+from plugins.its_you_online_auth.bizz.authentication import validate_session, decode_jwt_cached
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.cron.refresh_jwts import RefreshJwtsHandler
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
@@ -172,3 +174,24 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
             session (framework.models.session.Session)
         """
         return validate_session(session)
+
+    def get_session(self, environ):
+        # type: (dict) -> Session
+        auth_header = environ.get('HTTP_AUTHORIZATION', '').strip()
+        split = auth_header.split(' ')
+        if len(split) == 2:
+            auth_type, auth = split
+            if auth_header.lower().startswith('bearer'):
+                try:
+                    decoded_jwt = decode_jwt_cached(auth)
+                except JWSError as e:
+                    logging.info(e.message, exc_info=True)
+                    return None
+                username = decoded_jwt.get('username', None)
+                if not username:
+                    logging.debug('Username not found in JWT')
+                    return None
+                scopes = decoded_jwt.get('scope')
+                # Don't save this session
+                return Session(user_id=username, scopes=scopes, timeout=0)
+        return None
