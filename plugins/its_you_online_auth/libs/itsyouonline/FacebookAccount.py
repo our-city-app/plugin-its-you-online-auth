@@ -13,7 +13,7 @@ class FacebookAccount(object):
     @staticmethod
     def create(id, link, name, picture):
         """
-        :type id: int
+        :type id: str
         :type link: str
         :type name: str
         :type picture: str
@@ -40,7 +40,7 @@ class FacebookAccount(object):
         property_name = 'id'
         val = data.get(property_name)
         if val is not None:
-            datatypes = [int]
+            datatypes = [str]
             try:
                 self.id = client_support.val_factory(val, datatypes)
             except ValueError as err:
