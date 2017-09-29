@@ -18,8 +18,9 @@
 import json
 import logging
 
-from framework.plugin_loader import get_config
 from google.appengine.ext import ndb
+
+from framework.plugin_loader import get_config
 from mcfw.rpc import serialize_complex_value
 from plugins.its_you_online_auth.bizz.authentication import decode_jwt_cached
 from plugins.its_you_online_auth.bizz.settings import get_organization
@@ -37,10 +38,10 @@ def friend_register(rt_settings, id_, service_identity, user_details, origin, da
             return _friend_register_qr(rt_settings, id_, service_identity, user_details, origin, data, **kwargs)
         elif origin == REGISTRATION_ORIGIN_OAUTH:
             return _friend_register_oauth(rt_settings, id_, service_identity, user_details, origin, data, **kwargs)
-        
+
     except:
         logging.warn('friend_register failed', exc_info=True)
-        
+
     return DECLINE_ID
 
 
@@ -58,10 +59,10 @@ def _friend_register_qr(rt_settings, id_, service_identity, user_details, origin
     if not qr_type or not qr_content:
         logging.warn('Could not find qr_type or qr_content, denying installation.')
         return DECLINE_ID
-    
+
     if qr_type != 'jwt':
         return DECLINE_ID
-    
+
     decoded_jwt = decode_jwt_cached(qr_content)
     username = decoded_jwt.get('username', None)
     if not username:
