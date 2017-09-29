@@ -58,7 +58,7 @@ class KeyData(object):
         property_name = 'timestamp'
         val = data.get(property_name)
         if val is not None:
-            datatypes = [datetime]
+            datatypes = [client_support.datetime]
             try:
                 self.timestamp = client_support.val_factory(val, datatypes)
             except ValueError as err:

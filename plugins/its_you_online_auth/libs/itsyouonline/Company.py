@@ -44,7 +44,7 @@ class Company(object):
         property_name = 'expire'
         val = data.get(property_name)
         if val is not None:
-            datatypes = [datetime]
+            datatypes = [client_support.datetime]
             try:
                 self.expire = client_support.val_factory(val, datatypes)
             except ValueError as err:
