@@ -110,7 +110,7 @@ class userview(object):
         if val is not None:
             datatypes = [DigitalAssetAddress]
             try:
-                self.digitalwallet = client_support.val_factory(val, datatypes)
+                self.digitalwallet = client_support.list_factory(val, datatypes)
             except ValueError as err:
                 raise ValueError(create_error.format(cls=class_name, prop=property_name, val=val, err=err))
         else:
