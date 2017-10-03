@@ -21,18 +21,18 @@ import logging
 import time
 import urllib
 
+import requests
 from google.appengine.api import urlfetch, memcache
 from google.appengine.ext import ndb
+from jose import jwt, ExpiredSignatureError
+from mcfw.consts import DEBUG
+from mcfw.exceptions import HttpException, HttpForbiddenException, HttpUnAuthorizedException
 
-import requests
 from framework.bizz.authentication import get_current_session
 from framework.consts import BASE_URL
 from framework.models.session import Session
 from framework.plugin_loader import get_config, get_auth_plugin
 from framework.utils import now, urlencode
-from jose import jwt, ExpiredSignatureError
-from mcfw.consts import DEBUG
-from mcfw.exceptions import HttpException, HttpForbiddenException, HttpUnAuthorizedException
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, JWT_ISSUER, \
@@ -89,7 +89,7 @@ def get_access_response(config, state, code, use_jwt=None, audience=None, redire
         params['scope'] = 'offline_access'
         params['aud'] = audience
     access_token_url = '%s/access_token?%s' % (get_auth_plugin().oauth_base_url, urllib.urlencode(params))
-    response = requests.post(access_token_url, params)
+    response = requests.post(access_token_url, params, timeout=30)
 
     if use_jwt:
         content = response.content
