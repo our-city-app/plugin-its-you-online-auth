@@ -121,7 +121,7 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
         config = get_config(NAMESPACE)
         try:
             if config.login_with_organization:
-                profile = Profile.create_key(SOURCE_WEB, user_id).get()
+                profile = Profile.create_key(user_id).get()
                 if not profile:
                     return []
                 # todo refactor to use current session scopes instead and remove organization_id property from Profile
@@ -160,7 +160,7 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
 
     def set_user_language(self, language):
         session = get_current_session()
-        profile = Profile.create_key(SOURCE_WEB, session.user_id).get()
+        profile = Profile.create_key(session.user_id).get()
         profile.language = language
         profile.put()
 
@@ -168,7 +168,7 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
         session = get_current_session()
         if not is_valid_session(session):
             return None
-        profile = Profile.create_key(SOURCE_WEB, session.user_id).get()
+        profile = Profile.create_key(session.user_id).get()
         if not profile:
             return None
         return profile.language

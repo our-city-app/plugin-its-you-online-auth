@@ -22,6 +22,7 @@ import time
 import urllib
 
 from google.appengine.api import urlfetch, memcache
+from google.appengine.ext import ndb
 
 import requests
 from framework.bizz.authentication import get_current_session
@@ -33,6 +34,7 @@ from jose import jwt, ExpiredSignatureError
 from mcfw.consts import DEBUG
 from mcfw.exceptions import HttpException, HttpForbiddenException, HttpUnAuthorizedException
 from plugins.its_you_online_auth.libs.itsyouonline import Client
+from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, JWT_ISSUER, \
     SOURCE_WEB
 from plugins.its_you_online_auth.plugin_utils import get_users_organization, get_organization
@@ -180,7 +182,7 @@ def get_user_scopes_from_access_token(code, state_model):
 
 
 def save_profile_state(access_token_or_jwt, state_model, username):
-    profile_key = Profile.create_key(state_model.source, username)
+    profile_key = Profile.create_key(username)
     profile = profile_key.get() or Profile(key=profile_key)
     profile.access_token = access_token_or_jwt
     profile.organization_id = state_model.organization_id

@@ -26,7 +26,7 @@ from plugins.its_you_online_auth.bizz.authentication import decode_jwt_cached
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
 from plugins.its_you_online_auth.models import Profile, OauthState
-from plugins.its_you_online_auth.plugin_consts import NAMESPACE, SOURCE_APP
+from plugins.its_you_online_auth.plugin_consts import NAMESPACE
 from plugins.its_you_online_auth.plugin_utils import get_users_organization
 from plugins.rogerthat_api.to.friends import RegistrationResultTO, ACCEPT_ID, DECLINE_ID, REGISTRATION_ORIGIN_OAUTH, \
     RegistrationResultRolesTO, REGISTRATION_ORIGIN_QR
@@ -69,10 +69,8 @@ def _friend_register_qr(rt_settings, id_, service_identity, user_details, origin
         logging.warn('Could not find username in jwt denying installation.')
         return DECLINE_ID
 
-    profile_key = Profile.create_key(SOURCE_APP, username)
+    profile_key = Profile.create_key(username)
     profile = profile_key.get() or Profile(key=profile_key)
-    profile.access_token = qr_content
-    profile.organization_id = None
     profile.app_email = u"%s:%s" % (user_details[0]['email'], user_details[0]['app_id'])
     ndb.put_multi([profile])
 
@@ -111,9 +109,8 @@ def _friend_register_oauth(rt_settings, id_, service_identity, user_details, ori
                          expected_scope, scope)
             return DECLINE_ID
 
-    profile_key = Profile.create_key(login_state.source, username)
+    profile_key = Profile.create_key(username)
     profile = profile_key.get() or Profile(key=profile_key)
-    profile.access_token = access_token
     profile.organization_id = login_state.organization_id
     profile.app_email = u"%s:%s" % (user_details[0]['email'], user_details[0]['app_id'])
     login_state.completed = True

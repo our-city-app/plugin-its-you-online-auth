@@ -124,9 +124,8 @@ class ProfileInfo(ndb.Model):
 
 class Profile(NdbModel):
     NAMESPACE = NAMESPACE
-    access_token = ndb.StringProperty(indexed=False)  # todo: remove this property should use session for this
-    organization_id = ndb.StringProperty()  # todo: remove this property should use scopes for this (on session)
-    app_email = ndb.StringProperty()  # todo: remove this property as a user can have multiple apps with same account...
+    organization_id = ndb.StringProperty()  # Only used in case user must be member of a suborganization to login
+    app_email = ndb.StringProperty()  # Only use in case the deployed server is used for one app (and only one)
     language = ndb.StringProperty(indexed=False)
     info = ndb.LocalStructuredProperty(ProfileInfo)  # type: ProfileInfo
 
@@ -139,14 +138,11 @@ class Profile(NdbModel):
         return self.key.id().decode('utf8')
 
     @classmethod
-    def create_key(cls, source, username):
-        # todo get rid of this parent, makes things complicated for no good reason
-        parent_key = ndb.Key(cls, source, namespace=NAMESPACE)
-        return ndb.Key(cls, username, parent=parent_key)
+    def create_key(cls, username):
+        return ndb.Key(cls, username, namespace=NAMESPACE)
 
     def to_dict(self):
         result = super(Profile, self).to_dict()
-        del result['access_token']
         del result['organization_id']
         del result['app_email']
         result['username'] = self.username
