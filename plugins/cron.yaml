@@ -2,3 +2,7 @@ cron:
 - description: Refresh sessions
   url: /admin/cron/its_you_online_auth/refresh_jwts
   schedule: every 12 hours
+
+- description: Refresh user information
+  url: /admin/cron/its_you_online_auth/refresh_user_information
+  schedule: every monday 01:00

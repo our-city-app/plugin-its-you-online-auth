@@ -21,20 +21,18 @@ import logging
 import time
 import urllib
 
-import requests
 from google.appengine.api import urlfetch, memcache
-from google.appengine.ext import ndb
-from jose import jwt, ExpiredSignatureError
-from mcfw.consts import DEBUG
-from mcfw.exceptions import HttpException, HttpForbiddenException, HttpUnAuthorizedException
 
+import requests
 from framework.bizz.authentication import get_current_session
 from framework.consts import BASE_URL
 from framework.models.session import Session
 from framework.plugin_loader import get_config, get_auth_plugin
 from framework.utils import now, urlencode
+from jose import jwt, ExpiredSignatureError
+from mcfw.consts import DEBUG
+from mcfw.exceptions import HttpException, HttpForbiddenException, HttpUnAuthorizedException
 from plugins.its_you_online_auth.libs.itsyouonline import Client
-from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, JWT_ISSUER, \
     SOURCE_WEB
 from plugins.its_you_online_auth.plugin_utils import get_users_organization, get_organization

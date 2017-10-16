@@ -34,6 +34,7 @@ from plugins.its_you_online_auth.api import authenticated
 from plugins.its_you_online_auth.bizz.authentication import validate_session, decode_jwt_cached
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.cron.refresh_jwts import RefreshJwtsHandler
+from plugins.its_you_online_auth.cron.user_information import RefreshUserInformationHandler
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
     PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler, RegisterHandler
 from plugins.its_you_online_auth.libs import itsyouonline
@@ -60,6 +61,8 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
 7MjiGYvqalizeSWTHEpnd7oea9IQ8T5oJjMVH5cc0H5tFSKilFFeh//wngxIyny6
 6+Vq5t5B0V0Ehy01+2ceEon2Y0XDkIKv
 -----END PUBLIC KEY-----"""
+        if self.configuration.fetch_information is MISSING:
+            self.configuration.fetch_information = False
         rogerthat_api_plugin = get_plugin('rogerthat_api')
         assert isinstance(rogerthat_api_plugin, RogerthatApiPlugin)
         rogerthat_api_plugin.subscribe('friend.register', friend_register)
@@ -81,6 +84,8 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
                 yield Handler(url=url, handler=handler)
         elif auth == Handler.AUTH_ADMIN:
             yield Handler(url='/admin/cron/its_you_online_auth/refresh_jwts', handler=RefreshJwtsHandler)
+            yield Handler(url='/admin/cron/its_you_online_auth/refresh_user_information',
+                          handler=RefreshUserInformationHandler)
 
     def get_client_routes(self):
         return ['/itsyouonlinesettings<route:.*>']
@@ -112,14 +117,14 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
         user_id = session.user_id
         scopes = session.scopes
 
-        profile = Profile.create_key(SOURCE_WEB, user_id).get()
-        if not profile:
-            return []
-
         visible_modules = set()
         config = get_config(NAMESPACE)
         try:
             if config.login_with_organization:
+                profile = Profile.create_key(SOURCE_WEB, user_id).get()
+                if not profile:
+                    return []
+                # todo refactor to use current session scopes instead and remove organization_id property from Profile
                 organization_id = profile.organization_id
                 if not organization_id:
                     return []
