@@ -17,10 +17,12 @@
 
 from google.appengine.ext import ndb
 
-from plugins.its_you_online_auth import plugin_consts
+from framework.models.common import NdbModel
+from plugins.its_you_online_auth.plugin_consts import NAMESPACE
 
 
-class OauthState(ndb.Model):
+class OauthState(NdbModel):
+    NAMESPACE = NAMESPACE
     timestamp = ndb.IntegerProperty(indexed=False)
     organization_id = ndb.StringProperty(indexed=False)
     source = ndb.StringProperty(indexed=False)
@@ -34,14 +36,98 @@ class OauthState(ndb.Model):
 
     @classmethod
     def create_key(cls, state):
-        return ndb.Key(cls, state, namespace=plugin_consts.NAMESPACE)
+        return ndb.Key(cls, state, namespace=NAMESPACE)
 
 
-class Profile(ndb.Model):
-    access_token = ndb.StringProperty(indexed=False)  # This can also contain a JWT
-    organization_id = ndb.StringProperty()
-    app_email = ndb.StringProperty()
+class ProfileInfoAddress(ndb.Model):
+    city = ndb.StringProperty()
+    country = ndb.StringProperty()
+    label = ndb.StringProperty()
+    nr = ndb.StringProperty()
+    other = ndb.StringProperty()
+    postalcode = ndb.StringProperty()
+    street = ndb.StringProperty()
+
+
+class ProfileInfoAvatar(ndb.Model):
+    label = ndb.StringProperty()
+    source = ndb.StringProperty()
+
+
+class ProfileInfoBankAccount(ndb.Model):
+    bic = ndb.StringProperty()
+    country = ndb.StringProperty()
+    iban = ndb.StringProperty()
+    label = ndb.StringProperty()
+
+
+class ProfileInfoDigitalAssetAddress(ndb.Model):
+    address = ndb.StringProperty()
+    currencysymbol = ndb.StringProperty()
+    expire = ndb.StringProperty()
+    label = ndb.StringProperty()
+    noexpiration = ndb.BooleanProperty()
+
+
+class ProfileInfoEmailAddress(ndb.Model):
+    emailaddress = ndb.StringProperty()
+    label = ndb.StringProperty()
+
+
+class ProfileInfoFacebook(ndb.Model):
+    id = ndb.StringProperty()
+    link = ndb.StringProperty()
+    name = ndb.StringProperty()
+    picture = ndb.StringProperty()
+
+
+class ProfileInfoGithubAccount(ndb.Model):
+    avatar_url = ndb.StringProperty()
+    html_url = ndb.StringProperty()
+    id = ndb.StringProperty()
+    login = ndb.StringProperty()
+    name = ndb.StringProperty()
+
+
+class ProfileInfoOwnerOf(ndb.Model):
+    emailaddresses = ndb.StructuredProperty(ProfileInfoEmailAddress, repeated=True)
+
+
+class ProfileInfoPhoneNumber(ndb.Model):
+    label = ndb.StringProperty()
+    phonenumber = ndb.StringProperty()
+
+
+class ProfileInfoPublicKey(ndb.Model):
+    label = ndb.StringProperty()
+    publickey = ndb.StringProperty()
+
+
+class ProfileInfo(ndb.Model):
+    NAMESPACE = NAMESPACE
+    addresses = ndb.StructuredProperty(ProfileInfoAddress, repeated=True)
+    avatar = ndb.StructuredProperty(ProfileInfoAvatar, repeated=True)
+    bankaccounts = ndb.StructuredProperty(ProfileInfoBankAccount, repeated=True)
+    digitalwallet = ndb.StructuredProperty(ProfileInfoDigitalAssetAddress, repeated=True)
+    emailaddresses = ndb.StructuredProperty(ProfileInfoEmailAddress, repeated=True)
+    facebook = ndb.StructuredProperty(ProfileInfoFacebook)
+    firstname = ndb.StringProperty()
+    github = ndb.StructuredProperty(ProfileInfoGithubAccount)
+    lastname = ndb.StringProperty()
+    ownerof = ndb.StructuredProperty(ProfileInfoOwnerOf)
+    phonenumbers = ndb.StructuredProperty(ProfileInfoPhoneNumber, repeated=True)
+    publicKeys = ndb.StructuredProperty(ProfileInfoPublicKey, repeated=True)
+    username = ndb.StringProperty()
+    validatedemailaddresses = ndb.StructuredProperty(ProfileInfoEmailAddress, repeated=True)
+    validatedphonenumbers = ndb.StructuredProperty(ProfileInfoPhoneNumber, repeated=True)
+
+
+class Profile(NdbModel):
+    NAMESPACE = NAMESPACE
+    organization_id = ndb.StringProperty()  # Only used in case user must be member of a suborganization to login
+    app_email = ndb.StringProperty()  # Only use in case the deployed server is used for one app (and only one)
     language = ndb.StringProperty(indexed=False)
+    info = ndb.LocalStructuredProperty(ProfileInfo)  # type: ProfileInfo
 
     @property
     def source(self):
@@ -52,6 +138,12 @@ class Profile(ndb.Model):
         return self.key.id().decode('utf8')
 
     @classmethod
-    def create_key(cls, source, username):
-        parent_key = ndb.Key(cls, source, namespace=plugin_consts.NAMESPACE)
-        return ndb.Key(cls, username, parent=parent_key)
+    def create_key(cls, username):
+        return ndb.Key(cls, username, namespace=NAMESPACE)
+
+    def to_dict(self):
+        result = super(Profile, self).to_dict()
+        del result['organization_id']
+        del result['app_email']
+        result['username'] = self.username
+        return result

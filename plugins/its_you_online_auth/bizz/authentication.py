@@ -21,18 +21,18 @@ import logging
 import time
 import urllib
 
-import requests
 from google.appengine.api import urlfetch, memcache
 from google.appengine.ext import ndb
-from jose import jwt, ExpiredSignatureError
-from mcfw.consts import DEBUG
-from mcfw.exceptions import HttpException, HttpForbiddenException, HttpUnAuthorizedException
 
+import requests
 from framework.bizz.authentication import get_current_session
 from framework.consts import BASE_URL
 from framework.models.session import Session
 from framework.plugin_loader import get_config, get_auth_plugin
 from framework.utils import now, urlencode
+from jose import jwt, ExpiredSignatureError
+from mcfw.consts import DEBUG
+from mcfw.exceptions import HttpException, HttpForbiddenException, HttpUnAuthorizedException
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, JWT_ISSUER, \
@@ -166,7 +166,7 @@ def get_user_scopes_from_access_token(code, state_model):
         logging.debug('Missing or invalid scope.Expected: {} - Received: {}'.format(expected_scope, scope))
         raise HttpForbiddenException()
 
-    save_profile_state(access_result.get('access_token'), state_model, username)
+    save_profile_state(state_model, username)
 
     client = get_itsyouonline_client(config)
     scopes = [Scopes.get_organization_scope(Scopes.ORGANIZATION_MEMBER, state_model.organization_id)]
@@ -181,10 +181,9 @@ def get_user_scopes_from_access_token(code, state_model):
     return username, scopes
 
 
-def save_profile_state(access_token_or_jwt, state_model, username):
-    profile_key = Profile.create_key(state_model.source, username)
+def save_profile_state(state_model, username):
+    profile_key = Profile.create_key(username)
     profile = profile_key.get() or Profile(key=profile_key)
-    profile.access_token = access_token_or_jwt
     profile.organization_id = state_model.organization_id
     state_model.completed = True
     ndb.put_multi([profile, state_model])
@@ -201,7 +200,7 @@ def get_jwt(code, state_model, redirect_uri=None):
         raise HttpForbiddenException()
     username = decoded_jwt['username']
     scopes = decoded_jwt['scope']
-    save_profile_state(json_web_token, state_model, username)
+    save_profile_state(state_model, username)
     return json_web_token, username, scopes
 
 
