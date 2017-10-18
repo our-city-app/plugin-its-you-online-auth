@@ -91,13 +91,13 @@ def index_profile(profile_or_key):
 
 def create_profile_document(profile):
     # type: (Profile) -> search.Document
-    fields = [search.AtomField(name='username', value=profile.username)]
+    fields = [search.AtomField(name='username', value=profile.username.lower())]
     # complete this if needed
     if profile.info:
         if profile.info.firstname:
-            fields.append(search.TextField(name='firstname', value=profile.info.firstname))
+            fields.append(search.TextField(name='firstname', value=profile.info.firstname.lower()))
         if profile.info.lastname:
-            fields.append(search.TextField(name='lastname', value=profile.info.lastname))
+            fields.append(search.TextField(name='lastname', value=profile.info.lastname.lower()))
         if profile.info.validatedemailaddresses:
             for i, mail in enumerate(profile.info.validatedemailaddresses):
                 fields.append(search.AtomField(name='validatedemailaddresses_%d' % i, value=mail.emailaddress))
@@ -143,8 +143,12 @@ def get_profile(username):
 
 def search_profiles(query='', page_size=20, cursor=None):
     # type: (unicode, int, unicode) -> tuple[list[Profile], search.Cursor, bool]
+    sort_expressions = [search.SortExpression(expression='firstname', direction=search.SortExpression.ASCENDING),
+                        search.SortExpression(expression='lastname', direction=search.SortExpression.ASCENDING),
+                        search.SortExpression(expression='username', direction=search.SortExpression.ASCENDING)]
     options = search.QueryOptions(limit=page_size,
                                   cursor=search.Cursor(cursor),
+                                  sort_options=search.SortOptions(expressions=sort_expressions),
                                   ids_only=True)
     search_results = PROFILE_INDEX.search(
         search.Query(normalize_search_string(query), options=options))  # type: search.SearchResults
