@@ -122,7 +122,7 @@ def _decode_doc_id(doc_id):
 
 
 def normalize_search_string(search_string):
-    return re.sub(u'[, \"+\-:><=\\\\()~]', u' ', search_string)
+    return re.sub(r'[, \"+-:><=\\()~]', u' ', search_string)
 
 
 def get_profile(username):

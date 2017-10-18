@@ -20,7 +20,7 @@ from framework.utils import chunks
 from plugins.its_you_online_auth.models import Profile
 
 
-def migrate_profiles(dry_run=False):
+def migrate(dry_run=False):
     profiles = Profile.query()
     to_put = []
     to_delete = []

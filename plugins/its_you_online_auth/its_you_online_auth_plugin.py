@@ -39,7 +39,7 @@ from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, 
     PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler, RegisterHandler
 from plugins.its_you_online_auth.libs import itsyouonline
 from plugins.its_you_online_auth.models import Profile
-from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, SOURCE_WEB
+from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE
 from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
 from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 from plugins.rogerthat_api.rogerthat_api_plugin import RogerthatApiPlugin
