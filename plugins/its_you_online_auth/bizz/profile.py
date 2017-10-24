@@ -23,7 +23,9 @@ from google.appengine.ext import ndb
 
 from framework.bizz.job import run_job
 from framework.models.session import Session
+from mcfw.cache import cached
 from mcfw.exceptions import HttpNotFoundException
+from mcfw.rpc import returns, arguments
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import Profile, ProfileInfo, ProfileInfoAddress, ProfileInfoAvatar, \
     ProfileInfoBankAccount, ProfileInfoEmailAddress, ProfileInfoDigitalAssetAddress, ProfileInfoFacebook, \
@@ -159,3 +161,21 @@ def search_profiles(query='', page_size=20, cursor=None):
         keys.append(Profile.create_key(username))
     profiles = ndb.get_multi(keys) if keys else []
     return profiles, search_results.cursor, search_results.cursor is not None
+
+
+@cached(1, lifetime=0)
+@returns(unicode)
+@arguments(rogerthat_email=unicode)
+def get_username_from_rogerthat_email(rogerthat_email):
+    # type: (unicode) -> unicode
+    profile_key = Profile.get_by_app_email(rogerthat_email, keys_only=True)
+    return profile_key and profile_key.id()
+
+
+@cached(1, lifetime=0)
+@returns(unicode)
+@arguments(username=unicode)
+def get_rogerthat_email_from_username(username):
+    # type: (unicode) -> unicode
+    profile = Profile.create_key(username).get()
+    return profile and profile.app_email

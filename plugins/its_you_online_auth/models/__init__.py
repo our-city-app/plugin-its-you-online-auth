@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 # @@license_version:1.3@@
-
 from google.appengine.ext import ndb
 
 from framework.models.common import NdbModel
@@ -140,6 +139,10 @@ class Profile(NdbModel):
     @classmethod
     def create_key(cls, username):
         return ndb.Key(cls, username, namespace=NAMESPACE)
+
+    @classmethod
+    def get_by_app_email(cls, app_email, keys_only=False):
+        return cls.query().filter(cls.app_email == app_email).get(keys_only=keys_only)
 
     def to_dict(self):
         result = super(Profile, self).to_dict()
