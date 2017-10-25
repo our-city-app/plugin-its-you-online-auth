@@ -19,14 +19,15 @@ import json
 import logging
 
 from google.appengine.ext import ndb
+from google.appengine.ext.deferred import deferred
 
 from framework.plugin_loader import get_config
 from mcfw.rpc import serialize_complex_value
 from plugins.its_you_online_auth.bizz.authentication import decode_jwt_cached, get_itsyouonline_client
-from plugins.its_you_online_auth.bizz.profile import get_or_create_profile
+from plugins.its_you_online_auth.bizz.profile import get_or_create_profile, set_user_information
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
-from plugins.its_you_online_auth.models import OauthState
+from plugins.its_you_online_auth.models import OauthState, Profile
 from plugins.its_you_online_auth.plugin_consts import NAMESPACE
 from plugins.its_you_online_auth.plugin_utils import get_users_organization
 from plugins.rogerthat_api.to.friends import RegistrationResultTO, ACCEPT_ID, DECLINE_ID, REGISTRATION_ORIGIN_OAUTH, \
@@ -75,6 +76,9 @@ def _friend_register_qr(rt_settings, id_, service_identity, user_details, origin
 
     result = RegistrationResultTO(result=ACCEPT_ID, auto_connected_services=[], roles=[],
                                   user_details=RegistrationUserInfoTO(name=None, avatar=None))
+
+    if get_config(NAMESPACE).fetch_information:
+        deferred.defer(set_user_information, Profile.create_key(username))
     return serialize_complex_value(result, RegistrationResultTO, False)
 
 
@@ -134,4 +138,6 @@ def _friend_register_oauth(rt_settings, id_, service_identity, user_details, ori
         except OrganizationNotFoundException:
             pass
 
+    if config.fetch_information:
+        deferred.defer(set_user_information, Profile.create_key(username))
     return serialize_complex_value(result, RegistrationResultTO, False)

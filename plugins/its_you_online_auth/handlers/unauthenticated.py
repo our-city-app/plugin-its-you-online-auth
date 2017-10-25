@@ -22,6 +22,7 @@ import urllib
 import uuid
 
 import webapp2
+from google.appengine.ext.deferred import deferred
 
 from framework.bizz.authentication import login_user, logout_user, get_current_user_id, get_current_session
 from framework.bizz.session import is_valid_session
@@ -31,9 +32,10 @@ from framework.utils import now
 from mcfw.consts import MISSING
 from mcfw.exceptions import HttpException, HttpBadRequestException
 from plugins.its_you_online_auth.bizz.authentication import get_user_scopes_from_access_token, get_jwt
+from plugins.its_you_online_auth.bizz.profile import set_user_information
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
-from plugins.its_you_online_auth.models import OauthState
+from plugins.its_you_online_auth.models import OauthState, Profile
 from plugins.its_you_online_auth.plugin_consts import NAMESPACE, SOURCE_WEB, SOURCE_APP
 from plugins.its_you_online_auth.plugin_utils import get_users_organization
 from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
@@ -177,7 +179,6 @@ class DoLoginHandler(OauthAuthorizeHandler):
 
 class Oauth2CallbackHandler(webapp2.RequestHandler):
     def get(self):
-        # should only be used by source web
         code = self.request.GET.get('code', None)
         state = self.request.GET.get('state', None)
         try:
@@ -201,8 +202,11 @@ class Oauth2CallbackHandler(webapp2.RequestHandler):
             render_error_page(self.response, e.http_code, e.error)
             return
 
-        login_user(self.response, username, scopes, jwt)
+        _, session = login_user(self.response, username, scopes, jwt)
         self.redirect('/')
+
+        if config.fetch_information:
+            deferred.defer(set_user_information, Profile.create_key(username), session.key)
 
 
 class ContinueLoginHandler(webapp2.RequestHandler):

@@ -40,10 +40,13 @@ def _get_best_session(sessions):
     return sorted_sessions[0] if sorted_sessions and sorted_sessions[0].jwt else None
 
 
-def set_user_information(profile_key):
+def set_user_information(profile_key, session_key=None):
     profile = profile_key.get()  # type: Profile
-    sessions = Session.list_active_user(profile.username)
-    session = _get_best_session(sessions)
+    if session_key:
+        session = session_key.get()
+    else:
+        sessions = Session.list_active_user(profile.username)
+        session = _get_best_session(sessions)
     if session:
         client = Client()
         client.oauth.session.headers['Authorization'] = 'bearer %s' % session.jwt
