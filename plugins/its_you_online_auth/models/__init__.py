@@ -14,7 +14,6 @@
 # limitations under the License.
 #
 # @@license_version:1.3@@
-import warnings
 
 from google.appengine.ext import ndb
 

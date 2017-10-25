@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.0
+
+Profile pointers
+
+### Bugfixes
+
+profile: A new datastore model has been added: ProfileAppEmailMapping. This provides a mapping between a rogerthat user and an ityou.online username. This is needed because since itsyou.online now generates usernames, the usernames are no longer lowercase-only. This was a problem on rogerthat and has been fixed by taking a hash of the username instead of the username itself
+
+Run this migration when updating:
+
+```python
+def iyo_2():
+    from plugins.its_you_online_auth.migrations._002_profile_pointers import migrate
+    return migrate(dry_run=False)
+```
+
 ## 0.1.0
 
 Start versioning of ityou-online-auth plugin
