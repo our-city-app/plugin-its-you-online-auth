@@ -29,7 +29,7 @@ from mcfw.rpc import returns, arguments
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import Profile, ProfileInfo, ProfileInfoAddress, ProfileInfoAvatar, \
     ProfileInfoBankAccount, ProfileInfoEmailAddress, ProfileInfoDigitalAssetAddress, ProfileInfoFacebook, \
-    ProfileInfoOwnerOf, ProfileInfoPhoneNumber, ProfileInfoPublicKey
+    ProfileInfoOwnerOf, ProfileInfoPhoneNumber, ProfileInfoPublicKey, ProfileAppEmailMapping
 from plugins.its_you_online_auth.plugin_consts import NAMESPACE
 
 PROFILE_INDEX = search.Index('profile', namespace=NAMESPACE)
@@ -143,6 +143,16 @@ def get_profile(username):
     return profile
 
 
+def get_or_create_profile(username, app_email=None):
+    profile_key = Profile.create_key(username)
+    profile = profile_key.get() or Profile(key=profile_key)
+    if app_email:
+        profile.app_email = app_email
+        mapping_key = ProfileAppEmailMapping.create_key(app_email)
+        mapping_key.get() or ProfileAppEmailMapping(key=mapping_key, username=username).put()
+    return profile
+
+
 def search_profiles(query='', page_size=20, cursor=None):
     # type: (unicode, int, unicode) -> tuple[list[Profile], search.Cursor, bool]
     sort_expressions = [search.SortExpression(expression='firstname', direction=search.SortExpression.ASCENDING),
@@ -168,8 +178,23 @@ def search_profiles(query='', page_size=20, cursor=None):
 @arguments(rogerthat_email=unicode)
 def get_username_from_rogerthat_email(rogerthat_email):
     # type: (unicode) -> unicode
-    profile_key = Profile.get_by_app_email(rogerthat_email, keys_only=True)
-    return profile_key and profile_key.id()
+    mapping = ProfileAppEmailMapping.create_key(rogerthat_email).get()
+    return mapping and mapping.username
+
+
+@returns(dict)
+@arguments(rogerthat_emails=[unicode])
+def get_usernames_from_rogerthat_emails(rogerthat_emails):
+    # type: (list[unicode]) -> dict[unicode, unicode]
+    result = {}
+    mappings = ndb.get_multi([ProfileAppEmailMapping.create_key(app_email) for app_email in rogerthat_emails])
+    for app_email, mapping in zip(rogerthat_emails, mappings):
+        if mapping:
+            result[app_email] = mapping.username
+        else:
+            logging.error('No ProfileAppEmailMapping found for app email %s!', app_email)
+            result[app_email] = None
+    return result
 
 
 @cached(1, lifetime=0)

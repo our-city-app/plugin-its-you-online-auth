@@ -33,8 +33,8 @@ from framework.utils import now, urlencode
 from jose import jwt, ExpiredSignatureError
 from mcfw.consts import DEBUG
 from mcfw.exceptions import HttpException, HttpForbiddenException, HttpUnAuthorizedException
+from plugins.its_you_online_auth.bizz.profile import get_or_create_profile
 from plugins.its_you_online_auth.libs.itsyouonline import Client
-from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, JWT_ISSUER, \
     SOURCE_WEB
 from plugins.its_you_online_auth.plugin_utils import get_users_organization, get_organization
@@ -182,8 +182,7 @@ def get_user_scopes_from_access_token(code, state_model):
 
 
 def save_profile_state(state_model, username):
-    profile_key = Profile.create_key(username)
-    profile = profile_key.get() or Profile(key=profile_key)
+    profile = get_or_create_profile(username)
     profile.organization_id = state_model.organization_id
     state_model.completed = True
     ndb.put_multi([profile, state_model])

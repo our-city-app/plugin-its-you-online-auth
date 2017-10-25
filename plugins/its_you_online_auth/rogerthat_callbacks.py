@@ -23,9 +23,10 @@ from google.appengine.ext import ndb
 from framework.plugin_loader import get_config
 from mcfw.rpc import serialize_complex_value
 from plugins.its_you_online_auth.bizz.authentication import decode_jwt_cached, get_itsyouonline_client
+from plugins.its_you_online_auth.bizz.profile import get_or_create_profile
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
-from plugins.its_you_online_auth.models import Profile, OauthState
+from plugins.its_you_online_auth.models import OauthState
 from plugins.its_you_online_auth.plugin_consts import NAMESPACE
 from plugins.its_you_online_auth.plugin_utils import get_users_organization
 from plugins.rogerthat_api.to.friends import RegistrationResultTO, ACCEPT_ID, DECLINE_ID, REGISTRATION_ORIGIN_OAUTH, \
@@ -69,10 +70,8 @@ def _friend_register_qr(rt_settings, id_, service_identity, user_details, origin
         logging.warn('Could not find username in jwt denying installation.')
         return DECLINE_ID
 
-    profile_key = Profile.create_key(username)
-    profile = profile_key.get() or Profile(key=profile_key)
-    profile.app_email = u"%s:%s" % (user_details[0]['email'], user_details[0]['app_id'])
-    ndb.put_multi([profile])
+    profile = get_or_create_profile(username, u'%s:%s' % (user_details[0]['email'], user_details[0]['app_id']))
+    profile.put()
 
     result = RegistrationResultTO(result=ACCEPT_ID, auto_connected_services=[], roles=[],
                                   user_details=RegistrationUserInfoTO(name=None, avatar=None))
@@ -106,10 +105,8 @@ def _friend_register_oauth(rt_settings, id_, service_identity, user_details, ori
                          expected_scope, scope)
             return DECLINE_ID
 
-    profile_key = Profile.create_key(username)
-    profile = profile_key.get() or Profile(key=profile_key)
+    profile = get_or_create_profile(username, u'%s:%s' % (user_details[0]['email'], user_details[0]['app_id']))
     profile.organization_id = login_state.organization_id
-    profile.app_email = u'%s:%s' % (user_details[0]['email'], user_details[0]['app_id'])
     login_state.completed = True
     ndb.put_multi([profile, login_state])
 
