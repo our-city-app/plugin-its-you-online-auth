@@ -70,7 +70,8 @@ def _new_handle_data(self, uri, data, headers, params, content_type, method):
         res = method(uri, data=data, headers=headers, params=params)
     else:
         res = method(uri, json=data, headers=headers, params=params)
-    logging.debug('Response from %s: %s\n %s', uri, res.status_code, res.content)
+    content = res.content.decode('utf-8') if res.content else res.content
+    logging.debug('Response from %s: %s\n %s', uri, res.status_code, content)
     res.raise_for_status()
     return res
 
