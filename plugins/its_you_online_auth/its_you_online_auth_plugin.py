@@ -33,7 +33,7 @@ from mcfw.rpc import parse_complex_value
 from plugins.its_you_online_auth.api import authenticated
 from plugins.its_you_online_auth.bizz.authentication import validate_session, decode_jwt_cached
 from plugins.its_you_online_auth.bizz.profile import get_username_from_rogerthat_email, \
-    get_rogerthat_email_from_username
+    get_rogerthat_email_from_username, get_usernames_from_rogerthat_emails
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.cron.refresh_jwts import RefreshJwtsHandler
 from plugins.its_you_online_auth.cron.user_information import RefreshUserInformationHandler
@@ -206,6 +206,10 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
     def get_username_from_rogerthat_email(self, rogerthat_email):
         # type: (unicode) -> unicode
         return get_username_from_rogerthat_email(rogerthat_email)
+
+    def get_usernames_from_rogerthat_emails(self, rogerthat_emails):
+        # type: (list[unicode]) -> dict[unicode, unicode]
+        return get_usernames_from_rogerthat_emails(rogerthat_emails)
 
     def get_rogerthat_email_from_username(self, username):
         # type: (unicode) -> unicode

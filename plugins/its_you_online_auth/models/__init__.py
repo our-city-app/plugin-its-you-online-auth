@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 # @@license_version:1.3@@
+import warnings
+
 from google.appengine.ext import ndb
 
 from framework.models.common import NdbModel
@@ -129,10 +131,6 @@ class Profile(NdbModel):
     info = ndb.LocalStructuredProperty(ProfileInfo)  # type: ProfileInfo
 
     @property
-    def source(self):
-        return self.key.parent().id().decode('utf8')
-
-    @property
     def username(self):
         return self.key.id().decode('utf8')
 
@@ -141,8 +139,8 @@ class Profile(NdbModel):
         return ndb.Key(cls, username, namespace=NAMESPACE)
 
     @classmethod
-    def get_by_app_email(cls, app_email, keys_only=False):
-        return cls.query().filter(cls.app_email == app_email).get(keys_only=keys_only)
+    def list_with_app_user(cls):
+        return cls.query(cls.app_email != None)  # noQA
 
     def to_dict(self):
         result = super(Profile, self).to_dict()
@@ -150,3 +148,15 @@ class Profile(NdbModel):
         del result['app_email']
         result['username'] = self.username
         return result
+
+
+class ProfileAppEmailMapping(NdbModel):
+    username = ndb.StringProperty(indexed=False)
+
+    @classmethod
+    def create_key(cls, app_email):
+        return ndb.Key(cls, app_email, namespace=NAMESPACE)
+
+    @property
+    def app_email(self):
+        return self.key.id().decode('utf8')
