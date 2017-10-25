@@ -1,6 +1,6 @@
 import { MetaGuard } from '@ngx-meta/core';
-import { CreateOrganizationComponent, ItsYouOnlineAuthComponent, ViewOrganizationComponent } from './components/index';
 import { Route } from '../../framework/client/app.routes';
+import { CreateOrganizationComponent, ItsYouOnlineAuthComponent, ViewOrganizationComponent } from './components/index';
 
 export const ItsYouOnlineAuthRoutes: Route[] = [
   {

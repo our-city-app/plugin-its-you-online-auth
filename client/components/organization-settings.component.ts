@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 // app
 import { GetOrganizationsAction, RemoveOrganizationAction } from '../actions/index';
-import { getOrganizations } from '../its-you-online-auth.state';
 import { Organization } from '../interfaces/organization.interfaces';
+import { getOrganizations } from '../its-you-online-auth.state';
 import { IOrganizationsState } from '../states/organizations.state';
 
 @Component({

@@ -99,7 +99,6 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
         self.oauth_base_url = '%sv1/oauth' % itsyouonline.BASE_URI
         Client._handle_data = _new_handle_data
 
-
     def get_handlers(self, auth):
         if auth == Handler.AUTH_UNAUTHENTICATED:
             yield Handler(url='/login', handler=SigninHandler)

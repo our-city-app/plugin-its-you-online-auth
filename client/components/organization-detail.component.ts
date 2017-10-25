@@ -1,22 +1,14 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  Output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MdChipInputEvent } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
-import { ActionTypes } from '../actions/organizations.action';
-import { Organization, RegistrationResultRoles } from '../interfaces/index';
-import { IAppState } from '../../../framework/client/ngrx/index';
 import { LogService } from '../../../framework/client/core/index';
 import { DialogService } from '../../../framework/client/dialog/services/dialog.service';
+import { IAppState } from '../../../framework/client/ngrx/index';
+import { ActionTypes } from '../actions/organizations.action';
+import { Organization, RegistrationResultRoles } from '../interfaces/index';
 
 @Component({
   moduleId: module.id,
@@ -41,11 +33,12 @@ export class OrganizationDetailComponent implements OnDestroy {
   @Output() onAdd = new EventEmitter<Organization>();
   @Output() onUpdate = new EventEmitter<Organization>();
   @Output() onRemove = new EventEmitter<Organization>();
+
   private _organization: Organization;
 
   constructor(private log: LogService, private store: Store<IAppState>,
               public dialog: DialogService, public translate: TranslateService, private cdRef: ChangeDetectorRef) {
-    this.newRole = Object.assign({}, this.emptyRole);
+    this.newRole = { ...this.emptyRole };
     this.statusSubscription = store.select((state: any) => state.organizations.organizationStatus)
       .subscribe((status: string) => {
         // We need a better way to do this...
@@ -63,13 +56,13 @@ export class OrganizationDetailComponent implements OnDestroy {
       });
   }
 
-  @Input()
-  set organization(value: Organization) {
-    this._organization = Object.assign({}, value);
-  }
-
   get organization() {
     return this._organization;
+  }
+
+  @Input()
+  set organization(value: Organization) {
+    this._organization = { ...value };
   }
 
   public save(organization: Organization) {
@@ -115,7 +108,7 @@ export class OrganizationDetailComponent implements OnDestroy {
       return;
     }
     this.organization.roles = [ ...this.organization.roles, this.newRole ];
-    this.newRole = Object.assign({}, this.emptyRole);
+    this.newRole = { ...this.emptyRole };
     this.newRoleIds = '';
   }
 

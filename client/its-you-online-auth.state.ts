@@ -1,7 +1,6 @@
-// libs
-import { Observable } from 'rxjs/Observable';
 import '@ngrx/core/add/operator/select';
 import { compose } from '@ngrx/core/compose';
+import { Observable } from 'rxjs/Observable';
 import * as fromItsyouonline from './index';
 import { IOrganizationsState } from './states/organizations.state';
 

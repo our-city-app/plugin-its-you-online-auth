@@ -11,11 +11,7 @@ import { MultilingualModule } from '../../framework/client/i18n/multilingual.mod
 import { IAppState } from '../../framework/client/ngrx/state/app.state';
 import { AddRoutesAction } from '../../framework/client/sidebar/actions/sidebar.action';
 import { CreateOrganizationComponent } from './components/create-organization.component';
-import {
-  ItsYouOnlineAuthComponent,
-  OrganizationDetailComponent,
-  SelectedOrganizationComponent,
-} from './components/index';
+import { ItsYouOnlineAuthComponent, OrganizationDetailComponent, SelectedOrganizationComponent, } from './components/index';
 import { OrganizationSettingsComponent } from './components/organization-settings.component';
 import { ViewOrganizationComponent } from './components/view-organization.component';
 import { OrganizationsEffects } from './effects/organizations.effect';

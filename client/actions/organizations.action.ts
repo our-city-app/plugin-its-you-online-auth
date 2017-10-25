@@ -1,7 +1,7 @@
 import { Action } from '@ngrx/store';
+import { type } from '../../../framework/client/core/utils/type';
 import { ITS_YOU_ONLINE_CATEGORY } from '../common/category.common';
 import { Organization } from '../index';
-import { type } from '../../../framework/client/core/utils/type';
 
 export const ActionTypes = {
   GET_ORGANIZATIONS: type(`${ITS_YOU_ONLINE_CATEGORY} Get organizations`),

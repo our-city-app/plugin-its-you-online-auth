@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
-import { getOrganizationStatus, getSelectedOrganization } from '../its-you-online-auth.state';
 import { AddOrganizationAction, EditOrganizationAction, RemoveOrganizationAction } from '../actions/index';
-import { IOrganizationsState } from '../states/organizations.state';
 import { Organization } from '../interfaces/organization.interfaces';
+import { getOrganizationStatus, getSelectedOrganization } from '../its-you-online-auth.state';
+import { IOrganizationsState } from '../states/organizations.state';
 
 @Component({
   moduleId: module.id,
