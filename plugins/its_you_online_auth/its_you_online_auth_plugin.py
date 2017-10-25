@@ -40,6 +40,7 @@ from plugins.its_you_online_auth.cron.user_information import RefreshUserInforma
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
     PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler, RegisterHandler
 from plugins.its_you_online_auth.libs import itsyouonline
+from plugins.its_you_online_auth.libs.itsyouonline.client import Client
 from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE
 from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
@@ -47,6 +48,31 @@ from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 from plugins.rogerthat_api.rogerthat_api_plugin import RogerthatApiPlugin
 
 requests_toolbelt.adapters.appengine.monkeypatch()
+
+
+def _new_handle_data(self, uri, data, headers, params, content_type, method):
+    # Patched original method from itsyou.online client that it includes some helpful logging
+    headers = self._get_headers(headers, content_type)
+    if self.is_goraml_class(data):
+        data = data.as_json()
+    _headers = self.session.headers.copy()
+    _headers.update(headers)
+    logging.debug('%s %s\nHeaders: %s\nQuery params: %s\nData: %s', method.__name__.upper(), uri, _headers, params,
+                  data)
+    if content_type == "multipart/form-data":
+        # when content type is multipart/formdata remove the content-type header
+        # as requests will set this itself with correct boundary
+        headers.pop('Content-Type')
+        res = method(uri, files=data, headers=headers, params=params)
+    elif data is None:
+        res = method(uri, headers=headers, params=params)
+    elif type(data) is str:
+        res = method(uri, data=data, headers=headers, params=params)
+    else:
+        res = method(uri, json=data, headers=headers, params=params)
+    logging.debug('Response from %s: %s\n %s', uri, res.status_code, res.content)
+    res.raise_for_status()
+    return res
 
 
 class ItsYouOnlineAuthPlugin(AuthPlugin):
@@ -71,6 +97,8 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
         rogerthat_api_plugin.subscribe('friend.register_result', friend_register_result)
         itsyouonline.BASE_URI = u'https://%s/' % self.configuration.api_domain
         self.oauth_base_url = '%sv1/oauth' % itsyouonline.BASE_URI
+        Client._handle_data = _new_handle_data
+
 
     def get_handlers(self, auth):
         if auth == Handler.AUTH_UNAUTHENTICATED:
