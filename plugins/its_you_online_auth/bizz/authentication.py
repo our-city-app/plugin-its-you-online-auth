@@ -31,8 +31,10 @@ from framework.models.session import Session
 from framework.plugin_loader import get_config, get_auth_plugin
 from framework.utils import now, urlencode
 from jose import jwt, ExpiredSignatureError
+from mcfw.cache import cached
 from mcfw.consts import DEBUG
 from mcfw.exceptions import HttpException, HttpForbiddenException, HttpUnAuthorizedException
+from mcfw.rpc import returns, arguments
 from plugins.its_you_online_auth.bizz.profile import get_or_create_profile
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, JWT_ISSUER, \
@@ -40,13 +42,7 @@ from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, JWT_ISS
 from plugins.its_you_online_auth.plugin_utils import get_users_organization, get_organization
 from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 
-try:
-    from functools import lru_cache
-except ImportError:
-    from functools32 import lru_cache
 
-
-@lru_cache()
 def get_itsyouonline_client(config=None):
     if not config:
         config = get_config(NAMESPACE)
@@ -57,8 +53,18 @@ def get_itsyouonline_client(config=None):
     if not client_secret:
         raise Exception('Missing configuration: root_organization.web.client_secret must be set')
     client = Client()
-    client.oauth.LoginViaClientCredentials(organization, client_secret)
+    client.oauth.session.headers['Authorization'] = _get_client_auth_header(organization, client_secret)
     return client
+
+
+@cached(1, 3600 * 23)
+@returns(unicode)
+@arguments(organization=unicode, client_secret=unicode)
+def _get_client_auth_header(organization, client_secret):
+    # Cache the auth header for 23 hours (token is valid 24h)
+    client = Client()
+    client.oauth.LoginViaClientCredentials(organization, client_secret)
+    return client.oauth.session.headers['Authorization']
 
 
 def get_itsyouonline_client_from_username(username):
