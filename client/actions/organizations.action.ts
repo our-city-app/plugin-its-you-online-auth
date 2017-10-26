@@ -1,23 +1,39 @@
 import { Action } from '@ngrx/store';
 import { type } from '../../../framework/client/core/utils/type';
-import { ITS_YOU_ONLINE_CATEGORY } from '../common/category.common';
 import { Organization } from '../index';
 
-export const ActionTypes = {
-  GET_ORGANIZATIONS: type(`${ITS_YOU_ONLINE_CATEGORY} Get organizations`),
-  GET_ORGANIZATIONS_COMPLETE: type(`${ITS_YOU_ONLINE_CATEGORY} Get organizations succeeded`),
-  GET_ORGANIZATIONS_FAILED: type(`${ITS_YOU_ONLINE_CATEGORY} Get organizations failed`),
-  GET_ORGANIZATION: type(`${ITS_YOU_ONLINE_CATEGORY} Get organization`),
-  GET_ORGANIZATION_COMPLETE: type(`${ITS_YOU_ONLINE_CATEGORY} Get organization success`),
-  GET_ORGANIZATION_FAILED: type(`${ITS_YOU_ONLINE_CATEGORY} Get organization failed`),
-  CREATE: type(`${ITS_YOU_ONLINE_CATEGORY} Create page`),
-  ADD: type(`${ITS_YOU_ONLINE_CATEGORY} Add`),
-  ORGANIZATION_ADDED: type(`${ITS_YOU_ONLINE_CATEGORY} Organization added`),
-  EDIT: type(`${ITS_YOU_ONLINE_CATEGORY} Edit`),
-  EDITED: type(`${ITS_YOU_ONLINE_CATEGORY} Edited`),
-  EDIT_FAILED: type(`${ITS_YOU_ONLINE_CATEGORY} Edit failed`),
-  DELETE: type(`${ITS_YOU_ONLINE_CATEGORY} Delete`),
-  DELETED: type(`${ITS_YOU_ONLINE_CATEGORY} Deleted`),
+export interface IActionTypes {
+  GET_ORGANIZATIONS: '[Itsyouonline] Get organizations';
+  GET_ORGANIZATIONS_COMPLETE: '[Itsyouonline] Get organizations succeeded';
+  GET_ORGANIZATIONS_FAILED: '[Itsyouonline] Get organizations failed';
+  GET_ORGANIZATION: '[Itsyouonline] Get organization';
+  GET_ORGANIZATION_COMPLETE: '[Itsyouonline] Get organization success';
+  GET_ORGANIZATION_FAILED: '[Itsyouonline] Get organization failed';
+  CREATE: '[Itsyouonline] Create page';
+  ADD: '[Itsyouonline] Add';
+  ORGANIZATION_ADDED: '[Itsyouonline] Organization added';
+  EDIT: '[Itsyouonline] Edit';
+  EDITED: '[Itsyouonline] Edited';
+  EDIT_FAILED: '[Itsyouonline] Edit failed';
+  DELETE: '[Itsyouonline] Delete';
+  DELETED: '[Itsyouonline] Deleted';
+}
+
+export const ActionTypes: IActionTypes = {
+  GET_ORGANIZATIONS: type('[Itsyouonline] Get organizations'),
+  GET_ORGANIZATIONS_COMPLETE: type('[Itsyouonline] Get organizations succeeded'),
+  GET_ORGANIZATIONS_FAILED: type('[Itsyouonline] Get organizations failed'),
+  GET_ORGANIZATION: type('[Itsyouonline] Get organization'),
+  GET_ORGANIZATION_COMPLETE: type('[Itsyouonline] Get organization success'),
+  GET_ORGANIZATION_FAILED: type('[Itsyouonline] Get organization failed'),
+  CREATE: type('[Itsyouonline] Create page'),
+  ADD: type('[Itsyouonline] Add'),
+  ORGANIZATION_ADDED: type('[Itsyouonline] Organization added'),
+  EDIT: type('[Itsyouonline] Edit'),
+  EDITED: type('[Itsyouonline] Edited'),
+  EDIT_FAILED: type('[Itsyouonline] Edit failed'),
+  DELETE: type('[Itsyouonline] Delete'),
+  DELETED: type('[Itsyouonline] Deleted'),
 };
 
 /**
@@ -133,8 +149,10 @@ export type Actions
   | GetOrganizationAction
   | GetOrganizationCompleteAction
   | GetOrganizationFailedAction
+  | CreateAction
   | AddOrganizationAction
   | EditOrganizationAction
+  | EditOrganizationFailedAction
   | OrganizationEditedAction
   | OrganizationAddedAction
   | RemoveOrganizationAction
