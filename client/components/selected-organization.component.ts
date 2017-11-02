@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs/Observable';
 import { AddOrganizationAction, EditOrganizationAction, RemoveOrganizationAction } from '../actions/index';
@@ -9,6 +9,7 @@ import { IOrganizationsState } from '../states/organizations.state';
 @Component({
   moduleId: module.id,
   selector: 'selected-organization',
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <organization-detail
@@ -20,15 +21,18 @@ import { IOrganizationsState } from '../states/organizations.state';
     </organization-detail>
   `
 })
-export class SelectedOrganizationComponent {
+export class SelectedOrganizationComponent implements OnInit {
   organization$: Observable<Organization>;
   status$: Observable<string>;
 
   @Input() isNewOrganization: boolean;
 
   constructor(private store: Store<IOrganizationsState>) {
-    this.organization$ = store.let(getSelectedOrganization);
-    this.status$ = store.let(getOrganizationStatus);
+  }
+
+  ngOnInit() {
+    this.status$ = this.store.select(getOrganizationStatus);
+    this.organization$ = this.store.select(getSelectedOrganization);
   }
 
   addOrganization(organization: Organization) {

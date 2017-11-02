@@ -1,20 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-// angular
 import { Injectable } from '@angular/core';
-// libs
-// app
-import { Analytics, AnalyticsService } from '../../../framework/client/analytics/index';
-import { ITS_YOU_ONLINE_CATEGORY } from '../common/category.common';
-// module
 import { Organization } from '../index';
 import { ItsYouOnlineConfig } from './its-you-online-config';
 
 @Injectable()
-export class OrganizationsService extends Analytics {
+export class OrganizationsService {
 
-  constructor(public analytics: AnalyticsService, private http: HttpClient) {
-    super(analytics);
-    this.category = ITS_YOU_ONLINE_CATEGORY;
+  constructor(private http: HttpClient) {
   }
 
   getOrganizations() {
@@ -36,6 +28,6 @@ export class OrganizationsService extends Analytics {
 
   deleteOrganization(organization: Organization) {
     return this.http.delete(`${ItsYouOnlineConfig.API_URL}/organizations/${encodeURIComponent(organization.id)}`)
-      .map(res => organization);
+      .map(() => organization);
   }
 }

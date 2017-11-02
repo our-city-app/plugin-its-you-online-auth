@@ -1,22 +1,25 @@
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-// angular
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MdButtonModule, MdChipsModule, MdIconModule, MdInputModule, MdListModule } from '@angular/material';
 import { RouterModule } from '@angular/router';
 import { EffectsModule } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
+import { Store, StoreModule } from '@ngrx/store';
 import { MultilingualModule } from '../../framework/client/i18n/multilingual.module';
 import { IAppState } from '../../framework/client/ngrx/state/app.state';
 import { AddRoutesAction } from '../../framework/client/sidebar/actions/sidebar.action';
 import { CreateOrganizationComponent } from './components/create-organization.component';
-import { ItsYouOnlineAuthComponent, OrganizationDetailComponent, SelectedOrganizationComponent, } from './components/index';
+import {
+  ItsYouOnlineAuthComponent,
+  OrganizationDetailComponent,
+  SelectedOrganizationComponent,
+} from './components/index';
 import { OrganizationSettingsComponent } from './components/organization-settings.component';
 import { ViewOrganizationComponent } from './components/view-organization.component';
 import { OrganizationsEffects } from './effects/organizations.effect';
 import { ItsYouOnlineAuthRoutes } from './its-you-online-auth.routes';
-// app
+import { organizationsReducer } from './reducers/organizations.reducer';
 import { ItsYouOnlineConfig, OrganizationsService } from './services/index';
 
 /**
@@ -50,7 +53,8 @@ export const ITSYOU_ONLINE_PROVIDERS: any[] = [
     RouterModule,
     MultilingualModule,
     RouterModule.forChild(ItsYouOnlineAuthRoutes),
-    EffectsModule.run(OrganizationsEffects),
+    StoreModule.forFeature('organizations', organizationsReducer),
+    EffectsModule.forFeature([OrganizationsEffects]),
     MATERIAL_IMPORTS,
   ],
   declarations: [

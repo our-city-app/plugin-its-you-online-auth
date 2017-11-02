@@ -1,4 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Output,
+  ViewEncapsulation,
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MdChipInputEvent } from '@angular/material';
 import { Store } from '@ngrx/store';
@@ -14,6 +17,7 @@ import { Organization, RegistrationResultRoles } from '../interfaces/index';
   moduleId: module.id,
   selector: 'organization-detail',
   templateUrl: 'organization-detail.component.html',
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrganizationDetailComponent implements OnDestroy {

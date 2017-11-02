@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs/Subscription';
 import { RouterExtensions } from '../../../framework/client/core/index';
@@ -9,9 +9,10 @@ import { IAppState } from '../../../framework/client/ngrx/index';
 @Component({
   moduleId: module.id,
   selector: 'settings-component',
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <organization-settings *ngIf='isAdmin'></organization-settings>`
+    <organization-settings *ngIf='isAdmin'></organization-settings>`,
 })
 export class ItsYouOnlineAuthComponent implements OnInit, OnDestroy {
   isAdmin: boolean = false;
@@ -22,13 +23,13 @@ export class ItsYouOnlineAuthComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.sub = this.store.let(getIdentity).filter(i => i !== null).subscribe((identity: Identity) => {
+    this.sub = this.store.select(getIdentity).filter(i => i !== null).subscribe((identity: Identity) => {
       if (identity.scopes.includes('admin')) {
         this.isAdmin = true;
       } else {
         let organization = identity.scopes.filter((s: string) => {
           return s.startsWith('memberof:') && s.endsWith(':admin');
-        })[ 0 ];
+        })[0];
         let route: string = '';
         if (organization) {
           route = '/itsyouonlinesettings/organizations/' + organization

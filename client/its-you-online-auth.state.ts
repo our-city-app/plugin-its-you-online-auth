@@ -1,16 +1,15 @@
-import '@ngrx/core/add/operator/select';
-import { compose } from '@ngrx/core/compose';
-import { Observable } from 'rxjs/Observable';
-import * as fromItsyouonline from './index';
-import { IOrganizationsState } from './states/organizations.state';
+import { createFeatureSelector, createSelector } from '@ngrx/store';
+import { IOrganizationsState } from './index';
 
-export function getOrganizationsState(state$: Observable<IOrganizationsState>) {
-  return state$.select(s => s.organizations);
-}
+export const selectOrganizationsState = createFeatureSelector<IOrganizationsState>('organizations');
 
-
-export const getOrganizations: any = compose(fromItsyouonline.getOrganizations, getOrganizationsState);
-
-export const getSelectedOrganization: any = compose(fromItsyouonline.getOrganization, getOrganizationsState);
-
-export const getOrganizationStatus: any = compose(fromItsyouonline.getOrganizationStatus, getOrganizationsState);
+export const getOrganizations = createSelector(selectOrganizationsState, s => s.organizations);
+export const getSelectedOrganization = createSelector(selectOrganizationsState, s => s.organizations
+  .filter(o => o.id === s.selectedOrganization)[ 0 ] || {
+  id: '',
+  name: '',
+  auto_connected_services: [],
+  roles: [],
+  modules: [],
+});
+export const getOrganizationStatus = createSelector(selectOrganizationsState, s => s.organizationStatus);
