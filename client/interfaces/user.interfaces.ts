@@ -1,13 +1,4 @@
-export interface SearchUsersQuery {
-  cursor: string | null;
-  query: string | null;
-}
 
-export interface UserList {
-  cursor: string;
-  more: boolean;
-  results: Profile[];
-}
 
 export interface Profile {
   username: string;

@@ -23,6 +23,7 @@ from google.appengine.ext import ndb
 
 from framework.bizz.job import run_job
 from framework.models.session import Session
+from framework.plugin_loader import get_plugins
 from mcfw.cache import cached
 from mcfw.exceptions import HttpNotFoundException
 from mcfw.rpc import returns, arguments
@@ -75,7 +76,15 @@ def set_user_information(profile_key, session_key=None):
         profile.put()
     else:
         logging.info('No session found for user %s, not storing user information', profile.username)
-    index_profile(profile)
+    index_profile(profile, _get_extra_profile_fields(profile))
+
+
+def _get_extra_profile_fields(profile):
+    fields = []
+    for plugin in get_plugins():
+        if hasattr(plugin, 'get_extra_profile_fields'):
+            fields.extend(plugin.get_extra_profile_fields(profile))
+    return fields
 
 
 def index_all_profiles():
@@ -86,16 +95,18 @@ def _get_all_profiles():
     return Profile.query()
 
 
-def index_profile(profile_or_key):
-    # type: (ndb.Key) -> list[search.PutResult]
+def index_profile(profile_or_key, extra_profile_fields=None):
+    # type: (ndb.Key, list[search.Field]) -> list[search.PutResult]
     profile = profile_or_key.get() if isinstance(profile_or_key, ndb.Key) else profile_or_key
+    if extra_profile_fields is None:
+        extra_profile_fields = _get_extra_profile_fields(profile)
     logging.info('Indexing profile %s', profile.username)
-    document = create_profile_document(profile)
+    document = create_profile_document(profile, extra_profile_fields)
     return PROFILE_INDEX.put(document)
 
 
-def create_profile_document(profile):
-    # type: (Profile) -> search.Document
+def create_profile_document(profile, extra_profile_fields):
+    # type: (Profile, list[search.Field]) -> search.Document
     fields = [search.AtomField(name='username', value=profile.username.lower())]
     # complete this if needed
     if profile.info:
@@ -113,6 +124,7 @@ def create_profile_document(profile):
                 fields.append(search.AtomField(name='validatedphonenumbers_%d' % i, value=phone.phonenumber))
             phones = ' '.join([phone.phonenumber for phone in profile.info.validatedphonenumbers])
             fields.append(search.TextField(name='validatedphonenumbers', value=phones))
+    fields.extend(extra_profile_fields)
     return search.Document(_encode_doc_id(profile), fields)
 
 
@@ -165,8 +177,7 @@ def search_profiles(query='', page_size=20, cursor=None):
                                   cursor=search.Cursor(cursor),
                                   sort_options=search.SortOptions(expressions=sort_expressions),
                                   ids_only=True)
-    search_results = PROFILE_INDEX.search(
-        search.Query(normalize_search_string(query), options=options))  # type: search.SearchResults
+    search_results = PROFILE_INDEX.search(search.Query(query, options=options))  # type: search.SearchResults
     results = search_results.results  # type: list[search.ScoredDocument]
     keys = []
     for result in results:

@@ -39,7 +39,7 @@ class OauthState(NdbModel):
         return ndb.Key(cls, state, namespace=NAMESPACE)
 
 
-class ProfileInfoAddress(ndb.Model):
+class ProfileInfoAddress(NdbModel):
     city = ndb.StringProperty()
     country = ndb.StringProperty()
     label = ndb.StringProperty()
@@ -49,19 +49,19 @@ class ProfileInfoAddress(ndb.Model):
     street = ndb.StringProperty()
 
 
-class ProfileInfoAvatar(ndb.Model):
+class ProfileInfoAvatar(NdbModel):
     label = ndb.StringProperty()
     source = ndb.StringProperty()
 
 
-class ProfileInfoBankAccount(ndb.Model):
+class ProfileInfoBankAccount(NdbModel):
     bic = ndb.StringProperty()
     country = ndb.StringProperty()
     iban = ndb.StringProperty()
     label = ndb.StringProperty()
 
 
-class ProfileInfoDigitalAssetAddress(ndb.Model):
+class ProfileInfoDigitalAssetAddress(NdbModel):
     address = ndb.StringProperty()
     currencysymbol = ndb.StringProperty()
     expire = ndb.StringProperty()
@@ -69,19 +69,19 @@ class ProfileInfoDigitalAssetAddress(ndb.Model):
     noexpiration = ndb.BooleanProperty()
 
 
-class ProfileInfoEmailAddress(ndb.Model):
+class ProfileInfoEmailAddress(NdbModel):
     emailaddress = ndb.StringProperty()
     label = ndb.StringProperty()
 
 
-class ProfileInfoFacebook(ndb.Model):
+class ProfileInfoFacebook(NdbModel):
     id = ndb.StringProperty()
     link = ndb.StringProperty()
     name = ndb.StringProperty()
     picture = ndb.StringProperty()
 
 
-class ProfileInfoGithubAccount(ndb.Model):
+class ProfileInfoGithubAccount(NdbModel):
     avatar_url = ndb.StringProperty()
     html_url = ndb.StringProperty()
     id = ndb.StringProperty()
@@ -89,21 +89,39 @@ class ProfileInfoGithubAccount(ndb.Model):
     name = ndb.StringProperty()
 
 
-class ProfileInfoOwnerOf(ndb.Model):
+class ProfileInfoOwnerOf(NdbModel):
     emailaddresses = ndb.StructuredProperty(ProfileInfoEmailAddress, repeated=True)
 
 
-class ProfileInfoPhoneNumber(ndb.Model):
+class ProfileInfoPhoneNumber(NdbModel):
     label = ndb.StringProperty()
     phonenumber = ndb.StringProperty()
 
 
-class ProfileInfoPublicKey(ndb.Model):
+class ProfileInfoPublicKey(NdbModel):
     label = ndb.StringProperty()
     publickey = ndb.StringProperty()
 
 
-class ProfileInfo(ndb.Model):
+class ProfileInfo(NdbModel):
+    """
+    Args:
+        addresses(list[ProfileInfoAddress])
+        avatar(list[ProfileInfoAvatar])
+        bankaccounts(list[ProfileInfoBankAccount])
+        digitalwallet(list[ProfileInfoDigitalAssetAddress])
+        emailaddresses(list[ProfileInfoEmailAddress])
+        facebook(ProfileInfoFacebook)
+        firstname(unicode)
+        github(ProfileInfoGithubAccount)
+        lastname(unicode)
+        ownerof(ProfileInfoOwnerOf)
+        phonenumbers(list[ProfileInfoPhoneNumber])
+        publicKeys(list[ProfileInfoPublicKey])
+        username(unicode)
+        validatedemailaddresses(list[ProfileInfoEmailAddress])
+        validatedphonenumbers(list[ProfileInfoPhoneNumber])
+    """
     NAMESPACE = NAMESPACE
     addresses = ndb.StructuredProperty(ProfileInfoAddress, repeated=True)
     avatar = ndb.StructuredProperty(ProfileInfoAvatar, repeated=True)
