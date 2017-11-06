@@ -42,40 +42,44 @@ def _get_best_session(sessions):
 
 
 def set_user_information(profile_key, session_key=None):
-    profile = profile_key.get()  # type: Profile
+    iyo_username = profile_key.id()
     if session_key:
         session = session_key.get()
     else:
-        sessions = Session.list_active_user(profile.username)
+        sessions = Session.list_active_user(iyo_username)
         session = _get_best_session(sessions)
     if session:
         client = Client()
         client.oauth.session.headers['Authorization'] = 'bearer %s' % session.jwt
         data = client.api.users.GetUserInformation(session.user_id).json()
         logging.info('Saving user information %s', data)
-        profile.info = ProfileInfo(addresses=[ProfileInfoAddress(**address) for address in data['addresses']],
-                                   avatar=[ProfileInfoAvatar(**avatar) for avatar in data['avatar']],
-                                   bankaccounts=[ProfileInfoBankAccount(**bank) for bank in data['bankaccounts']],
-                                   digitalwallet=[ProfileInfoDigitalAssetAddress(**wallet) for wallet in
-                                                  data['digitalwallet']],
-                                   emailaddresses=[ProfileInfoEmailAddress(**email) for email in
-                                                   data['emailaddresses']],
-                                   facebook=ProfileInfoFacebook(**data['facebook']),
-                                   firstname=data['firstname'],
-                                   lastname=data['lastname'],
-                                   ownerof=ProfileInfoOwnerOf(
-                                       emailaddresses=[ProfileInfoEmailAddress(**email) for email in
-                                                       data['ownerof']['emailaddresses']]),
-                                   phonenumbers=[ProfileInfoPhoneNumber(**phone) for phone in data['phonenumbers']],
-                                   publicKeys=[ProfileInfoPublicKey(**phone) for phone in data['publicKeys']],
-                                   username=data['username'],
-                                   validatedemailaddresses=[ProfileInfoEmailAddress(**email) for email in
-                                                            data['validatedemailaddresses']],
-                                   validatedphonenumbers=[ProfileInfoPhoneNumber(**phone) for phone in
-                                                          data['validatedphonenumbers']])
-        profile.put()
+        store_user_information(data)
     else:
-        logging.info('No session found for user %s, not storing user information', profile.username)
+        logging.info('No session found for user %s, not storing user information', iyo_username)
+
+
+def store_user_information(data):
+    profile = Profile.create_key(data['username']).get()
+    profile.info = ProfileInfo(addresses=[ProfileInfoAddress(**address) for address in data['addresses']],
+                               avatar=[ProfileInfoAvatar(**avatar) for avatar in data['avatar']],
+                               bankaccounts=[ProfileInfoBankAccount(**bank) for bank in data['bankaccounts']],
+                               digitalwallet=[ProfileInfoDigitalAssetAddress(**wallet) for wallet in
+                                              data['digitalwallet']],
+                               emailaddresses=[ProfileInfoEmailAddress(**email) for email in data['emailaddresses']],
+                               facebook=ProfileInfoFacebook(**data['facebook']),
+                               firstname=data['firstname'],
+                               lastname=data['lastname'],
+                               ownerof=ProfileInfoOwnerOf(
+                                   emailaddresses=[ProfileInfoEmailAddress(**email) for email in
+                                                   data['ownerof']['emailaddresses']]),
+                               phonenumbers=[ProfileInfoPhoneNumber(**phone) for phone in data['phonenumbers']],
+                               publicKeys=[ProfileInfoPublicKey(**phone) for phone in data['publicKeys']],
+                               username=data['username'],
+                               validatedemailaddresses=[ProfileInfoEmailAddress(**email) for email in
+                                                        data['validatedemailaddresses']],
+                               validatedphonenumbers=[ProfileInfoPhoneNumber(**phone) for phone in
+                                                      data['validatedphonenumbers']])
+    profile.put()
     index_profile(profile, _get_extra_profile_fields(profile))
 
 

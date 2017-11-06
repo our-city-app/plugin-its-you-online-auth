@@ -24,7 +24,7 @@ from google.appengine.ext.deferred import deferred
 from framework.plugin_loader import get_config
 from mcfw.rpc import serialize_complex_value
 from plugins.its_you_online_auth.bizz.authentication import decode_jwt_cached, get_itsyouonline_client
-from plugins.its_you_online_auth.bizz.profile import get_or_create_profile, set_user_information
+from plugins.its_you_online_auth.bizz.profile import get_or_create_profile, set_user_information, store_user_information
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
 from plugins.its_you_online_auth.models import OauthState, Profile
@@ -139,5 +139,5 @@ def _friend_register_oauth(rt_settings, id_, service_identity, user_details, ori
             pass
 
     if config.fetch_information:
-        deferred.defer(set_user_information, Profile.create_key(username))
+        deferred.defer(store_user_information, user_info)
     return serialize_complex_value(result, RegistrationResultTO, False)
