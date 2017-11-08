@@ -258,6 +258,7 @@ def validate_session(session):
         try:
             new_jwt = refresh_jwt(session.jwt)
             session.jwt = new_jwt
+            session.timeout = new_jwt['exp']
             session.scopes = decode_jwt_cached(new_jwt)['scope']
             session.put()
             return True
