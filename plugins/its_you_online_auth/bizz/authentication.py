@@ -258,11 +258,13 @@ def validate_session(session):
         try:
             new_jwt = refresh_jwt(session.jwt)
             session.jwt = new_jwt
-            session.timeout = new_jwt['exp']
-            session.scopes = decode_jwt_cached(new_jwt)['scope']
+            decoded_jwt = decode_jwt_cached(new_jwt)
+            session.timeout = decoded_jwt['exp']
+            session.scopes = decoded_jwt['scope']
             session.put()
             return True
-        except Exception:
+        except HttpUnAuthorizedException as e:
+            logging.warn(e.message, exc_info=True)
             # This probably happens because the JWT did not contain a refresh_token.
             logging.debug('Error while refreshing JWT', exc_info=True)
             session.key.delete()
