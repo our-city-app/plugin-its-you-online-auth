@@ -128,6 +128,10 @@ def create_profile_document(profile, extra_profile_fields):
                 fields.append(search.AtomField(name='validatedphonenumbers_%d' % i, value=phone.phonenumber))
             phones = ' '.join([phone.phonenumber for phone in profile.info.validatedphonenumbers])
             fields.append(search.TextField(name='validatedphonenumbers', value=phones))
+    else:
+        # Adding username as firstname/lastname for sorting reasons
+        fields.append(search.TextField(name='firstname', value=profile.username.lower()))
+        fields.append(search.TextField(name='lastname', value=profile.username.lower()))
     fields.extend(extra_profile_fields)
     return search.Document(_encode_doc_id(profile), fields)
 
