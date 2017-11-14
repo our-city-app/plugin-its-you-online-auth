@@ -7,7 +7,6 @@ import { getOrganizations } from '../its-you-online-auth.state';
 import { IOrganizationsState } from '../states/organizations.state';
 
 @Component({
-  moduleId: module.id,
   selector: 'organization-settings',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,

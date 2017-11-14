@@ -1,9 +1,15 @@
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, Output,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  Output,
   ViewEncapsulation,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MdChipInputEvent } from '@angular/material';
+import { MatChipInputEvent } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
@@ -14,7 +20,6 @@ import { ActionTypes } from '../actions/organizations.action';
 import { Organization, RegistrationResultRoles } from '../interfaces/index';
 
 @Component({
-  moduleId: module.id,
   selector: 'organization-detail',
   templateUrl: 'organization-detail.component.html',
   encapsulation: ViewEncapsulation.None,
@@ -77,7 +82,7 @@ export class OrganizationDetailComponent implements OnDestroy {
     }
   }
 
-  public addModuleInput(event: MdChipInputEvent) {
+  public addModuleInput(event: MatChipInputEvent) {
     if (this.organization.modules.indexOf(event.value) === -1) {
       this.organization.modules = [ ...this.organization.modules, event.value ];
     }
@@ -88,7 +93,7 @@ export class OrganizationDetailComponent implements OnDestroy {
     this.organization.modules = this.organization.modules.filter(a => a !== module);
   }
 
-  public addAutoConnectedInput(event: MdChipInputEvent) {
+  public addAutoConnectedInput(event: MatChipInputEvent) {
     if (!this.addAcsFormControl.valid) {
       this.addAcsFormControl.markAsTouched();
       return;

@@ -1,74 +1,74 @@
 <form (ngSubmit)="save(organization)" #organizationForm="ngForm">
   <div fxLayout="column" fxFlex="40" fxFlex.md="60" fxFlex.xs="100">
-    <md-form-field>
-      <input mdInput [(ngModel)]="organization.name" name="newOrganizationName"
+    <mat-form-field>
+      <input matInput [(ngModel)]="organization.name" name="newOrganizationName"
              [placeholder]="'iyo.organization_name' | translate" required>
-    </md-form-field>
+    </mat-form-field>
 
-    <md-form-field>
-      <input mdInput [(ngModel)]="organization.id" name="organization_id"
+    <mat-form-field>
+      <input matInput [(ngModel)]="organization.id" name="organization_id"
              [placeholder]="'iyo.organization_id' | translate"
              required [disabled]="!isNew" pattern="^[a-z\d\-_\s]{3,150}$">
-    </md-form-field>
+    </mat-form-field>
     <h3>{{ 'iyo.modules' | translate }}</h3>
-    <md-chip-list #moduleChips>
-      <md-chip *ngFor="let module of organization.modules" (remove)="showConfirmRemoveModule(module)">
+    <mat-chip-list #moduleChips>
+      <mat-chip *ngFor="let module of organization.modules" (remove)="showConfirmRemoveModule(module)">
         {{ module }}
-        <md-icon mdChipRemove>cancel</md-icon>
-      </md-chip>
-    </md-chip-list>
-    <md-form-field>
-      <input mdInput
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+    </mat-chip-list>
+    <mat-form-field>
+      <input matInput
              [formControl]="addModuleFormControl"
              [placeholder]="'iyo.new_module' | translate"
-             [mdChipInputFor]="moduleChips"
-             (mdChipInputTokenEnd)="addModuleInput($event)"/>
-    </md-form-field>
+             [matChipInputFor]="moduleChips"
+             (matChipInputTokenEnd)="addModuleInput($event)"/>
+    </mat-form-field>
 
     <h3>{{ 'iyo.auto_connected_services' | translate }}</h3>
-    <md-chip-list #acsChips>
-      <md-chip *ngFor="let acs of organization.auto_connected_services" class="md-primary"
-               (remove)="showConfirmRemoveACS(acs)">
+    <mat-chip-list #acsChips>
+      <mat-chip *ngFor="let acs of organization.auto_connected_services" color="primary"
+                (remove)="showConfirmRemoveACS(acs)">
         {{ acs }}
-        <md-icon mdChipRemove>cancel</md-icon>
-      </md-chip>
-    </md-chip-list>
-    <md-form-field>
-      <input mdInput type="email"
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+    </mat-chip-list>
+    <mat-form-field>
+      <input matInput type="email"
              [formControl]="addAcsFormControl"
              placeholder="{{ 'iyo.new_auto_connected_service' | translate }}"
-             [mdChipInputFor]="acsChips"
-             (mdChipInputTokenEnd)="addAutoConnectedInput($event)"/>
-    </md-form-field>
+             [matChipInputFor]="acsChips"
+             (matChipInputTokenEnd)="addAutoConnectedInput($event)"/>
+    </mat-form-field>
     <h3>{{ 'iyo.roles' | translate }}</h3>
-    <md-list>
-      <md-list-item *ngFor="let role of organization.roles">
-        <h4 md-line>{{ 'iyo.service' | translate }}: {{ role.service }}</h4>
-        <p md-line>{{ 'iyo.identity'| translate }}: {{ role.identity }}</p>
-        <p md-line class="demo-secondary-text">{{ 'iyo.role_ids_x' | translate:{ids:role.ids} }}</p>
-        <button md-icon-button (click)="removeRole(role)">
-          <md-icon>delete</md-icon>
+    <mat-list>
+      <mat-list-item *ngFor="let role of organization.roles">
+        <h4 matLine>{{ 'iyo.service' | translate }}: {{ role.service }}</h4>
+        <p matLine>{{ 'iyo.identity'| translate }}: {{ role.identity }}</p>
+        <p matLine class="demo-secondary-text">{{ 'iyo.role_ids_x' | translate:{ids:role.ids} }}</p>
+        <button mat-icon-button (click)="removeRole(role)">
+          <mat-icon>delete</mat-icon>
         </button>
-      </md-list-item>
-    </md-list>
-    <md-form-field>
-      <input mdInput name="newRoleService" [(ngModel)]="newRole.service" type="email"
+      </mat-list-item>
+    </mat-list>
+    <mat-form-field>
+      <input matInput name="newRoleService" [(ngModel)]="newRole.service" type="email"
              placeholder="{{ 'iyo.service' | translate }}"
              [email]="true"
              #newRoleServiceElem="ngModel"/>
-    </md-form-field>
-    <md-form-field>
-      <input mdInput name="newRoleIdentity" [(ngModel)]="newRole.identity"
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput name="newRoleIdentity" [(ngModel)]="newRole.identity"
              placeholder="{{ 'iyo.identity' | translate }}"
              #newRoleIdentityElem="ngModel"/>
-    </md-form-field>
-    <md-form-field>
-      <input mdInput name="newRoleIds" [(ngModel)]="newRoleIds"
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput name="newRoleIds" [(ngModel)]="newRoleIds"
              placeholder="{{ 'iyo.role_ids' | translate }}"
              #newRoleIdsElem="ngModel"/>
-    </md-form-field>
+    </mat-form-field>
     <div fxLayoutAlign="end center">
-      <button type="button" md-button md-raised-button (click)="addRole();"
+      <button type="button" mat-button mat-raised-button (click)="addRole();"
               [disabled]="!newRole.service || !newRole.identity ||  !newRoleServiceElem.valid || !newRoleIdentityElem.valid">
         {{ 'iyo.add_role' | translate }}
       </button>
@@ -76,7 +76,7 @@
   </div>
   <br/>
   <div>
-    <button md-button md-raised-button color="primary" [disabled]="!organizationForm.form.valid">
+    <button mat-button mat-raised-button color="primary" [disabled]="!organizationForm.form.valid">
       {{ (isNew ? 'iyo.add_organization' : 'iyo.update_organization') | translate}}
     </button>
     <p *ngIf="status">{{ status | translate }}</p>

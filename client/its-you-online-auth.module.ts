@@ -2,32 +2,32 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MdButtonModule, MdChipsModule, MdIconModule, MdInputModule, MdListModule } from '@angular/material';
+import { MatButtonModule, MatChipsModule, MatIconModule, MatInputModule, MatListModule } from '@angular/material';
 import { RouterModule } from '@angular/router';
 import { EffectsModule } from '@ngrx/effects';
 import { Store, StoreModule } from '@ngrx/store';
 import { MultilingualModule } from '../../framework/client/i18n/multilingual.module';
-import { IAppState } from '../../framework/client/ngrx/state/app.state';
-import { AddRoutesAction } from '../../framework/client/sidebar/actions/sidebar.action';
-import { CreateOrganizationComponent } from './components/create-organization.component';
+import { IAppState } from '../../framework/client/ngrx';
+import { AddRoutesAction } from '../../framework/client/sidebar/actions';
 import {
+  CreateOrganizationComponent,
   ItsYouOnlineAuthComponent,
   OrganizationDetailComponent,
+  OrganizationSettingsComponent,
   SelectedOrganizationComponent,
-} from './components/index';
-import { OrganizationSettingsComponent } from './components/organization-settings.component';
-import { ViewOrganizationComponent } from './components/view-organization.component';
-import { OrganizationsEffects } from './effects/organizations.effect';
+  ViewOrganizationComponent,
+} from './components';
+import { OrganizationsEffects } from './effects';
 import { ItsYouOnlineAuthRoutes } from './its-you-online-auth.routes';
-import { organizationsReducer } from './reducers/organizations.reducer';
-import { ItsYouOnlineConfig, OrganizationsService } from './services/index';
+import { organizationsReducer } from './reducers';
+import { ItsYouOnlineConfig, OrganizationsService } from './services';
 
 /**
  * Do not specify providers for modules that might be imported by a lazy loaded module.
  */
 
 const MATERIAL_IMPORTS = [
-  MdButtonModule, MdChipsModule, MdIconModule, MdInputModule, MdListModule,
+  MatButtonModule, MatChipsModule, MatIconModule, MatInputModule, MatListModule,
 ];
 export const ITS_YOU_ONLINE_COMPONENTS: any[] = [
   CreateOrganizationComponent,
@@ -43,7 +43,6 @@ export const ITSYOU_ONLINE_PROVIDERS: any[] = [
   ItsYouOnlineConfig,
 ];
 
-
 @NgModule({
   imports: [
     CommonModule,
@@ -54,7 +53,7 @@ export const ITSYOU_ONLINE_PROVIDERS: any[] = [
     MultilingualModule,
     RouterModule.forChild(ItsYouOnlineAuthRoutes),
     StoreModule.forFeature('organizations', organizationsReducer),
-    EffectsModule.forFeature([OrganizationsEffects]),
+    EffectsModule.forFeature([ OrganizationsEffects ]),
     MATERIAL_IMPORTS,
   ],
   declarations: [

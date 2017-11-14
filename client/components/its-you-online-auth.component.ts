@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs/Subscription';
-import { RouterExtensions } from '../../../framework/client/core/index';
 import { getIdentity } from '../../../framework/client/identity/identity.state';
 import { Identity } from '../../../framework/client/identity/index';
 import { IAppState } from '../../../framework/client/ngrx/index';
+import { Router } from '@angular/router';
 
 @Component({
-  moduleId: module.id,
   selector: 'settings-component',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,7 +17,7 @@ export class ItsYouOnlineAuthComponent implements OnInit, OnDestroy {
   isAdmin: boolean = false;
   private sub: Subscription;
 
-  constructor(private routerext: RouterExtensions,
+  constructor(private router: Router,
               private store: Store<IAppState>) {
   }
 
@@ -36,7 +35,7 @@ export class ItsYouOnlineAuthComponent implements OnInit, OnDestroy {
             .replace('memberof:', '')
             .replace(':admin', '');
         }
-        this.routerext.navigateByUrl(route);
+        this.router.navigateByUrl(route);
       }
     });
   }

@@ -4,7 +4,6 @@ import * as organizationActions from '../actions/organizations.action';
 import { IOrganizationsState } from '../states/organizations.state';
 
 @Component({
-  moduleId: module.id,
   selector: 'create-organization',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -7,7 +7,6 @@ import { getOrganizationStatus, getSelectedOrganization } from '../its-you-onlin
 import { IOrganizationsState } from '../states/organizations.state';
 
 @Component({
-  moduleId: module.id,
   selector: 'selected-organization',
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
