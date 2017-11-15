@@ -31,7 +31,7 @@ from framework.plugin_loader import get_config, get_auth_plugin
 from framework.utils import now
 from mcfw.consts import MISSING
 from mcfw.exceptions import HttpException, HttpBadRequestException
-from plugins.its_you_online_auth.bizz.authentication import get_user_scopes_from_access_token, get_jwt
+from plugins.its_you_online_auth.bizz.authentication import get_user_scopes_from_access_token, get_jwt, get_redirect_uri
 from plugins.its_you_online_auth.bizz.profile import set_user_information
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
@@ -153,7 +153,7 @@ class OauthAuthorizeHandler(webapp2.RequestHandler):
         params = {
             'response_type': 'code',
             'client_id': config.root_organization.name,
-            'redirect_uri': config.root_organization[source].redirect_uri,
+            'redirect_uri': get_redirect_uri(config, source),
             'scope': scope,
             'state': str(uuid.uuid4())
         }

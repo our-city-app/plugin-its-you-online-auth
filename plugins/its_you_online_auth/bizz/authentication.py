@@ -20,8 +20,10 @@ import httplib
 import logging
 import time
 import urllib
+from urlparse import urlparse
 
 from google.appengine.api import urlfetch, memcache
+from google.appengine.api.app_identity import get_application_id, get_default_version_hostname
 from google.appengine.ext import ndb
 
 import requests
@@ -87,7 +89,7 @@ def get_access_response(config, state, code, use_jwt=None, audience=None, redire
         'client_id': config.root_organization.name,
         'client_secret': config.root_organization[SOURCE_WEB].client_secret,
         'code': code,
-        'redirect_uri': redirect_uri or config.root_organization[SOURCE_WEB].redirect_uri,
+        'redirect_uri': get_redirect_uri(config, SOURCE_WEB, redirect_uri),
         'state': state
     }
     if use_jwt:
@@ -108,6 +110,16 @@ def get_access_response(config, state, code, use_jwt=None, audience=None, redire
         exception.error = content
         raise exception
     return content
+
+
+def get_redirect_uri(config, source, redirect_uri=None):
+    redirect_uri = redirect_uri or config.root_organization[source].redirect_uri
+    parsed_url = urlparse(redirect_uri)
+    parsed_current_base = urlparse(BASE_URL)
+    # Support logging in from {version name}-dot-{application id}.appspot.com
+    if parsed_current_base.netloc.endswith('%s-appspot.com' % get_application_id()) != get_default_version_hostname():
+        redirect_uri = parsed_url._replace(netloc=parsed_current_base.netloc).geturl()
+    return redirect_uri
 
 
 def create_jwt(access_token, scope):
