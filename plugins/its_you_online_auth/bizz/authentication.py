@@ -22,21 +22,21 @@ import time
 import urllib
 from urlparse import urlparse
 
-from google.appengine.api import urlfetch, memcache
-from google.appengine.api.app_identity import get_default_version_hostname
-from google.appengine.ext import ndb
-
 import requests
 from framework.bizz.authentication import get_current_session
-from framework.consts import BASE_URL
+from framework.consts import get_base_url
 from framework.models.session import Session
 from framework.plugin_loader import get_config, get_auth_plugin
 from framework.utils import now, urlencode
+from google.appengine.api import urlfetch, memcache
+from google.appengine.api.app_identity import get_default_version_hostname
+from google.appengine.ext import ndb
 from jose import jwt, ExpiredSignatureError
 from mcfw.cache import cached
 from mcfw.consts import DEBUG
 from mcfw.exceptions import HttpException, HttpForbiddenException, HttpUnAuthorizedException
 from mcfw.rpc import returns, arguments
+
 from plugins.its_you_online_auth.bizz.profile import get_or_create_profile
 from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, JWT_ISSUER, \
@@ -116,7 +116,7 @@ def get_redirect_uri(config, source, redirect_uri=None):
     redirect_uri = redirect_uri or config.root_organization[source].redirect_uri
     parsed_redirect_uri = urlparse(redirect_uri)
     if 'http' in parsed_redirect_uri.scheme:
-        parsed_current_base = urlparse(BASE_URL)
+        parsed_current_base = urlparse(get_base_url())
         current_netloc = parsed_current_base.netloc.split(':')[0]
         # Support logging in from {version name}-dot-{application id}.appspot.com
         default_hostname = get_default_version_hostname()
@@ -159,7 +159,7 @@ def refresh_jwt(old_jwt, validity=24 * 60 * 60):
     logging.debug('Failed to refresh JWT\n%s: %s', data.status_code, data.content)
     if DEBUG:
         logging.debug(old_jwt)
-    raise HttpUnAuthorizedException(data={'login_url': BASE_URL + get_auth_plugin().get_login_url()})
+    raise HttpUnAuthorizedException(data={'login_url': get_base_url() + get_auth_plugin().get_login_url()})
 
 
 def has_access_to_organization(client, organization_id, username):
