@@ -77,6 +77,7 @@ def _new_handle_data(self, uri, data, headers, params, content_type, method):
 
 
 class ItsYouOnlineAuthPlugin(AuthPlugin):
+
     def __init__(self, configuration):
         super(ItsYouOnlineAuthPlugin, self).__init__(configuration)
         self.configuration = parse_complex_value(ItsYouOnlineConfiguration, configuration,
@@ -215,7 +216,7 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
         auth_header = environ.get('HTTP_AUTHORIZATION', '').strip()
         split = auth_header.split(' ')
         if len(split) == 2:
-            auth_type, auth = split
+            _, auth = split
             if auth_header.lower().startswith('bearer'):
                 try:
                     decoded_jwt = decode_jwt_cached(auth)

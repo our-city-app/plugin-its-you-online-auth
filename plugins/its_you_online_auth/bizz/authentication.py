@@ -23,7 +23,7 @@ import urllib
 from urlparse import urlparse
 
 from google.appengine.api import urlfetch, memcache
-from google.appengine.api.app_identity import get_application_id, get_default_version_hostname
+from google.appengine.api.app_identity import get_default_version_hostname
 from google.appengine.ext import ndb
 
 import requests
@@ -114,11 +114,18 @@ def get_access_response(config, state, code, use_jwt=None, audience=None, redire
 
 def get_redirect_uri(config, source, redirect_uri=None):
     redirect_uri = redirect_uri or config.root_organization[source].redirect_uri
-    parsed_url = urlparse(redirect_uri)
-    parsed_current_base = urlparse(BASE_URL)
-    # Support logging in from {version name}-dot-{application id}.appspot.com
-    if parsed_current_base.netloc.endswith('%s-appspot.com' % get_application_id()) != get_default_version_hostname():
-        redirect_uri = parsed_url._replace(netloc=parsed_current_base.netloc).geturl()
+    parsed_redirect_uri = urlparse(redirect_uri)
+    if 'http' in parsed_redirect_uri.scheme:
+        parsed_current_base = urlparse(BASE_URL)
+        current_netloc = parsed_current_base.netloc.split(':')[0]
+        # Support logging in from {version name}-dot-{application id}.appspot.com
+        default_hostname = get_default_version_hostname()
+        if current_netloc.endswith('.appspot.com') and current_netloc != default_hostname:
+            new_redirect_uri = parsed_redirect_uri._replace(netloc=current_netloc).geturl()
+            logging.debug('Patched redirect_uri from %s to %s\ndefault_version_hostname: %s\nparsed_current_base: %s',
+                          redirect_uri, new_redirect_uri, default_hostname, parsed_current_base)
+            redirect_uri = new_redirect_uri
+
     return redirect_uri
 
 
@@ -243,8 +250,8 @@ def decode_jwt_cached(token):
     logging.debug('Decoding JWT took %ss', time.time() - t)
     # Cache JWT for as long as it's valid
 
-    memcache.set(key=memcache_key, value=decoded_jwt, time=decoded_jwt['exp'] - timestamp,
-                 namespace=NAMESPACE)  # @UndefinedVariable
+    memcache.set(key=memcache_key, value=decoded_jwt, time=decoded_jwt['exp'] - timestamp,  # @UndefinedVariable
+                 namespace=NAMESPACE)
     return decoded_jwt
 
 
