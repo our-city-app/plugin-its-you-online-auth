@@ -6,7 +6,7 @@
   <mat-list-item *ngFor="let organization of (organizations$ | async)"
                 [routerLink]="'/itsyouonlinesettings/organizations/' + organizationId(organization)">
     <h4 matLine>{{ organization.name }}</h4>
-    <p matLine class="list-secondary-text">{{ organization.id }}</p>
+    <p matLine>{{ organization.id }}</p>
     <button mat-icon-button (click)="deleteOrganization(organization)">
       <mat-icon>delete</mat-icon>
     </button>
