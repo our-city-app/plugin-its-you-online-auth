@@ -32,6 +32,7 @@ from plugins.its_you_online_auth.models import Profile, ProfileInfo, ProfileInfo
     ProfileInfoBankAccount, ProfileInfoEmailAddress, ProfileInfoDigitalAssetAddress, ProfileInfoFacebook, \
     ProfileInfoOwnerOf, ProfileInfoPhoneNumber, ProfileInfoPublicKey, ProfileAppEmailMapping
 from plugins.its_you_online_auth.plugin_consts import NAMESPACE
+from transliterate import slugify
 
 PROFILE_INDEX = search.Index('profile', namespace=NAMESPACE)
 
@@ -109,15 +110,23 @@ def index_profile(profile_or_key, extra_profile_fields=None):
     return PROFILE_INDEX.put(document)
 
 
+def _add_slug_fields(key, value):
+    if not value:
+        return []
+    value = value.lower().strip()
+    return [
+        search.TextField(name=key, value=value),
+        search.TextField(name='%s_slug' % key, value=slugify(value) or value)
+    ]
+
+
 def create_profile_document(profile, extra_profile_fields):
     # type: (Profile, list[search.Field]) -> search.Document
     fields = [search.AtomField(name='username', value=profile.username.lower())]
     # complete this if needed
     if profile.info:
-        if profile.info.firstname:
-            fields.append(search.TextField(name='firstname', value=profile.info.firstname.lower()))
-        if profile.info.lastname:
-            fields.append(search.TextField(name='lastname', value=profile.info.lastname.lower()))
+        fields.extend(_add_slug_fields('firstname', profile.info.firstname))
+        fields.extend(_add_slug_fields('lastname', profile.info.lastname))
         if profile.info.validatedemailaddresses:
             for i, mail in enumerate(profile.info.validatedemailaddresses):
                 fields.append(search.AtomField(name='validatedemailaddresses_%d' % i, value=mail.emailaddress))
@@ -130,8 +139,8 @@ def create_profile_document(profile, extra_profile_fields):
             fields.append(search.TextField(name='validatedphonenumbers', value=phones))
     else:
         # Adding username as firstname/lastname for sorting reasons
-        fields.append(search.TextField(name='firstname', value=profile.username.lower()))
-        fields.append(search.TextField(name='lastname', value=profile.username.lower()))
+        fields.append(search.TextField(name='firstname_slug', value=profile.username.lower()))
+        fields.append(search.TextField(name='lastname_slug', value=profile.username.lower()))
     fields.extend(extra_profile_fields)
     return search.Document(_encode_doc_id(profile), fields)
 
@@ -178,8 +187,8 @@ def get_or_create_profile(username, app_email=None):
 
 def search_profiles(query='', page_size=20, cursor=None):
     # type: (unicode, int, unicode) -> tuple[list[Profile], search.Cursor, bool]
-    sort_expressions = [search.SortExpression(expression='firstname', direction=search.SortExpression.ASCENDING),
-                        search.SortExpression(expression='lastname', direction=search.SortExpression.ASCENDING),
+    sort_expressions = [search.SortExpression(expression='firstname_slug', direction=search.SortExpression.ASCENDING),
+                        search.SortExpression(expression='lastname_slug', direction=search.SortExpression.ASCENDING),
                         search.SortExpression(expression='username', direction=search.SortExpression.ASCENDING)]
     options = search.QueryOptions(limit=page_size,
                                   cursor=search.Cursor(cursor),

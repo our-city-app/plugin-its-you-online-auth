@@ -4,3 +4,4 @@ ecdsa==0.13
 python-jose==0.5.2
 enum34==1.1.6
 python-dateutil==2.6.1
+transliterate
