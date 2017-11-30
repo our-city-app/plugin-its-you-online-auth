@@ -27,7 +27,6 @@ from framework.plugin_loader import get_plugins
 from mcfw.cache import cached
 from mcfw.exceptions import HttpNotFoundException
 from mcfw.rpc import returns, arguments
-from plugins.its_you_online_auth.libs.itsyouonline import Client
 from plugins.its_you_online_auth.models import Profile, ProfileInfo, ProfileInfoAddress, ProfileInfoAvatar, \
     ProfileInfoBankAccount, ProfileInfoEmailAddress, ProfileInfoDigitalAssetAddress, ProfileInfoFacebook, \
     ProfileInfoOwnerOf, ProfileInfoPhoneNumber, ProfileInfoPublicKey, ProfileAppEmailMapping
@@ -43,6 +42,7 @@ def _get_best_session(sessions):
 
 
 def set_user_information(profile_key, session_key=None):
+    from plugins.its_you_online_auth.bizz.authentication import get_itsyouonline_client_from_jwt
     iyo_username = profile_key.id()
     if session_key:
         session = session_key.get()
@@ -50,8 +50,7 @@ def set_user_information(profile_key, session_key=None):
         sessions = Session.list_active_user(iyo_username)
         session = _get_best_session(sessions)
     if session:
-        client = Client()
-        client.oauth.session.headers['Authorization'] = 'bearer %s' % session.jwt
+        client = get_itsyouonline_client_from_jwt(session.jwt)
         data = client.api.users.GetUserInformation(session.user_id).json()
         logging.info('Saving user information %s', data)
         store_user_information(data)

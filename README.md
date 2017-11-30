@@ -15,3 +15,10 @@ Members of the top-level organization (`root_org` in this example) have permissi
 Members of the `root_org.organizations.example.users` organization can only login, and members of `root_org.organizations.example` have admin permissions on that organization.
 
 The organization `root_org.organizations` should never have any members/owners, as that would imply that those users have permission to every organization. Those users should just be added to the top-level organization(`root_org`) if this is what you want.
+
+
+### Dev notes
+
+Regex to fix url params in users_service.py and organizations_service.py:
+
+find `\+([a-zA-Z]+\w)+` replace `+quote_plus($1)`

@@ -39,7 +39,6 @@ from plugins.its_you_online_auth.cron.refresh_jwts import RefreshJwtsHandler
 from plugins.its_you_online_auth.cron.user_information import RefreshUserInformationHandler
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
     PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler, RegisterHandler
-from plugins.its_you_online_auth.libs import itsyouonline
 from plugins.its_you_online_auth.libs.itsyouonline.client import Client
 from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE
@@ -97,8 +96,9 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
         assert isinstance(rogerthat_api_plugin, RogerthatApiPlugin)
         rogerthat_api_plugin.subscribe('friend.register', friend_register)
         rogerthat_api_plugin.subscribe('friend.register_result', friend_register_result)
-        itsyouonline.BASE_URI = u'https://%s/' % self.configuration.api_domain
-        self.oauth_base_url = '%sv1/oauth' % itsyouonline.BASE_URI
+        self.base_uri = u'https://%s/' % self.configuration.api_domain
+        self.api_uri = u'%sapi' % self.base_uri
+        self.oauth_base_url = '%sv1/oauth' % self.base_uri
         Client._handle_data = _new_handle_data
 
     def get_handlers(self, auth):
@@ -135,7 +135,7 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
         return '%s/logout' % server_url
 
     def get_profile_url(self):
-        return itsyouonline.BASE_URI
+        return self.base_uri
 
     def get_cookie_name(self):
         return self.configuration.cookie_name

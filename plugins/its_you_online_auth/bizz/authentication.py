@@ -20,42 +20,50 @@ import httplib
 import logging
 import time
 import urllib
-from urlparse import urlparse
+from urlparse import urlparse, urljoin
+
+from google.appengine.api import urlfetch, memcache
+from google.appengine.api.app_identity import get_default_version_hostname
+from google.appengine.ext import ndb
 
 import requests
 from framework.bizz.authentication import get_current_session
 from framework.consts import get_base_url
 from framework.models.session import Session
-from framework.plugin_loader import get_config, get_auth_plugin
+from framework.plugin_loader import get_config, get_auth_plugin, get_plugin
 from framework.utils import now, urlencode
-from google.appengine.api import urlfetch, memcache
-from google.appengine.api.app_identity import get_default_version_hostname
-from google.appengine.ext import ndb
 from jose import jwt, ExpiredSignatureError
 from mcfw.cache import cached
 from mcfw.consts import DEBUG
 from mcfw.exceptions import HttpException, HttpForbiddenException, HttpUnAuthorizedException
 from mcfw.rpc import returns, arguments
-
 from plugins.its_you_online_auth.bizz.profile import get_or_create_profile
-from plugins.its_you_online_auth.libs.itsyouonline import Client
+from plugins.its_you_online_auth.libs import itsyouonline
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE, JWT_ISSUER, \
     SOURCE_WEB
 from plugins.its_you_online_auth.plugin_utils import get_users_organization, get_organization
 from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 
 
-def get_itsyouonline_client(config=None):
-    if not config:
-        config = get_config(NAMESPACE)
-    organization = config.root_organization.name
-    client_secret = config.root_organization[SOURCE_WEB].client_secret
+def get_iyo_plugin():
+    # type: () -> ItsYouOnlineAuthPlugin
+    from plugins.its_you_online_auth.its_you_online_auth_plugin import ItsYouOnlineAuthPlugin
+    p = get_plugin(NAMESPACE)
+    assert isinstance(p, ItsYouOnlineAuthPlugin)
+    return p
+
+
+def get_itsyouonline_client():
+    # type: () -> itsyouonline.Client
+    plugin = get_iyo_plugin()
+    organization = plugin.configuration.root_organization.name
+    client_secret = plugin.configuration.root_organization[SOURCE_WEB].client_secret
     if not organization:
         raise Exception('Missing configuration: root_organization.name must be set')
     if not client_secret:
         raise Exception('Missing configuration: root_organization.web.client_secret must be set')
-    client = Client()
-    client.oauth.session.headers['Authorization'] = _get_client_auth_header(organization, client_secret)
+    client = itsyouonline.Client(base_uri=plugin.api_uri)
+    client.api.session.headers['Authorization'] = _get_client_auth_header(organization, client_secret)
     return client
 
 
@@ -64,9 +72,16 @@ def get_itsyouonline_client(config=None):
 @arguments(organization=unicode, client_secret=unicode)
 def _get_client_auth_header(organization, client_secret):
     # Cache the auth header for 23 hours (token is valid 24h)
-    client = Client()
-    client.oauth.LoginViaClientCredentials(organization, client_secret)
-    return client.oauth.session.headers['Authorization']
+    plugin = get_iyo_plugin()
+    url = urljoin(plugin.base_uri, 'access_token')
+    params = {'grant_type': 'client_credentials',
+              'client_id': organization,
+              'client_secret': client_secret}
+    data = requests.post(url, params=params)
+    if data.status_code != 200:
+        raise RuntimeError("Failed to login")
+    token = data.json()['access_token']
+    return 'token {token}'.format(token=token)
 
 
 def get_itsyouonline_client_from_username(username):
@@ -79,8 +94,9 @@ def get_itsyouonline_client_from_username(username):
 
 
 def get_itsyouonline_client_from_jwt(jwt):
-    client = Client()
-    client.oauth.session.headers['Authorization'] = 'bearer {jwt}'.format(jwt=jwt)
+    plugin = get_iyo_plugin()
+    client = itsyouonline.Client(base_uri=plugin.api_uri)
+    client.api.session.headers['Authorization'] = 'bearer {jwt}'.format(jwt=jwt)
     return client
 
 
@@ -163,6 +179,7 @@ def refresh_jwt(old_jwt, validity=24 * 60 * 60):
 
 
 def has_access_to_organization(client, organization_id, username):
+    assert isinstance(client, Client)
     r = client.api.organizations.UserIsMember(username, organization_id).json()
     return r['IsMember']
 
@@ -193,7 +210,7 @@ def get_user_scopes_from_access_token(code, state_model):
 
     save_profile_state(state_model, username)
 
-    client = get_itsyouonline_client(config)
+    client = get_itsyouonline_client()
     scopes = [Scopes.get_organization_scope(Scopes.ORGANIZATION_MEMBER, state_model.organization_id)]
     if has_access_to_organization(client, config.root_organization.name, username):
         scopes.append(Scopes.ADMIN)
