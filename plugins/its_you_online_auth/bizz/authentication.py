@@ -20,7 +20,7 @@ import httplib
 import logging
 import time
 import urllib
-from urlparse import urlparse, urljoin
+from urlparse import urlparse
 
 from google.appengine.api import urlfetch, memcache
 from google.appengine.api.app_identity import get_default_version_hostname
@@ -73,14 +73,13 @@ def get_itsyouonline_client():
 def _get_client_auth_header(organization, client_secret):
     # Cache the auth header for 23 hours (token is valid 24h)
     plugin = get_iyo_plugin()
-    url = urljoin(plugin.base_uri, 'access_token')
+    url = plugin.oauth_base_url + '/access_token'
     params = {'grant_type': 'client_credentials',
               'client_id': organization,
               'client_secret': client_secret}
-    data = requests.post(url, params=params)
-    if data.status_code != 200:
-        raise RuntimeError("Failed to login")
-    token = data.json()['access_token']
+    request = requests.post(url, params=params)
+    request.raise_for_status()
+    token = request.json()['access_token']
     return 'token {token}'.format(token=token)
 
 
