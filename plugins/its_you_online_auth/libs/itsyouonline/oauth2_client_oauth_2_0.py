@@ -1,12 +1,8 @@
-from urlparse import urljoin
-
 import requests
 
-
-class Oauth2ClientOauth_2_0(object):
-    def __init__(self):
-        from . import BASE_URI
-        self.access_token_uri = urljoin(BASE_URI, '/v1/oauth/access_token')
+class Oauth2ClientOauth_2_0():
+    def __init__(self, access_token_uri='https://itsyou.online/v1/oauth/access_token'):
+        self.access_token_uri = access_token_uri
 
     def get_access_token(self, client_id, client_secret, scopes=[], audiences=[]):
         params = {
@@ -18,5 +14,5 @@ class Oauth2ClientOauth_2_0(object):
             params['scope'] = ",".join(scopes)
         if len(audiences) > 0:
             params['aud'] = ",".join(audiences)
-
+        
         return requests.post(self.access_token_uri, params=params)

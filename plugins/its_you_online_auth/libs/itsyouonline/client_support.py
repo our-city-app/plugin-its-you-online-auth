@@ -9,6 +9,7 @@ from uuid import UUID
 from enum import Enum
 from dateutil import parser
 
+
 # python2/3 compatible basestring, for use in to_dict
 try:
     basestring
@@ -64,8 +65,7 @@ def dict_factory(val, objmap):
                 except Exception:
                     pass
             if objdict.get(attrname) is None:
-                raise ValueError(
-                    'dict_factory: {attr}: unable to instantiate with any supplied type'.format(attr=attrname))
+                raise ValueError('dict_factory: {attr}: unable to instantiate with any supplied type'.format(attr=attrname))
         elif attrdict.get('required'):
             raise ValueError('dict_factory: {attr} is required'.format(attr=attrname))
 
@@ -90,6 +90,46 @@ def val_factory(val, datatypes):
                      format(val=val, types=datatypes, excs=exceptions))
 
 
+def set_property(name, data, data_types, has_child_properties,
+                 required_child_properties, is_list, required, class_name):
+    """
+    Set a class property
+    :param name: property name to set
+    :param data: class data
+    :param data_types: the data types this property supports
+    :param has_child_properties: boolean indicating if the property has child properties
+    :param required_child_properties: a list of required child properties
+    :param is_list: boolean indicating if this property is a list
+    :param required: boolean indicating if this property is required or not
+    :param class_name: name of the class this property belongs to
+    :return:
+    """
+    create_error = '{cls}: unable to create {prop} from value: {val}: {err}'
+    required_error = '{cls}: missing required property {prop}'
+    factory_value = None
+    val = data.get(name)
+    if val is not None:
+        try:
+            if is_list:
+                factory_value = list_factory(val, data_types)
+            elif has_child_properties:
+                factory_value = dict_factory(val, data_types)
+            else:
+                factory_value = val_factory(val, data_types)
+        except ValueError as err:
+            raise ValueError(create_error.format(cls=class_name, prop=name, val=val, err=err))
+        else:
+            if required_child_properties:
+                for child in required_child_properties:
+                    if not factory_value.get(child):
+                        child_prop_name = "{parent}.{child}".format(parent=name, child=child)
+                        raise ValueError(required_error.format(cls=class_name, prop=child_prop_name))
+    elif required:
+        raise ValueError(required_error.format(cls=class_name, prop=name))
+
+    return factory_value
+
+
 def to_json(cls, indent=0):
     """
     serialize to JSON
@@ -105,7 +145,6 @@ def to_dict(cls, convert_datetime=True):
     `convert_datetime` controls whether datetime objects are converted to strings or not
     :rtype: dict
     """
-
     def todict(obj):
         """
         recurse the objects and represent as a dict
@@ -137,7 +176,6 @@ class DatetimeHandler(object):
     """
     output datetime objects as iso-8601 compliant strings
     """
-
     @classmethod
     def flatten(cls, obj):
         """flatten"""
@@ -153,7 +191,6 @@ class UUIDHandler(object):
     """
     output UUID objects as a string
     """
-
     @classmethod
     def flatten(cls, obj):
         """flatten"""
@@ -169,7 +206,6 @@ class EnumHandler(object):
     """
     output Enum objects as their value
     """
-
     @classmethod
     def flatten(cls, obj):
         """flatten"""
