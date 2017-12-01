@@ -115,7 +115,7 @@ def _friend_register_oauth(rt_settings, id_, service_identity, user_details, ori
     ndb.put_multi([profile, login_state])
 
     client = get_itsyouonline_client()
-    client.oauth.session.headers['Authorization'] = 'token %s' % access_token
+    client.api.session.headers['Authorization'] = 'token %s' % access_token
     user_info = client.api.users.GetUserInformation(username).json()
     if user_info['firstname'] and user_info['lastname']:
         name = '%s %s' % (user_info['firstname'], user_info['lastname'])
