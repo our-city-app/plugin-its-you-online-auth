@@ -547,7 +547,7 @@ class UsersService:
         Sign a see object
         It is method for PUT /users/{username}/see/{uniqueid}/{globalid}/sign/{version}
         """
-        uri = self.client.base_url + "/users/"+quote(username)+"/see/"+quote(uniqueid)+"/"+quote(globalid)+"/sign/"+version
+        uri = self.client.base_url + "/users/"+quote(username)+"/see/"+quote(uniqueid)+"/"+quote(globalid)+"/sign/%s"%version
         return self.client.put(uri, data, headers, query_params, content_type)
 
     def GetSeeObject(self, uniqueid, globalid, username, headers=None, query_params=None, content_type="application/json"):
