@@ -178,7 +178,7 @@ def refresh_jwt(old_jwt, validity=24 * 60 * 60):
 
 
 def has_access_to_organization(client, organization_id, username):
-    assert isinstance(client, Client)
+    assert isinstance(client, itsyouonline.Client)
     r = client.api.organizations.UserIsMember(username, organization_id).json()
     return r['IsMember']
 
