@@ -104,7 +104,7 @@ def index_profile(profile_or_key, extra_profile_fields=None):
     profile = profile_or_key.get() if isinstance(profile_or_key, ndb.Key) else profile_or_key
     if extra_profile_fields is None:
         extra_profile_fields = _get_extra_profile_fields(profile)
-    logging.info('Indexing profile %s', profile.username)
+    logging.debug('Indexing profile %s\nExtra fields: %s', profile.username, extra_profile_fields)
     document = create_profile_document(profile, extra_profile_fields)
     return PROFILE_INDEX.put(document)
 
