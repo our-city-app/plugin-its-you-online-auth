@@ -21,4 +21,4 @@ The organization `root_org.organizations` should never have any members/owners, 
 
 Regex to fix url params in users_service.py and organizations_service.py:
 
-find `\+([a-zA-Z]+\w)+` replace `+quote_plus($1)`
+find `\+([a-zA-Z]+\w)+` replace `+quote($1)`
