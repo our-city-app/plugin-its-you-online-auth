@@ -31,7 +31,7 @@ from framework.bizz.authentication import get_current_session
 from framework.consts import get_base_url
 from framework.models.session import Session
 from framework.plugin_loader import get_config, get_auth_plugin, get_plugin
-from framework.utils import now, urlencode
+from framework.utils import now, urlencode, convert_to_str
 from jose import jwt, ExpiredSignatureError
 from mcfw.cache import cached
 from mcfw.consts import DEBUG
@@ -179,7 +179,7 @@ def refresh_jwt(old_jwt, validity=24 * 60 * 60):
 
 def has_access_to_organization(client, organization_id, username):
     assert isinstance(client, itsyouonline.Client)
-    r = client.api.organizations.UserIsMember(username, organization_id).json()
+    r = client.api.organizations.UserIsMember(convert_to_str(username), organization_id).json()
     return r['IsMember']
 
 
