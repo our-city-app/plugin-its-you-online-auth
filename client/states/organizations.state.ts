@@ -8,6 +8,6 @@ export interface IOrganizationsState {
 
 export const initialState: IOrganizationsState = {
   organizations: [],
-  selectedOrganization: null,
-  organizationStatus: null
+  selectedOrganization: '',
+  organizationStatus: ''
 };

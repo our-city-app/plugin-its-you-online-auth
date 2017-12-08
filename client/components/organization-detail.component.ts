@@ -59,7 +59,7 @@ export class OrganizationDetailComponent implements OnDestroy {
           return;
         }
         setTimeout(() => {
-          this.status = null;
+          this.status = '';
           cdRef.markForCheck();
         }, 5000);
       });

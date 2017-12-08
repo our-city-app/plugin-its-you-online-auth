@@ -69,7 +69,6 @@ export class GetOrganizationAction implements Action {
 
 export class CreateAction implements Action {
   type = ActionTypes.CREATE;
-  payload: null = null;
 }
 
 export class GetOrganizationCompleteAction implements Action {

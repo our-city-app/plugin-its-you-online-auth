@@ -20,7 +20,7 @@ export function organizationsReducer(state: IOrganizationsState = initialState,
     case actions.ActionTypes.CREATE:
       return {
         ...state,
-        selectedOrganization: action.payload,
+        selectedOrganization: '',
         organizationStatus: action.type
       };
     case actions.ActionTypes.EDITED:
