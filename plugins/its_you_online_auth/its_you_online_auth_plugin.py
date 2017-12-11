@@ -22,7 +22,6 @@ import logging
 import requests_toolbelt.adapters.appengine
 from framework.bizz.authentication import get_current_session
 from framework.bizz.session import is_valid_session
-from framework.configuration import get_configuration
 from framework.models.session import Session
 from framework.plugin_loader import AuthPlugin, get_auth_plugin, get_plugin, get_plugins, get_config
 from framework.utils.plugins import Handler, Module
@@ -128,11 +127,7 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
         return self.configuration.login_url
 
     def get_logout_url(self):
-        server_url = get_configuration().server_url
-        if not server_url or server_url is MISSING:
-            server_url = ''
-            logging.debug('Using default logout url')
-        return '%s/logout' % server_url
+        return '/logout'
 
     def get_profile_url(self):
         return self.base_uri
