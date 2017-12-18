@@ -13,6 +13,7 @@ import { MatChipInputEvent } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators/filter';
 import { LogService } from '../../../framework/client/core/index';
 import { DialogService } from '../../../framework/client/dialog/services/dialog.service';
 import { IAppState } from '../../../framework/client/ngrx/index';
@@ -127,14 +128,14 @@ export class OrganizationDetailComponent implements OnDestroy {
 
   public showConfirmRemoveModule(module: string) {
     let msg = this.translate.instant('iyo.do_you_want_to_delete_module', { m: module });
-    this.showConfirmDialog(this.translate.instant('iyo.confirmation'), msg)
-      .filter(confirmed => confirmed).subscribe(confirmed => this.removeModule(module));
+    this.showConfirmDialog(this.translate.instant('iyo.confirmation'), msg).pipe(filter(confirmed => confirmed))
+      .subscribe(confirmed => this.removeModule(module));
   }
 
   public showConfirmRemoveACS(acs: string) {
     let msg = this.translate.instant('iyo.do_you_want_to_delete_auto_connected_service', { acs: acs });
-    this.showConfirmDialog(this.translate.instant('iyo.confirmation'), msg)
-      .filter(confirmed => confirmed).subscribe(confirmed => this.removeAutoConnectedService(acs));
+    this.showConfirmDialog(this.translate.instant('iyo.confirmation'), msg).pipe(filter(confirmed => confirmed))
+      .subscribe(confirmed => this.removeAutoConnectedService(acs));
   }
 
   public showConfirmDialog(title: string, message: string) {

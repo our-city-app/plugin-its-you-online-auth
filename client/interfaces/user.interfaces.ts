@@ -1,22 +1,3 @@
-/**
- * todo remove this
- * @deprecated
- */
-export interface SearchUsersQuery {
-  cursor: string | null;
-  query: string | null;
-}
-
-/**
- * todo remove this
- * @deprecated
- */
-export interface UserList {
-  cursor: string;
-  more: boolean;
-  results: Profile[];
-}
-
 export interface Profile {
   username: string;
   language: string;

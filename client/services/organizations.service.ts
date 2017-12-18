@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { map } from 'rxjs/operators/map';
 import { Organization } from '../index';
 import { ItsYouOnlineConfig } from './its-you-online-config';
 
@@ -28,6 +29,6 @@ export class OrganizationsService {
 
   deleteOrganization(organization: Organization) {
     return this.http.delete(`${ItsYouOnlineConfig.API_URL}/organizations/${encodeURIComponent(organization.id)}`)
-      .map(() => organization);
+      .pipe(map(() => organization));
   }
 }

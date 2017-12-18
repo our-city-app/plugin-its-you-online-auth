@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { map } from 'rxjs/operators/map';
 import { Subscription } from 'rxjs/Subscription';
-
 import * as organizationActions from '../actions/organizations.action';
-import { IOrganizationsState } from '../states/index';
+import { IOrganizationsState } from '../states';
 
 @Component({
   selector: 'view-organization',
@@ -18,8 +18,7 @@ export class ViewOrganizationComponent implements OnDestroy {
 
   constructor(private store: Store<IOrganizationsState>, route: ActivatedRoute) {
     this.actionsSubscription = route.params
-      .select<string>('organization_id')
-      .map(organizationId => new organizationActions.GetOrganizationAction(organizationId))
+      .pipe(map(params => new organizationActions.GetOrganizationAction(params.organization_id)))
       .subscribe(store);
   }
 
