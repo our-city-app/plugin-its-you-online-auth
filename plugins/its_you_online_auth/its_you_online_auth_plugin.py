@@ -199,12 +199,13 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
             return None
         return profile.language
 
-    def validate_session(self, session):
+    def validate_session(self, session, force_refresh=False, **kwargs):
         """
         Args:
             session (framework.models.session.Session)
+            force_refresh (bool)
         """
-        return validate_session(session)
+        return validate_session(session, force_refresh)
 
     def get_session(self, environ):
         # type: (dict) -> Session

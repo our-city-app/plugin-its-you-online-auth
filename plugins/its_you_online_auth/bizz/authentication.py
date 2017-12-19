@@ -271,10 +271,11 @@ def decode_jwt_cached(token):
     return decoded_jwt
 
 
-def validate_session(session):
+def validate_session(session, force_refresh=False):
     """
     Args:
         session (framework.models.session.Session)
+        force_refresh (bool)
 
     Returns:
         bool: True if the session is valid
@@ -284,7 +285,7 @@ def validate_session(session):
             logging.info('Validating JWT %s', session.jwt)
             jwt = decode_jwt_cached(session.jwt)
             # This function is executed every 12 hours and JWT's are only valid for 24h
-            if jwt['exp'] > now() + 3600 * 12:
+            if jwt['exp'] > now() + 3600 * 12 and not force_refresh:
                 logging.debug('JWT is fine %s', jwt)
                 return True
         except ExpiredSignatureError:
