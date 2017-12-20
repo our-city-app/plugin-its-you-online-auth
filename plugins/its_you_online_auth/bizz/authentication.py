@@ -112,7 +112,7 @@ def get_access_response(config, state, code, use_jwt=None, audience=None, redire
         params['scope'] = 'offline_access'
         params['aud'] = audience
     access_token_url = '%s/access_token?%s' % (get_auth_plugin().oauth_base_url, urllib.urlencode(params))
-    response = requests.post(access_token_url, params, timeout=30)
+    response = requests.post(access_token_url, params, timeout=55)
 
     if use_jwt:
         content = response.content
