@@ -147,7 +147,7 @@ class OrganizationsService:
         Cancel a pending invitation.
         It is method for DELETE /organizations/{globalid}/invitations/{username}
         """
-        uri = self.client.base_url + "/organizations/"+quote(globalid)+"/invitations/"+quote(username)
+        uri = self.client.base_url + "/organizations/"+quote(globalid)+"/invitations/"+quote(username.encode('utf-8') if isinstance(username, unicode) else username)
         return self.client.delete(uri, None, headers, query_params, content_type)
 
     def GetInvitations(self, globalid, headers=None, query_params=None, content_type="application/json"):
@@ -187,7 +187,7 @@ class OrganizationsService:
         Remove a member from an organization.
         It is method for DELETE /organizations/{globalid}/members/{username}
         """
-        uri = self.client.base_url + "/organizations/"+quote(globalid)+"/members/"+quote(username)
+        uri = self.client.base_url + "/organizations/"+quote(globalid)+"/members/"+quote(username.encode('utf-8') if isinstance(username, unicode) else username)
         return self.client.delete(uri, None, headers, query_params, content_type)
 
     def AddOrganizationMember(self, data, globalid, headers=None, query_params=None, content_type="application/json"):
@@ -283,7 +283,7 @@ class OrganizationsService:
         Remove an owner from organization
         It is method for DELETE /organizations/{globalid}/owners/{username}
         """
-        uri = self.client.base_url + "/organizations/"+quote(globalid)+"/owners/"+quote(username)
+        uri = self.client.base_url + "/organizations/"+quote(globalid)+"/owners/"+quote(username.encode('utf-8') if isinstance(username, unicode) else username)
         return self.client.delete(uri, None, headers, query_params, content_type)
 
     def AddOrganizationOwner(self, data, globalid, headers=None, query_params=None, content_type="application/json"):
@@ -363,7 +363,7 @@ class OrganizationsService:
         Checks if the user has memberschip rights on the organization
         It is method for GET /organizations/{globalid}/users/ismember/{username}
         """
-        uri = self.client.base_url + "/organizations/"+quote(globalid)+"/users/ismember/"+quote(username)
+        uri = self.client.base_url + "/organizations/"+quote(globalid)+"/users/ismember/"+quote(username.encode('utf-8') if isinstance(username, unicode) else username)
         return self.client.get(uri, None, headers, query_params, content_type)
 
     def GetOrganizationUsers(self, globalid, headers=None, query_params=None, content_type="application/json"):
