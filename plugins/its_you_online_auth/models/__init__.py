@@ -159,12 +159,12 @@ class Profile(NdbModel):
     def list_with_app_user(cls):
         return cls.query(cls.app_email != None)  # noQA
 
-    def to_dict(self):
-        result = super(Profile, self).to_dict()
-        del result['organization_id']
-        del result['app_email']
-        result['username'] = self.username
-        return result
+    def to_dict(self, extra_properties=None, include=None, exclude=None):
+        if not extra_properties:
+            extra_properties = ['username']
+        if not exclude:
+            exclude = {'organization_id'}
+        return super(Profile, self).to_dict(extra_properties, include, exclude)
 
 
 class ProfileAppEmailMapping(NdbModel):
