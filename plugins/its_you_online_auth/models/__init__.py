@@ -151,6 +151,10 @@ class Profile(NdbModel):
     def username(self):
         return self.key.id().decode('utf8')
 
+    @property
+    def full_name(self):
+        return self.info and '%s %s' % (self.info.firstname, self.info.lastname)
+
     @classmethod
     def create_key(cls, username):
         return ndb.Key(cls, username, namespace=NAMESPACE)

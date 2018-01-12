@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { filter } from 'rxjs/operators/filter';
 import { Subscription } from 'rxjs/Subscription';
 import { getIdentity } from '../../../framework/client/identity/identity.state';
-import { Identity } from '../../../framework/client/identity/index';
-import { IAppState } from '../../../framework/client/ngrx/index';
-import { Router } from '@angular/router';
+import { Identity } from '../../../framework/client/identity/interfaces';
+import { filterNull, IAppState } from '../../../framework/client/ngrx/index';
 
 @Component({
   selector: 'settings-component',
@@ -23,7 +22,8 @@ export class ItsYouOnlineAuthComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.sub = this.store.select(getIdentity).pipe(filter(i => i !== null)).subscribe((identity: Identity) => {
+    this.sub = this.store.select(getIdentity).pipe(filterNull<Identity>())
+      .subscribe(identity => {
       if (identity.scopes.includes('admin')) {
         this.isAdmin = true;
       } else {
