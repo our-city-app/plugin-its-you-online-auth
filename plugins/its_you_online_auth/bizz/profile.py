@@ -20,19 +20,19 @@ import re
 
 from google.appengine.api import search
 from google.appengine.ext import ndb
+from mcfw.cache import cached
+from mcfw.exceptions import HttpNotFoundException
+from mcfw.rpc import returns, arguments
+from transliterate import slugify
 
 from framework.bizz.job import run_job
 from framework.models.session import Session
 from framework.plugin_loader import get_plugins
 from framework.utils import convert_to_str
-from mcfw.cache import cached
-from mcfw.exceptions import HttpNotFoundException
-from mcfw.rpc import returns, arguments
 from plugins.its_you_online_auth.models import Profile, ProfileInfo, ProfileInfoAddress, ProfileInfoAvatar, \
     ProfileInfoBankAccount, ProfileInfoEmailAddress, ProfileInfoDigitalAssetAddress, ProfileInfoFacebook, \
     ProfileInfoOwnerOf, ProfileInfoPhoneNumber, ProfileInfoPublicKey, ProfileAppEmailMapping
 from plugins.its_you_online_auth.plugin_consts import NAMESPACE
-from transliterate import slugify
 
 PROFILE_INDEX = search.Index('profile', namespace=NAMESPACE)
 
@@ -93,6 +93,7 @@ def _get_extra_profile_fields(profile):
 
 
 def index_all_profiles():
+    remove_all_from_index(PROFILE_INDEX)
     run_job(_get_all_profiles, [], index_profile, [])
 
 
@@ -235,3 +236,18 @@ def get_rogerthat_email_from_username(username):
     # type: (unicode) -> unicode
     profile = Profile.create_key(username).get()
     return profile and profile.app_email
+
+
+def remove_all_from_index(index):
+    # type: (search.Index) -> long
+    total = 0
+    while True:
+        result = index.search(search.Query(u'', options=search.QueryOptions(ids_only=True, limit=1000)))
+        if not result.results:
+            break
+        logging.debug('Deleting %d documents from %s' % (len(result.results), index))
+        total += len(result.results)
+        for rpc in [index.delete_async([r.doc_id for r in chunk]) for chunk in chunks(result.results, 200)]:
+            rpc.get_result()
+    logging.info('Deleted %d documents from %s', total, index)
+    return total
