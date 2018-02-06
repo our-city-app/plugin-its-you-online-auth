@@ -28,7 +28,7 @@ from transliterate import slugify
 from framework.bizz.job import run_job
 from framework.models.session import Session
 from framework.plugin_loader import get_plugins
-from framework.utils import convert_to_str
+from framework.utils import convert_to_str, chunks
 from plugins.its_you_online_auth.models import Profile, ProfileInfo, ProfileInfoAddress, ProfileInfoAvatar, \
     ProfileInfoBankAccount, ProfileInfoEmailAddress, ProfileInfoDigitalAssetAddress, ProfileInfoFacebook, \
     ProfileInfoOwnerOf, ProfileInfoPhoneNumber, ProfileInfoPublicKey, ProfileAppEmailMapping
