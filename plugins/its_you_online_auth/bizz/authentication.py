@@ -63,7 +63,7 @@ def get_itsyouonline_client():
     if not client_secret:
         raise Exception('Missing configuration: root_organization.web.client_secret must be set')
     client = itsyouonline.Client(base_uri=plugin.api_uri)
-    client.api.session.headers['Authorization'] = _get_client_auth_header(organization, client_secret)
+    client.organizations.client.session.headers['Authorization'] = client.users.client.session.headers['Authorization'] = _get_client_auth_header(organization, client_secret)
     return client
 
 
@@ -95,7 +95,7 @@ def get_itsyouonline_client_from_username(username):
 def get_itsyouonline_client_from_jwt(jwt):
     plugin = get_iyo_plugin()
     client = itsyouonline.Client(base_uri=plugin.api_uri)
-    client.api.session.headers['Authorization'] = 'bearer {jwt}'.format(jwt=jwt)
+    client.organizations.client.session.headers['Authorization'] = client.users.client.session.headers['Authorization'] = 'bearer {jwt}'.format(jwt=jwt)
     return client
 
 
@@ -144,8 +144,12 @@ def get_redirect_uri(config, source, redirect_uri=None):
     return redirect_uri
 
 
-def create_jwt(access_token, scope):
-    url = '{}/jwt?scope={}'.format(get_auth_plugin().oauth_base_url, scope)
+def create_jwt(access_token, scope, add_grants=True):
+    params = {
+        'scope': scope,
+        'add_grants': 'true' if add_grants else 'false'
+    }
+    url = '%s/jwt?%s' % (get_auth_plugin().oauth_base_url, urlencode(params))
     headers = {
         'Authorization': 'token {token}'.format(token=access_token)
     }
@@ -160,9 +164,10 @@ def create_jwt(access_token, scope):
     raise Exception(msg)
 
 
-def refresh_jwt(old_jwt, validity=24 * 60 * 60):
+def refresh_jwt(old_jwt, validity=24 * 60 * 60, add_grants=True):
     args = {
-        "validity": validity
+        'validity': validity,
+        'add_grants': 'true' if add_grants else 'false'
     }
     url = '%s/jwt/refresh?%s' % (get_auth_plugin().oauth_base_url, urlencode(args))
     headers = {
@@ -179,7 +184,7 @@ def refresh_jwt(old_jwt, validity=24 * 60 * 60):
 
 def has_access_to_organization(client, organization_id, username):
     assert isinstance(client, itsyouonline.Client)
-    r = client.api.organizations.UserIsMember(convert_to_str(username), organization_id).json()
+    r = client.organizations.UserIsMember(convert_to_str(username), organization_id).json()
     return r['IsMember']
 
 

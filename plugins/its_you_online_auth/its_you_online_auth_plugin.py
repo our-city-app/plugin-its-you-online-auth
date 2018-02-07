@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 
 import logging
 
-import requests_toolbelt.adapters.appengine
 from framework.bizz.authentication import get_current_session
 from framework.bizz.session import is_valid_session
 from framework.models.session import Session
@@ -38,12 +37,13 @@ from plugins.its_you_online_auth.cron.refresh_jwts import RefreshJwtsHandler
 from plugins.its_you_online_auth.cron.user_information import RefreshUserInformationHandler
 from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, LogoutHandler, AppLoginHandler, \
     PickOrganizationHandler, DoLoginHandler, Oauth2CallbackHandler, ContinueLoginHandler, RegisterHandler
-from plugins.its_you_online_auth.libs.itsyouonline.client import Client
+from plugins.its_you_online_auth.libs.itsyouonline.http_client import HTTPClient
 from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE
 from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
 from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 from plugins.rogerthat_api.rogerthat_api_plugin import RogerthatApiPlugin
+import requests_toolbelt.adapters.appengine
 
 requests_toolbelt.adapters.appengine.monkeypatch()
 
@@ -64,7 +64,7 @@ def _new_handle_data(self, uri, data, headers, params, content_type, method):
         res = method(uri, files=data, headers=headers, params=params)
     elif data is None:
         res = method(uri, headers=headers, params=params)
-    elif type(data) is str:
+    elif isinstance(data, str):
         res = method(uri, data=data, headers=headers, params=params)
     else:
         res = method(uri, json=data, headers=headers, params=params)
@@ -98,7 +98,7 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
         self.base_uri = u'https://%s/' % self.configuration.api_domain
         self.api_uri = u'%sapi' % self.base_uri
         self.oauth_base_url = '%sv1/oauth' % self.base_uri
-        Client._handle_data = _new_handle_data
+        HTTPClient._handle_data = _new_handle_data
 
     def get_handlers(self, auth):
         if auth == Handler.AUTH_UNAUTHENTICATED:

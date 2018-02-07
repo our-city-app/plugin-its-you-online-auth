@@ -20,19 +20,19 @@ import re
 
 from google.appengine.api import search
 from google.appengine.ext import ndb
-from mcfw.cache import cached
-from mcfw.exceptions import HttpNotFoundException
-from mcfw.rpc import returns, arguments
-from transliterate import slugify
 
 from framework.bizz.job import run_job
 from framework.models.session import Session
 from framework.plugin_loader import get_plugins
 from framework.utils import convert_to_str, chunks
+from mcfw.cache import cached
+from mcfw.exceptions import HttpNotFoundException
+from mcfw.rpc import returns, arguments
 from plugins.its_you_online_auth.models import Profile, ProfileInfo, ProfileInfoAddress, ProfileInfoAvatar, \
     ProfileInfoBankAccount, ProfileInfoEmailAddress, ProfileInfoDigitalAssetAddress, ProfileInfoFacebook, \
     ProfileInfoOwnerOf, ProfileInfoPhoneNumber, ProfileInfoPublicKey, ProfileAppEmailMapping
 from plugins.its_you_online_auth.plugin_consts import NAMESPACE
+from transliterate import slugify
 
 PROFILE_INDEX = search.Index('profile', namespace=NAMESPACE)
 
@@ -52,7 +52,7 @@ def set_user_information(profile_key, session_key=None):
         session = _get_best_session(sessions)
     if session:
         client = get_itsyouonline_client_from_jwt(session.jwt)
-        data = client.api.users.GetUserInformation(convert_to_str(session.user_id)).json()
+        data = client.users.GetUserInformation(convert_to_str(session.user_id)).json()
         logging.info('Saving user information %s', data)
         store_user_information(data)
     else:
