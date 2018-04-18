@@ -1,7 +1,7 @@
 import { Action } from '@ngrx/store';
 import { Organization } from '../index';
 
-export enum ActionTypes {
+export const enum ActionTypes {
   GET_ORGANIZATIONS = '[Itsyouonline] Get organizations',
   GET_ORGANIZATIONS_COMPLETE = '[Itsyouonline] Get organizations succeeded',
   GET_ORGANIZATIONS_FAILED = '[Itsyouonline] Get organizations failed',
