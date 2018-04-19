@@ -155,6 +155,22 @@ class Profile(NdbModel):
     def full_name(self):
         return self.info and '%s %s' % (self.info.firstname, self.info.lastname)
 
+    @property
+    def email(self):
+        if self.info:
+            if self.info.validatedemailaddresses:
+                return self.info.validatedemailaddresses[0].emailaddress
+            if self.info.emailaddresses:
+                return self.info.emailaddresses[0].emailaddress
+
+    @property
+    def phone(self):
+        if self.info:
+            if self.info.validatedphonenumbers:
+                return self.info.validatedphonenumbers[0].phonenumber
+            if self.info.phonenumbers:
+                return self.info.phonenumbers[0].phonenumber
+
     @classmethod
     def create_key(cls, username):
         return ndb.Key(cls, username, namespace=NAMESPACE)
