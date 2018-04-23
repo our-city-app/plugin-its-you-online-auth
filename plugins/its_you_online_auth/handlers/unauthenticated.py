@@ -206,7 +206,7 @@ class Oauth2CallbackHandler(webapp2.RequestHandler):
         self.redirect('/')
 
         if config.fetch_information:
-            deferred.defer(set_user_information, Profile.create_key(username), session.key)
+            deferred.defer(set_user_information, Profile.create_key(username), session.key, _queue='iyo-requests')
 
 
 class ContinueLoginHandler(webapp2.RequestHandler):
