@@ -26,7 +26,8 @@ from plugins.its_you_online_auth.plugin_consts import NAMESPACE
 class RefreshUserInformationHandler(webapp2.RequestHandler):
     def get(self):
         if get_config(NAMESPACE).fetch_information:
-            run_job(_get_all_profiles, [], set_user_information, [])
+            run_job(_get_all_profiles, [], set_user_information, [], qry_transactional=False,
+                    worker_queue='iyo-requests')
 
 
 def _get_all_profiles():
