@@ -28,9 +28,7 @@ from framework.utils import convert_to_str, chunks
 from mcfw.cache import cached
 from mcfw.exceptions import HttpNotFoundException
 from mcfw.rpc import returns, arguments
-from plugins.its_you_online_auth.models import Profile, ProfileInfo, ProfileInfoAddress, ProfileInfoAvatar, \
-    ProfileInfoBankAccount, ProfileInfoEmailAddress, ProfileInfoDigitalAssetAddress, ProfileInfoFacebook, \
-    ProfileInfoOwnerOf, ProfileInfoPhoneNumber, ProfileInfoPublicKey, ProfileAppEmailMapping
+from plugins.its_you_online_auth.models import Profile, ProfileAppEmailMapping
 from plugins.its_you_online_auth.plugin_consts import NAMESPACE
 from transliterate import slugify
 
@@ -61,25 +59,7 @@ def set_user_information(profile_key, session_key=None):
 
 def store_user_information(data):
     profile = Profile.create_key(data['username']).get()
-    profile.info = ProfileInfo(addresses=[ProfileInfoAddress(**address) for address in data['addresses']],
-                               avatar=[ProfileInfoAvatar(**avatar) for avatar in data['avatar']],
-                               bankaccounts=[ProfileInfoBankAccount(**bank) for bank in data['bankaccounts']],
-                               digitalwallet=[ProfileInfoDigitalAssetAddress(**wallet) for wallet in
-                                              data['digitalwallet']],
-                               emailaddresses=[ProfileInfoEmailAddress(**email) for email in data['emailaddresses']],
-                               facebook=ProfileInfoFacebook(**data['facebook']),
-                               firstname=data['firstname'],
-                               lastname=data['lastname'],
-                               ownerof=ProfileInfoOwnerOf(
-                                   emailaddresses=[ProfileInfoEmailAddress(**email) for email in
-                                                   data['ownerof']['emailaddresses']]),
-                               phonenumbers=[ProfileInfoPhoneNumber(**phone) for phone in data['phonenumbers']],
-                               publicKeys=[ProfileInfoPublicKey(**phone) for phone in data['publicKeys']],
-                               username=data['username'],
-                               validatedemailaddresses=[ProfileInfoEmailAddress(**email) for email in
-                                                        data['validatedemailaddresses']],
-                               validatedphonenumbers=[ProfileInfoPhoneNumber(**phone) for phone in
-                                                      data['validatedphonenumbers']])
+    profile.information = data
     profile.put()
     index_profile(profile, _get_extra_profile_fields(profile))
 

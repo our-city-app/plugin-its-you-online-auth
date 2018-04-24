@@ -18,6 +18,7 @@
 from google.appengine.ext import ndb
 
 from framework.models.common import NdbModel
+from plugins.its_you_online_auth.libs import itsyouonline
 from plugins.its_you_online_auth.plugin_consts import NAMESPACE
 
 
@@ -39,113 +40,12 @@ class OauthState(NdbModel):
         return ndb.Key(cls, state, namespace=NAMESPACE)
 
 
-class ProfileInfoAddress(NdbModel):
-    city = ndb.StringProperty()
-    country = ndb.StringProperty()
-    label = ndb.StringProperty()
-    nr = ndb.StringProperty()
-    other = ndb.StringProperty()
-    postalcode = ndb.StringProperty()
-    street = ndb.StringProperty()
-
-
-class ProfileInfoAvatar(NdbModel):
-    label = ndb.StringProperty()
-    source = ndb.StringProperty()
-
-
-class ProfileInfoBankAccount(NdbModel):
-    bic = ndb.StringProperty()
-    country = ndb.StringProperty()
-    iban = ndb.StringProperty()
-    label = ndb.StringProperty()
-
-
-class ProfileInfoDigitalAssetAddress(NdbModel):
-    address = ndb.StringProperty()
-    currencysymbol = ndb.StringProperty()
-    expire = ndb.StringProperty()
-    label = ndb.StringProperty()
-    noexpiration = ndb.BooleanProperty()
-
-
-class ProfileInfoEmailAddress(NdbModel):
-    emailaddress = ndb.StringProperty()
-    label = ndb.StringProperty()
-
-
-class ProfileInfoFacebook(NdbModel):
-    id = ndb.StringProperty()
-    link = ndb.StringProperty()
-    name = ndb.StringProperty()
-    picture = ndb.StringProperty()
-
-
-class ProfileInfoGithubAccount(NdbModel):
-    avatar_url = ndb.StringProperty()
-    html_url = ndb.StringProperty()
-    id = ndb.StringProperty()
-    login = ndb.StringProperty()
-    name = ndb.StringProperty()
-
-
-class ProfileInfoOwnerOf(NdbModel):
-    emailaddresses = ndb.StructuredProperty(ProfileInfoEmailAddress, repeated=True)
-
-
-class ProfileInfoPhoneNumber(NdbModel):
-    label = ndb.StringProperty()
-    phonenumber = ndb.StringProperty()
-
-
-class ProfileInfoPublicKey(NdbModel):
-    label = ndb.StringProperty()
-    publickey = ndb.StringProperty()
-
-
-class ProfileInfo(NdbModel):
-    """
-    Args:
-        addresses(list[ProfileInfoAddress])
-        avatar(list[ProfileInfoAvatar])
-        bankaccounts(list[ProfileInfoBankAccount])
-        digitalwallet(list[ProfileInfoDigitalAssetAddress])
-        emailaddresses(list[ProfileInfoEmailAddress])
-        facebook(ProfileInfoFacebook)
-        firstname(unicode)
-        github(ProfileInfoGithubAccount)
-        lastname(unicode)
-        ownerof(ProfileInfoOwnerOf)
-        phonenumbers(list[ProfileInfoPhoneNumber])
-        publicKeys(list[ProfileInfoPublicKey])
-        username(unicode)
-        validatedemailaddresses(list[ProfileInfoEmailAddress])
-        validatedphonenumbers(list[ProfileInfoPhoneNumber])
-    """
-    NAMESPACE = NAMESPACE
-    addresses = ndb.StructuredProperty(ProfileInfoAddress, repeated=True)
-    avatar = ndb.StructuredProperty(ProfileInfoAvatar, repeated=True)
-    bankaccounts = ndb.StructuredProperty(ProfileInfoBankAccount, repeated=True)
-    digitalwallet = ndb.StructuredProperty(ProfileInfoDigitalAssetAddress, repeated=True)
-    emailaddresses = ndb.StructuredProperty(ProfileInfoEmailAddress, repeated=True)
-    facebook = ndb.StructuredProperty(ProfileInfoFacebook)
-    firstname = ndb.StringProperty()
-    github = ndb.StructuredProperty(ProfileInfoGithubAccount)
-    lastname = ndb.StringProperty()
-    ownerof = ndb.StructuredProperty(ProfileInfoOwnerOf)
-    phonenumbers = ndb.StructuredProperty(ProfileInfoPhoneNumber, repeated=True)
-    publicKeys = ndb.StructuredProperty(ProfileInfoPublicKey, repeated=True)
-    username = ndb.StringProperty()
-    validatedemailaddresses = ndb.StructuredProperty(ProfileInfoEmailAddress, repeated=True)
-    validatedphonenumbers = ndb.StructuredProperty(ProfileInfoPhoneNumber, repeated=True)
-
-
 class Profile(NdbModel):
     NAMESPACE = NAMESPACE
     organization_id = ndb.StringProperty()  # Only used in case user must be member of a suborganization to login
     app_email = ndb.StringProperty()  # Only use in case the deployed server is used for one app (and only one)
     language = ndb.StringProperty(indexed=False)
-    info = ndb.LocalStructuredProperty(ProfileInfo)  # type: ProfileInfo
+    information = ndb.JsonProperty()
 
     @property
     def username(self):
@@ -162,6 +62,10 @@ class Profile(NdbModel):
                 return self.info.validatedemailaddresses[0].emailaddress
             if self.info.emailaddresses:
                 return self.info.emailaddresses[0].emailaddress
+
+    @property
+    def info(self):
+        return self.information and itsyouonline.userview(self.information)
 
     @property
     def phone(self):
