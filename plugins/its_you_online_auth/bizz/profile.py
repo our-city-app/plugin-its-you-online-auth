@@ -15,12 +15,14 @@
 #
 # @@license_version:1.3@@
 import base64
+import httplib
 import logging
 import re
 
 from google.appengine.api import search
 from google.appengine.ext import ndb
 
+import requests
 from framework.bizz.job import run_job
 from framework.models.session import Session
 from framework.plugin_loader import get_plugins
@@ -50,7 +52,13 @@ def set_user_information(profile_key, session_key=None):
         session = _get_best_session(sessions)
     if session:
         client = get_itsyouonline_client_from_jwt(session.jwt)
-        data = client.users.GetUserInformation(convert_to_str(session.user_id)).json()
+        try:
+            data = client.users.GetUserInformation(convert_to_str(session.user_id)).json()
+        except requests.HTTPError as e:
+            logging.warn('%s: %s', e.response.status_code, e.response.content)
+            if e.response.status_code != httplib.FORBIDDEN:
+                raise e
+            return
         logging.info('Saving user information %s', data)
         store_user_information(data)
     else:
