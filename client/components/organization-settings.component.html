@@ -4,7 +4,7 @@
 </a>
 <mat-nav-list fxLayout="column" fxFlex="40" fxFlex.md="60" fxFlex.xs="100">
   <mat-list-item *ngFor="let organization of (organizations$ | async)"
-                [routerLink]="'/itsyouonlinesettings/organizations/' + organizationId(organization)">
+                 [routerLink]="'/itsyouonlinesettings/organizations/' + organizationId(organization)">
     <h4 matLine>{{ organization.name }}</h4>
     <p matLine>{{ organization.id }}</p>
     <button mat-icon-button (click)="deleteOrganization(organization)">

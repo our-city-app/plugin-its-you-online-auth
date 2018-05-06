@@ -13,7 +13,7 @@ import { MatChipInputEvent } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators/filter';
+import { filter } from 'rxjs/operators';
 import { LogService } from '../../../framework/client/core/index';
 import { DialogService } from '../../../framework/client/dialog/services/dialog.service';
 import { IAppState } from '../../../framework/client/ngrx/index';

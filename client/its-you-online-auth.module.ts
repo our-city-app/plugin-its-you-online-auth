@@ -57,13 +57,13 @@ export const ITSYOU_ONLINE_PROVIDERS: any[] = [
     MATERIAL_IMPORTS,
   ],
   declarations: [
-    ...ITS_YOU_ONLINE_COMPONENTS
+    ...ITS_YOU_ONLINE_COMPONENTS,
   ],
   providers: [
     ITSYOU_ONLINE_PROVIDERS,
   ],
   exports: [
-    ...ITS_YOU_ONLINE_COMPONENTS
+    ...ITS_YOU_ONLINE_COMPONENTS,
   ],
 })
 export class ItsYouOnlineAuthModule {

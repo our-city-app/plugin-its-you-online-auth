@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
 import { getIdentity } from '../../../framework/client/identity';
 import { filterNull, IAppState } from '../../../framework/client/ngrx';
 
@@ -27,7 +27,7 @@ export class ItsYouOnlineAuthComponent implements OnInit, OnDestroy {
       } else {
         let organization = identity.scopes.filter((s: string) => {
           return s.startsWith('memberof:') && s.endsWith(':admin');
-        })[0];
+        })[ 0 ];
         let route: string = '';
         if (organization) {
           route = '/itsyouonlinesettings/organizations/' + organization

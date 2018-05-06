@@ -15,19 +15,19 @@ export function organizationsReducer(state: IOrganizationsState = initialState,
       return {
         ...state,
         selectedOrganization: action.payload,
-        organizationStatus: action.type
+        organizationStatus: action.type,
       };
     case actions.ActionTypes.CREATE:
       return {
         ...state,
         selectedOrganization: '',
-        organizationStatus: action.type
+        organizationStatus: action.type,
       };
     case actions.ActionTypes.EDITED:
       return {
         ...state,
         organizations: updateItem(state.organizations, action.payload, 'id'),
-        organizationStatus: action.type
+        organizationStatus: action.type,
       };
     case actions.ActionTypes.GET_ORGANIZATION_COMPLETE:
       if (state.organizations.find(organization => organization.id === action.payload.id)) {
@@ -45,13 +45,13 @@ export function organizationsReducer(state: IOrganizationsState = initialState,
         ...state,
         organizations: [ ...state.organizations, action.payload ],
         selectedOrganization: state.selectedOrganization,
-        organizationStatus: action.type
+        organizationStatus: action.type,
       };
     case actions.ActionTypes.DELETED:
       return {
         ...state,
         organizations: removeItem(state.organizations, action.payload, 'id'),
-        organizationStatus: action.type
+        organizationStatus: action.type,
       };
     case actions.ActionTypes.ADD:
     case actions.ActionTypes.GET_ORGANIZATIONS:

@@ -9,5 +9,5 @@ export interface IOrganizationsState {
 export const initialState: IOrganizationsState = {
   organizations: [],
   selectedOrganization: '',
-  organizationStatus: ''
+  organizationStatus: '',
 };

@@ -11,9 +11,9 @@ export const ItsYouOnlineAuthRoutes: Route[] = [
       id: 'its_you_online_settings',
       meta: {
         title: 'iyo.itsyouonline_settings',
-      }
+      },
     },
-    component: ItsYouOnlineAuthComponent
+    component: ItsYouOnlineAuthComponent,
   },
   {
     path: 'itsyouonlinesettings/organizations/create',
@@ -21,9 +21,9 @@ export const ItsYouOnlineAuthRoutes: Route[] = [
     data: {
       meta: {
         title: 'iyo.add_organization',
-      }
+      },
     },
-    component: CreateOrganizationComponent
+    component: CreateOrganizationComponent,
   },
   {
     path: 'itsyouonlinesettings/organizations/:organization_id',
@@ -31,8 +31,8 @@ export const ItsYouOnlineAuthRoutes: Route[] = [
     data: {
       meta: {
         title: 'iyo.update_organization',
-      }
+      },
     },
-    component: ViewOrganizationComponent
-  }
+    component: ViewOrganizationComponent,
+  },
 ];

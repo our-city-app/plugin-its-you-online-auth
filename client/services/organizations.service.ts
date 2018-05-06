@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs/operators/map';
+import { map } from 'rxjs/operators';
 import { Organization } from '../index';
 import { ItsYouOnlineConfig } from './its-you-online-config';
 

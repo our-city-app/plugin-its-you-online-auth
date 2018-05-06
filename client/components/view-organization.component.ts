@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { map } from 'rxjs/operators/map';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 import * as organizationActions from '../actions/organizations.action';
 import { IOrganizationsState } from '../states';
 
@@ -11,7 +11,7 @@ import { IOrganizationsState } from '../states';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <selected-organization [isNewOrganization]="false"></selected-organization>`
+    <selected-organization [isNewOrganization]="false"></selected-organization>`,
 })
 export class ViewOrganizationComponent implements OnDestroy {
   actionsSubscription: Subscription;

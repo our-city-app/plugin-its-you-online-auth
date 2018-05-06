@@ -8,7 +8,7 @@ import { IOrganizationsState } from '../states/organizations.state';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <selected-organization [isNewOrganization]="true"></selected-organization>`
+    <selected-organization [isNewOrganization]="true"></selected-organization>`,
 })
 export class CreateOrganizationComponent implements OnInit {
   constructor(private store: Store<IOrganizationsState>) {

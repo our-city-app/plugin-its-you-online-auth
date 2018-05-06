@@ -12,7 +12,7 @@
     </mat-form-field>
     <h3>{{ 'iyo.modules' | translate }}</h3>
     <mat-chip-list #moduleChips>
-      <mat-chip *ngFor="let module of organization.modules" (remove)="showConfirmRemoveModule(module)">
+      <mat-chip *ngFor="let module of organization.modules" (removed)="showConfirmRemoveModule(module)">
         {{ module }}
         <mat-icon matChipRemove>cancel</mat-icon>
       </mat-chip>
@@ -28,7 +28,7 @@
     <h3>{{ 'iyo.auto_connected_services' | translate }}</h3>
     <mat-chip-list #acsChips>
       <mat-chip *ngFor="let acs of organization.auto_connected_services" color="primary"
-                (remove)="showConfirmRemoveACS(acs)">
+                (removed)="showConfirmRemoveACS(acs)">
         {{ acs }}
         <mat-icon matChipRemove>cancel</mat-icon>
       </mat-chip>

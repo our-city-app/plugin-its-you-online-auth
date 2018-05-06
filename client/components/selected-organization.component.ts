@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { AddOrganizationAction, EditOrganizationAction, RemoveOrganizationAction } from '../actions/index';
 import { Organization } from '../interfaces/organization.interfaces';
 import { getOrganizationStatus, getSelectedOrganization } from '../its-you-online-auth.state';
@@ -18,7 +18,7 @@ import { IOrganizationsState } from '../states/organizations.state';
       (onUpdate)="updateOrganization($event)"
       (onRemove)="removeOrganization($event)">
     </organization-detail>
-  `
+  `,
 })
 export class SelectedOrganizationComponent implements OnInit {
   organization$: Observable<Organization>;
