@@ -53,7 +53,8 @@ class Profile(NdbModel):
 
     @property
     def full_name(self):
-        return self.info and '%s %s' % (self.info.firstname, self.info.lastname)
+        if self.info and self.info.firstname:
+            return '%s %s' % (self.info.firstname, self.info.lastname)
 
     @property
     def email(self):
