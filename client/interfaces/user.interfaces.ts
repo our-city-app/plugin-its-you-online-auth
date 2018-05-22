@@ -2,7 +2,7 @@ export interface Profile {
   username: string;
   language: string;
   app_email: string | null;
-  info: ProfileInfo | null;
+  information: ProfileInfo | null;
 }
 
 export interface ProfileInfo {
