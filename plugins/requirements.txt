@@ -1,7 +1,7 @@
 requests==2.18.4
 requests-toolbelt==0.8.0
 ecdsa==0.13
-python-jose[pycrypto]==2.0.1
+python-jose[pycrypto]==3.0.0
 enum34==1.1.6
-python-dateutil==2.6.1
+python-dateutil==2.7.3
 transliterate
