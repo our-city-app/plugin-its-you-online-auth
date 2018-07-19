@@ -40,7 +40,7 @@ from plugins.its_you_online_auth.handlers.unauthenticated import SigninHandler, 
 from plugins.its_you_online_auth.libs.itsyouonline.http_client import HTTPClient
 from plugins.its_you_online_auth.models import Profile
 from plugins.its_you_online_auth.plugin_consts import Scopes, NAMESPACE
-from plugins.its_you_online_auth.rogerthat_callbacks import friend_register, friend_register_result
+from plugins.its_you_online_auth.rogerthat_callbacks import friend_register
 from plugins.its_you_online_auth.to.config import ItsYouOnlineConfiguration
 from plugins.rogerthat_api.rogerthat_api_plugin import RogerthatApiPlugin
 import requests_toolbelt.adapters.appengine
@@ -94,7 +94,6 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
         rogerthat_api_plugin = get_plugin('rogerthat_api')
         assert isinstance(rogerthat_api_plugin, RogerthatApiPlugin)
         rogerthat_api_plugin.subscribe('friend.register', friend_register)
-        rogerthat_api_plugin.subscribe('friend.register_result', friend_register_result)
         self.base_uri = u'https://%s/' % self.configuration.api_domain
         self.api_uri = u'%sapi' % self.base_uri
         self.oauth_base_url = '%sv1/oauth' % self.base_uri

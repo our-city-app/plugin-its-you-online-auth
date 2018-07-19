@@ -23,63 +23,26 @@ from google.appengine.ext.deferred import deferred
 
 from framework.plugin_loader import get_config
 from mcfw.rpc import serialize_complex_value
-from plugins.its_you_online_auth.bizz.authentication import decode_jwt_cached, get_itsyouonline_client
-from plugins.its_you_online_auth.bizz.profile import get_or_create_profile, set_user_information, store_user_information
+from plugins.its_you_online_auth.bizz.authentication import get_itsyouonline_client
+from plugins.its_you_online_auth.bizz.profile import get_or_create_profile, store_user_information
 from plugins.its_you_online_auth.bizz.settings import get_organization
 from plugins.its_you_online_auth.exceptions.organizations import OrganizationNotFoundException
-from plugins.its_you_online_auth.models import OauthState, Profile
+from plugins.its_you_online_auth.models import OauthState
 from plugins.its_you_online_auth.plugin_consts import NAMESPACE
 from plugins.its_you_online_auth.plugin_utils import get_users_organization
 from plugins.rogerthat_api.to.friends import RegistrationResultTO, ACCEPT_ID, DECLINE_ID, REGISTRATION_ORIGIN_OAUTH, \
-    RegistrationResultRolesTO, REGISTRATION_ORIGIN_QR, RegistrationUserInfoTO
+    RegistrationResultRolesTO, RegistrationUserInfoTO
 
 
 def friend_register(rt_settings, id_, service_identity, user_details, origin, data, **kwargs):
     try:
-        if origin == REGISTRATION_ORIGIN_QR:
-            return _friend_register_qr(rt_settings, id_, service_identity, user_details, origin, data, **kwargs)
-        elif origin == REGISTRATION_ORIGIN_OAUTH:
+        if origin == REGISTRATION_ORIGIN_OAUTH:
             return _friend_register_oauth(rt_settings, id_, service_identity, user_details, origin, data, **kwargs)
 
     except:
         logging.warn('friend_register failed', exc_info=True)
 
     return DECLINE_ID
-
-
-def friend_register_result(rt_settings, id_, service_identity, user_details, origin, **kwargs):
-    pass
-
-
-def _friend_register_qr(rt_settings, id_, service_identity, user_details, origin, data, **kwargs):
-    if not data:
-        raise Exception('data was null')
-
-    data = json.loads(data)
-    qr_type = data.get('qr_type', None)
-    qr_content = data.get('qr_content', None)
-    if not qr_type or not qr_content:
-        logging.warn('Could not find qr_type or qr_content, denying installation.')
-        return DECLINE_ID
-
-    if qr_type != 'jwt':
-        return DECLINE_ID
-
-    decoded_jwt = decode_jwt_cached(qr_content)
-    username = decoded_jwt.get('username', None)
-    if not username:
-        logging.warn('Could not find username in jwt denying installation.')
-        return DECLINE_ID
-
-    profile = get_or_create_profile(username, u'%s:%s' % (user_details[0]['email'], user_details[0]['app_id']))
-    profile.put()
-
-    result = RegistrationResultTO(result=ACCEPT_ID, auto_connected_services=[], roles=[],
-                                  user_details=RegistrationUserInfoTO(name=None, avatar=None))
-
-    if get_config(NAMESPACE).fetch_information:
-        deferred.defer(set_user_information, Profile.create_key(username))
-    return serialize_complex_value(result, RegistrationResultTO, False)
 
 
 def _friend_register_oauth(rt_settings, id_, service_identity, user_details, origin, data, **kwargs):
