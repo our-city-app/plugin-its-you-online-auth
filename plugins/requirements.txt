@@ -1,5 +1,5 @@
-requests==2.19.1
-requests-toolbelt==0.8.0
+requests==2.21.0
+requests-toolbelt==0.9.1
 ecdsa==0.13
 python-jose[pycrypto]==3.0.0
 enum34==1.1.6
