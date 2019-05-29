@@ -7,8 +7,8 @@ import { RouterModule } from '@angular/router';
 import { EffectsModule } from '@ngrx/effects';
 import { Store, StoreModule } from '@ngrx/store';
 import { MultilingualModule } from '../../framework/client/i18n/multilingual.module';
+import { AddRoutesAction } from '../../framework/client/nav/sidebar/actions';
 import { IAppState } from '../../framework/client/ngrx';
-import { AddRoutesAction } from '../../framework/client/sidebar/actions';
 import {
   CreateOrganizationComponent,
   ItsYouOnlineAuthComponent,
