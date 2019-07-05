@@ -119,7 +119,7 @@ MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAES5X8XrfKdx9gYayFITc89wad4usrk0n2
                           handler=RefreshUserInformationHandler)
 
     def get_client_routes(self):
-        return ['/itsyouonlinesettings<route:.*>']
+        return []
 
     def get_modules(self):
         yield Module('its_you_online_settings', [Scopes.ADMIN, Scopes.ORGANIZATION_ADMIN], 10000)
